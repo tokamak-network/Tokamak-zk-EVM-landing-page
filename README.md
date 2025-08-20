@@ -57,7 +57,7 @@ A modern, interactive landing page for Tokamak's zero-knowledge Ethereum Virtual
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/tokamak-network/Tokamak-zk-EVM-landing-page.git
 cd Tokamak-zk-EVM-landing-page
 ```
 
