@@ -1,34 +1,25 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 const Hero: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [particles, setParticles] = useState<Array<{id: number, x: number, y: number, size: number, opacity: number, speed: number, color: string}>>([]);
+
+
   const [interactiveElements, setInteractiveElements] = useState<Array<{id: number, x: number, y: number, scale: number, rotation: number}>>([]);
   const [clickEffects, setClickEffects] = useState<Array<{id: number, x: number, y: number, timestamp: number}>>([]);
+  
+
 
   useEffect(() => {
     setIsVisible(true);
     
-    // Initialize enhanced floating particles with colors
-    const colors = ['#3B82F6', '#1E40AF', '#60A5FA', '#2563EB', '#1D4ED8'];
+
+
+    // Initialize interactive floating elements (reduced and positioned away from center)
     const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
     const screenHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
     
-    const newParticles = Array.from({ length: 40 }, (_, i) => ({
-      id: i,
-      x: Math.random() * screenWidth,
-      y: Math.random() * screenHeight,
-      size: Math.random() * 6 + 2,
-      opacity: Math.random() * 0.7 + 0.2,
-      speed: Math.random() * 1 + 0.3,
-      color: colors[Math.floor(Math.random() * colors.length)]
-    }));
-    setParticles(newParticles);
-
-    // Initialize interactive floating elements (reduced and positioned away from center)
     const newElements = Array.from({ length: 5 }, (_, i) => ({
       id: i,
       x: Math.random() * screenWidth * 0.3 + (i % 2 === 0 ? 0 : screenWidth * 0.7),
@@ -38,9 +29,7 @@ const Hero: React.FC = () => {
     }));
     setInteractiveElements(newElements);
     
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
+
     
     const handleClick = (e: MouseEvent) => {
       const newEffect = {
@@ -59,17 +48,6 @@ const Hero: React.FC = () => {
     
     // Enhanced particle animation
     const animateParticles = () => {
-      setParticles(prev => prev.map(particle => ({
-        ...particle,
-        y: particle.y - particle.speed,
-        x: particle.x + Math.sin(particle.y * 0.005) * 1,
-        ...(particle.y < -10 && {
-          y: window.innerHeight + 10,
-          x: Math.random() * window.innerWidth,
-          color: colors[Math.floor(Math.random() * colors.length)]
-        })
-      })));
-
       setInteractiveElements(prev => prev.map(element => ({
         ...element,
         rotation: element.rotation + 0.5,
@@ -82,12 +60,10 @@ const Hero: React.FC = () => {
       })));
     };
     
-    const particleInterval = setInterval(animateParticles, 30);
-    window.addEventListener('mousemove', handleMouseMove);
+    const particleInterval = setInterval(animateParticles, 60);
     window.addEventListener('click', handleClick);
     
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('click', handleClick);
       clearInterval(particleInterval);
     };
@@ -100,23 +76,7 @@ const Hero: React.FC = () => {
     >
       {/* Enhanced Interactive Background */}
       <div className="absolute inset-0 z-0 opacity-80">
-        {/* Enhanced Floating Particles */}
-        {particles.map(particle => (
-          <div
-            key={particle.id}
-            className="absolute rounded-full transition-all duration-300 hover:scale-150"
-            style={{
-              left: particle.x,
-              top: particle.y,
-              width: particle.size,
-              height: particle.size,
-              opacity: particle.opacity,
-              background: particle.color,
-              boxShadow: `0 0 ${particle.size * 2}px ${particle.color}40`,
-              animation: `twinkle ${2 + Math.random() * 3}s ease-in-out infinite`
-            }}
-          />
-        ))}
+
 
         {/* Interactive Floating Elements */}
         {interactiveElements.map(element => (
@@ -156,14 +116,7 @@ const Hero: React.FC = () => {
         <div className="absolute top-1/4 right-1/3 w-12 h-12 border border-blue-200/50 rotate-45 animate-spin-slow delay-500"></div>
         <div className="absolute bottom-1/4 left-1/3 w-14 h-14 bg-gradient-to-r from-blue-100/30 to-blue-200/20 rounded-full animate-float"></div>
         
-        {/* Enhanced Mouse Follower */}
-        <div 
-          className="absolute w-80 h-80 bg-gradient-to-br from-blue-200/20 to-blue-300/10 rounded-full blur-3xl transition-all duration-500 ease-out pointer-events-none"
-          style={{
-            left: mousePosition.x - 160,
-            top: mousePosition.y - 160,
-          }}
-        />
+
         
         {/* Dynamic Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.08)_1px,transparent_1px)] bg-[size:60px_60px] [mask:radial-gradient(ellipse_100%_70%_at_50%_0%,#000_40%,transparent_100%)] animate-pulse" />
