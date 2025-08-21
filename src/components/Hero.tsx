@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
+import { FileText, Lock, ArrowRight } from "lucide-react";
 
 const Hero: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -72,7 +73,7 @@ const Hero: React.FC = () => {
   return (
     <section 
       id="hero" 
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white pt-24"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white pt-38"
     >
       {/* Enhanced Interactive Background */}
       <div className="absolute inset-0 z-0 opacity-80">
@@ -179,6 +180,67 @@ const Hero: React.FC = () => {
                 <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
             </button>
+          </div>
+
+          {/* Transaction to ZK Proof Conversion Visual */}
+          <div className={`mt-16 mb-16 transition-all duration-1000 delay-800 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <div className="max-w-3xl mx-auto p-4 sm:p-6 md:p-8 bg-white/80 backdrop-blur-md rounded-2xl border border-gray-200/50 shadow-lg relative z-50">
+              <div className="text-center mb-4 sm:mb-6">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  You Control The Conversion
+                </h3>
+                <p className="text-gray-600 text-xs sm:text-sm">
+                  Transform any Ethereum transaction into a zero-knowledge proof on your own machine
+                </p>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row items-center justify-center sm:space-x-6 space-y-6 sm:space-y-0">
+                {/* Transaction */}
+                <div className="text-center">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-xl flex items-center justify-center mb-3 mx-auto shadow-sm">
+                    <FileText size={28} className="sm:size-9 text-gray-600" />
+                  </div>
+                  <span className="text-xs sm:text-sm font-medium text-gray-700">Transaction</span>
+                  <div className="text-xs text-gray-500 mt-1">Visible on-chain</div>
+                </div>
+                
+                {/* Arrow - Mobile: Vertical, Desktop: Horizontal */}
+                <div className="sm:flex-1 sm:h-px sm:bg-gradient-to-r from-blue-300 to-blue-500 relative w-px h-12 bg-gradient-to-b sm:w-auto sm:h-px">
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 sm:w-8 sm:h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <ArrowRight size={12} className="sm:size-4 text-white rotate-90 sm:rotate-0" />
+                  </div>
+                  <div className="hidden sm:block absolute sm:-top-12 sm:left-1/2 sm:transform sm:-translate-x-1/2 text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full whitespace-nowrap">
+                    Local Proof
+                  </div>
+                </div>
+                
+                {/* ZK Proof */}
+                <div className="text-center">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-blue-600 rounded-xl flex items-center justify-center mb-3 mx-auto shadow-md">
+                    <Lock size={28} className="sm:size-9 text-white" />
+                  </div>
+                  <span className="text-xs sm:text-sm font-medium text-gray-700">ZK Proof</span>
+                  <div className="text-xs text-gray-500 mt-1">Privacy preserved</div>
+                </div>
+              </div>
+              
+              <div className="mt-4 sm:mt-6 text-center">
+                <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4 text-xs text-gray-500">
+                  <div className="flex items-center">
+                    <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                    No third parties
+                  </div>
+                  <div className="flex items-center">
+                    <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
+                    Runs on your hardware
+                  </div>
+                  <div className="flex items-center">
+                    <span className="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
+                    Verify anywhere
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

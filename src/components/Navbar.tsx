@@ -45,7 +45,7 @@ const Navigation = () => {
 
   const navItems = [
     { id: "who-section", label: "Who" },
-    { id: "three-ways-section", label: "How" },
+    { id: "two-ways-section", label: "How" },
     { id: "why-different-section", label: "Why" },
   ];
 
@@ -65,7 +65,7 @@ const Navigation = () => {
                   alt="Tokamak Network"
                   width={200}
                   height={17}
-                  className="h-6 w-auto filter drop-shadow-sm"
+                  className="h-4 md:h-6 w-auto filter drop-shadow-sm"
                 />
               </div>
             </div>
@@ -89,7 +89,7 @@ const Navigation = () => {
             {/* CTA Button - Right Side */}
             <div className="hidden md:block">
               <button
-                onClick={() => scrollToSection("quickstart-section")}
+                onClick={() => scrollToSection("two-ways-section")}
                 className="relative inline-flex items-center px-7 py-3 text-sm font-semibold rounded-full text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 overflow-hidden group"
               >
                 <span className="relative z-10">Get Started</span>
@@ -144,7 +144,7 @@ const Navigation = () => {
             ))}
             <div className="mt-6 px-4">
               <button
-                onClick={() => scrollToSection("quickstart-section")}
+                onClick={() => scrollToSection("two-ways-section")}
                 className="w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 Get Started

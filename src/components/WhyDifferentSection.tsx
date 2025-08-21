@@ -48,15 +48,15 @@ const WhyDifferentSection: React.FC = () => {
     {
       iconType: "usability",
       title: "Usability First",
-      description: "GUI Playground + CLI; \"paste tx hash → proof\" flow.",
-      highlight: "paste → proof",
+      description: "Simple GUI Playground and powerful CLI tools. Just paste any Ethereum transaction hash, click 'Prove', and get a complete zero-knowledge proof with verification.",
+      highlight: "paste → prove → verify",
       color: "from-blue-600 to-blue-800"
     },
     {
       iconType: "research",
       title: "Research-driven Design",
-      description: "Accepted to the Ethereum Foundation Academic Grants (2023); ongoing papers and code.",
-      highlight: "EF Grant 2023",
+      description: "Ongoing research papers and open-source code development with transparent design principles.",
+      highlight: "Open Research",
       color: "from-blue-700 to-blue-900"
     }
   ];

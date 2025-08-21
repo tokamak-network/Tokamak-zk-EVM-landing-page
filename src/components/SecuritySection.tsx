@@ -150,13 +150,9 @@ const SecuritySection: React.FC = () => {
               Every component from circuit design to consensus protocols is publicly auditable.
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                <div className="text-blue-400 font-bold text-sm mb-1">Ethereum Foundation</div>
-                <div className="text-white/80 text-sm">Academic Grant Recipient</div>
-              </div>
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                <div className="text-blue-400 font-bold text-sm mb-1">Peer Reviewed</div>
+                <div className="text-blue-400 font-bold text-sm mb-1">Open Research</div>
                 <div className="text-white/80 text-sm">Theory & Implementation</div>
               </div>
               <div className="p-4 rounded-xl bg-white/5 border border-white/10">

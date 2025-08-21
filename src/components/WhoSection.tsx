@@ -60,7 +60,7 @@ const WhoSection: React.FC = () => {
     },
     {
       title: "Researchers & Auditors",
-      description: "Inspect circuits, reproduce proofs, and stress-test our lightweight SNARK and consensus approach. Backed by peer-reviewed theory and an EF academic grant.",
+      description: "Inspect circuits, reproduce proofs, and stress-test our lightweight SNARK and consensus approach.",
       iconType: "research",
       color: "from-blue-800 to-blue-900"
     }

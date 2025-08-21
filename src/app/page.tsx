@@ -3,10 +3,6 @@ import Hero from "@/components/Hero";
 import WhoSection from "@/components/WhoSection";
 import ThreeWaysSection from "@/components/ThreeWaysSection";
 import WhyDifferentSection from "@/components/WhyDifferentSection";
-import HowItWorksSection from "@/components/HowItWorksSection";
-
-import QuickStartSection from "@/components/QuickStartSection";
-
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -18,8 +14,6 @@ export default function Home() {
         <WhoSection />
         <ThreeWaysSection />
         <WhyDifferentSection />
-        <HowItWorksSection />
-        <QuickStartSection />
       </main>
       <Footer />
     </div>

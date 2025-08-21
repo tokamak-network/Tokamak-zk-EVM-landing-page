@@ -17,7 +17,7 @@ const ThreeWaysSection: React.FC = () => {
       { threshold: 0.1 }
     );
 
-    const section = document.getElementById("three-ways-section");
+    const section = document.getElementById("two-ways-section");
     if (section) observer.observe(section);
 
     return () => observer.disconnect();
@@ -39,27 +39,6 @@ const ThreeWaysSection: React.FC = () => {
   };
 
   const ways = [
-    {
-      title: "ZK Core",
-      subtitle: "(the protocol)",
-      iconType: "core",
-      color: "blue",
-      features: [
-        {
-          title: "Lightweight Circuits",
-          description: "Transaction-specific circuits rather than one huge \"EVM-in-a-circuit\". Faster proving, laptop-friendly."
-        },
-        {
-          title: "Pre/Post-SNARK Consensus",
-          description: "MPC + threshold to minimize trust when setting parameters and agreeing on synthesized outputs."
-        },
-        {
-          title: "Formal Analysis",
-          description: "Formally analyzed frontend/back-end theory with public artifacts."
-        }
-      ],
-      benefit: "Proofs are practical on normal hardware and the setup avoids single points of failure."
-    },
     {
       title: "Playground",
       subtitle: "(no-code GUI)",
@@ -99,12 +78,12 @@ const ThreeWaysSection: React.FC = () => {
 
 
   return (
-    <section id="three-ways-section" className="py-24 bg-white">
+    <section id="two-ways-section" className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className={`text-center mb-16 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 font-heading">
-            The Three Ways to Use It
+            Two Ways to Use It
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Choose your entry point into zero-knowledge privacy
