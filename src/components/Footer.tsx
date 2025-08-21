@@ -78,7 +78,7 @@ const Footer: React.FC = () => {
               </li>
               <li>
                 <a 
-                  href="#three-ways-section" 
+                  href="#two-ways-section" 
                   className="text-gray-300 hover:text-white transition-colors duration-300 hover:translate-x-1 transform inline-block"
                 >
                   How to Use
@@ -123,7 +123,7 @@ const Footer: React.FC = () => {
               </li>
               <li>
                 <a 
-                  href="#quickstart-section" 
+                  href="#two-ways-section" 
                   className="text-gray-300 hover:text-white transition-colors duration-300 hover:translate-x-1 transform inline-block"
                 >
                   Get Started
