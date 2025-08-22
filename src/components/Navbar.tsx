@@ -59,7 +59,10 @@ const Navigation = () => {
           <div className={`flex items-center justify-between ${isScrolled ? "h-14 sm:h-16 px-4 sm:px-6 rounded-full bg-white/90 backdrop-blur-xl shadow-lg ring-1 ring-black/5 mt-3" : "h-20 mt-0"}`}>
             {/* Logo Section - Left Side */}
             <div className="flex-shrink-0 group">
-              <div className="transform hover:scale-105 transition-all duration-300 ease-out">
+              <button
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="transform hover:scale-105 transition-all duration-300 ease-out cursor-pointer"
+              >
                 <Image
                   src={LogoImage}
                   alt="Tokamak Network"
@@ -67,7 +70,7 @@ const Navigation = () => {
                   height={17}
                   className="h-4 md:h-6 w-auto filter drop-shadow-sm"
                 />
-              </div>
+              </button>
             </div>
 
             {/* Desktop Navigation Links - Center */}
@@ -88,8 +91,10 @@ const Navigation = () => {
 
             {/* CTA Button - Right Side */}
             <div className="hidden md:block">
-              <button
-                onClick={() => scrollToSection("two-ways-section")}
+              <a
+                href="https://github.com/tokamak-network/Tokamak-zk-EVM"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="relative inline-flex items-center px-7 py-3 text-sm font-semibold rounded-full text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 overflow-hidden group"
               >
                 <span className="relative z-10">Get Started</span>
@@ -97,7 +102,7 @@ const Navigation = () => {
                   <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
                 <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </button>
+              </a>
             </div>
 
             {/* Mobile Menu Button */}
@@ -143,15 +148,17 @@ const Navigation = () => {
               </button>
             ))}
             <div className="mt-6 px-4">
-              <button
-                onClick={() => scrollToSection("two-ways-section")}
+              <a
+                href="https://github.com/tokamak-network/Tokamak-zk-EVM"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 Get Started
                 <svg className="ml-2 -mr-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
-              </button>
+              </a>
             </div>
           </div>
         </div>

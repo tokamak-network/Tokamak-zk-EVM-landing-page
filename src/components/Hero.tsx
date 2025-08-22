@@ -160,7 +160,12 @@ const Hero: React.FC = () => {
           {/* Dual CTA Buttons */}
           <div className={`flex flex-col sm:flex-row gap-4 justify-center items-center transition-all duration-1000 delay-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             {/* Primary CTA - Playground */}
-            <button className="group relative inline-flex items-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl relative z-50">
+            <a
+              href="https://github.com/tokamak-network/Tokamak-zk-EVM-playgrounds"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative inline-flex items-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl relative z-50"
+            >
               <svg className="mr-3 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
@@ -168,10 +173,15 @@ const Hero: React.FC = () => {
               <svg className="ml-2 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
-            </button>
+            </a>
             
             {/* Secondary CTA - CLI */}
-            <button className="group relative inline-flex items-center px-8 py-4 text-lg font-semibold text-blue-700 bg-white border-2 border-blue-600 rounded-xl hover:bg-blue-50 hover:border-blue-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl relative z-50">
+            <a
+              href="https://github.com/tokamak-network/Tokamak-zk-EVM"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative inline-flex items-center px-8 py-4 text-lg font-semibold text-blue-700 bg-white border-2 border-blue-600 rounded-xl hover:bg-blue-50 hover:border-blue-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl relative z-50"
+            >
               <svg className="mr-3 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -179,7 +189,7 @@ const Hero: React.FC = () => {
               <svg className="ml-2 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
-            </button>
+            </a>
           </div>
 
           {/* Transaction to ZK Proof Conversion Visual */}

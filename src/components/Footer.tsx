@@ -123,7 +123,9 @@ const Footer: React.FC = () => {
               </li>
               <li>
                 <a 
-                  href="#two-ways-section" 
+                  href="https://github.com/tokamak-network/Tokamak-zk-EVM"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-gray-300 hover:text-white transition-colors duration-300 hover:translate-x-1 transform inline-block"
                 >
                   Get Started
