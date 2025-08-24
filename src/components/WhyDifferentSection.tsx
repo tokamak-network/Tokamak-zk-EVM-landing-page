@@ -41,8 +41,8 @@ const WhyDifferentSection: React.FC = () => {
     {
       iconType: "performance",
       title: "Laptop-ready Performance",
-      description: "In Q2 2025, we generated a proof for 1–8 Ethereum transactions in about ~7 minutes on a 32 GB RAM box with a 14-core M4 CPU or RTX 3070 Ti, no exotic rigs.",
-      highlight: "~7 minutes",
+      description: "Our powerful ZKP backend allows you to generate a batch proof for multiple transactions in few minutes on your home laptop.",
+      highlight: "home laptop",
       color: "from-blue-500 to-blue-700"
     },
     {
