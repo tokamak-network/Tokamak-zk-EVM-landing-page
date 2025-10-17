@@ -98,13 +98,13 @@ const RoadmapSection: React.FC = () => {
 
         {/* Toggle Buttons */}
         <div className={`flex justify-center mb-12 transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <div className="bg-gray-100 p-2 rounded-2xl flex">
+          <div className="bg-gray-100 p-2 flex">
                           <button
                 onClick={() => setActiveView('today')}
-                className={`px-8 py-4 rounded-xl font-semibold transition-all duration-300 ${
+                className={`px-8 py-4 font-semibold transition-all duration-300 ${
                   activeView === 'today'
                     ? 'bg-gradient-to-r from-blue-500 to-blue-700 text-white shadow-lg scale-105'
-                    : 'text-gray-600 hover:text-gray-800'
+                    : 'text-gray-900 hover:text-gray-900 hover:bg-gray-200'
                 }`}
             >
               <span className="mr-2">✅</span>
@@ -112,10 +112,10 @@ const RoadmapSection: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveView('next')}
-              className={`px-8 py-4 rounded-xl font-semibold transition-all duration-300 ${
+              className={`px-8 py-4 font-semibold transition-all duration-300 ${
                 activeView === 'next'
                   ? 'bg-gradient-to-r from-blue-500 to-blue-700 text-white shadow-lg scale-105'
-                  : 'text-gray-600 hover:text-gray-800'
+                  : 'text-gray-900 hover:text-gray-900 hover:bg-gray-200'
               }`}
             >
               <span className="mr-2">🚀</span>
@@ -133,7 +133,7 @@ const RoadmapSection: React.FC = () => {
             return (
               <div key={view} className="max-w-5xl mx-auto">
                 {/* Header */}
-                <div className={`text-center mb-12 p-8 rounded-3xl ${data.bgColor}/50 border border-gray-200/50`}>
+                <div className={`text-center mb-12 p-8 ${data.bgColor}/50 border border-gray-200/50`}>
                   <h3 className={`text-3xl font-bold mb-4 bg-gradient-to-r ${data.color} bg-clip-text text-transparent`}>
                     {data.title}
                   </h3>
@@ -145,12 +145,12 @@ const RoadmapSection: React.FC = () => {
                   {data.items.map((item, index) => (
                     <div
                       key={index}
-                      className={`group p-8 rounded-3xl bg-white border border-gray-200/50 hover:border-gray-300/50 transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-lg`}
+                      className={`group p-8 bg-white border border-gray-200/50 hover:border-gray-300/50 transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-lg`}
                       style={{ animationDelay: `${index * 200}ms` }}
                     >
                       <div className="flex items-start space-x-6">
                         {/* Icon */}
-                        <div className={`flex-shrink-0 w-16 h-16 rounded-2xl bg-gradient-to-r ${data.color} flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                        <div className={`flex-shrink-0 w-16 h-16 bg-gradient-to-r ${data.color} flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                           {renderIcon(item.iconType)}
                         </div>
 
@@ -160,7 +160,7 @@ const RoadmapSection: React.FC = () => {
                             <h4 className={`text-xl font-bold text-gray-900 group-hover:bg-gradient-to-r group-hover:${data.color} group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300`}>
                               {item.title}
                             </h4>
-                            <span className={`px-4 py-2 rounded-full bg-gradient-to-r ${data.color} text-white text-sm font-semibold shadow-sm`}>
+                            <span className={`px-4 py-2 bg-gradient-to-r ${data.color} text-white text-sm font-semibold shadow-sm`}>
                               {item.status}
                             </span>
                           </div>
@@ -176,7 +176,7 @@ const RoadmapSection: React.FC = () => {
                 {/* Bottom CTA */}
                 {view === 'today' && (
                   <div className="text-center mt-12">
-                    <button className="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold rounded-2xl hover:from-blue-600 hover:to-blue-800 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+                    <button className="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold hover:from-blue-600 hover:to-blue-800 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
                       <span>Try It Now</span>
                       <svg className="ml-2 w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -187,8 +187,8 @@ const RoadmapSection: React.FC = () => {
 
                 {view === 'next' && (
                   <div className="text-center mt-12">
-                    <div className="inline-flex items-center px-6 py-3 rounded-full bg-blue-50 border border-blue-200/50 text-blue-700">
-                      <span className="w-2 h-2 bg-blue-500 rounded-full mr-3 animate-pulse"></span>
+                    <div className="inline-flex items-center px-6 py-3 bg-blue-50 border border-blue-200/50 text-blue-700">
+                      <span className="w-2 h-2 bg-blue-500 mr-3 animate-pulse"></span>
                       <span className="text-sm font-medium">Follow our progress on GitHub</span>
                     </div>
                   </div>

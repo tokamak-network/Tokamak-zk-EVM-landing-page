@@ -84,8 +84,8 @@ const SecuritySection: React.FC = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className={`text-center mb-20 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-6">
-            <span className="w-2 h-2 bg-blue-400 rounded-full mr-3 animate-pulse"></span>
+          <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-md border border-white/20 mb-6">
+            <span className="w-2 h-2 bg-blue-400 mr-3 animate-pulse"></span>
             <span className="text-white/80 text-sm font-medium">Trust & Safety</span>
           </div>
           
@@ -102,11 +102,11 @@ const SecuritySection: React.FC = () => {
           {securityFeatures.map((feature, index) => (
             <div
               key={index}
-              className={`group relative p-8 rounded-3xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/20 transform hover:scale-105 hover:-translate-y-2 transition-all duration-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+              className={`group relative p-8 bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/20 transform hover:scale-105 hover:-translate-y-2 transition-all duration-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
               style={{ animationDelay: `${index * 200}ms` }}
             >
               {/* Icon */}
-              <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+              <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
                 {renderIcon(feature.iconType)}
               </div>
 
@@ -120,23 +120,23 @@ const SecuritySection: React.FC = () => {
               </p>
 
               {/* Details */}
-              <div className={`p-4 rounded-xl bg-gradient-to-r ${feature.color} bg-opacity-10 border border-white/10`}>
+              <div className={`p-4 bg-gradient-to-r ${feature.color} bg-opacity-10 border border-white/10`}>
                 <p className="text-white/80 text-sm">
                   {feature.details}
                 </p>
               </div>
 
               {/* Hover Glow */}
-              <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} opacity-0 group-hover:opacity-10 rounded-3xl transition-opacity duration-300`}></div>
+              <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
             </div>
           ))}
         </div>
 
         {/* Security Statement */}
         <div className={`text-center transition-all duration-1000 delay-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <div className="max-w-4xl mx-auto p-8 rounded-3xl bg-white/5 backdrop-blur-md border border-white/10">
+          <div className="max-w-4xl mx-auto p-8 bg-white/5 backdrop-blur-md border border-white/10">
             <div className="flex items-center justify-center mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-700 flex items-center justify-center text-white shadow-lg">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-700 flex items-center justify-center text-white shadow-lg">
                 <Shield size={24} />
               </div>
             </div>
@@ -151,11 +151,11 @@ const SecuritySection: React.FC = () => {
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="p-4 bg-white/5 border border-white/10">
                 <div className="text-blue-400 font-bold text-sm mb-1">Open Research</div>
                 <div className="text-white/80 text-sm">Theory & Implementation</div>
               </div>
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="p-4 bg-white/5 border border-white/10">
                 <div className="text-blue-400 font-bold text-sm mb-1">Open Source</div>
                 <div className="text-white/80 text-sm">Full Code Transparency</div>
               </div>
@@ -173,7 +173,7 @@ const SecuritySection: React.FC = () => {
               "Open source code",
               "Peer reviewed theory"
             ].map((item, index) => (
-              <div key={index} className="flex items-center justify-center p-4 rounded-xl bg-white/5 border border-white/10">
+              <div key={index} className="flex items-center justify-center p-4 bg-white/5 border border-white/10">
                 <span className="text-blue-400 mr-3">✓</span>
                 <span className="text-white/80 text-sm">{item}</span>
               </div>

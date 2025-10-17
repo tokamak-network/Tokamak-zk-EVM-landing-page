@@ -78,14 +78,14 @@ const ThreeWaysSection: React.FC = () => {
 
 
   return (
-    <section id="two-ways-section" className="py-24 bg-white">
+    <section id="two-ways-section" className="py-24 bg-gradient-to-b from-[#1a2347] to-[#0a1930]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className={`text-center mb-16 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 font-heading">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6" style={{ fontFamily: '"Jersey 10", "Press Start 2P", monospace' }}>
             Two Ways to Use It
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-white/80 max-w-3xl mx-auto" style={{ fontFamily: '"IBM Plex Mono"' }}>
             Choose your entry point into zero-knowledge privacy
           </p>
         </div>
@@ -97,13 +97,14 @@ const ThreeWaysSection: React.FC = () => {
               <button
                 key={index}
                 onClick={() => setActiveTab(index)}
-                className={`mx-2 mb-4 px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center ${
+                className={`mx-2 mb-4 px-6 py-3 font-semibold transition-all duration-300 flex items-center ${
                   activeTab === index
-                    ? 'bg-blue-600 text-white shadow-lg scale-105'
-                    : 'bg-white text-gray-700 border border-gray-200 hover:border-blue-200 hover:scale-105'
+                    ? 'bg-gradient-to-r from-[#4fc3f7] to-[#29b6f6] text-white shadow-lg scale-105'
+                    : 'bg-gradient-to-b from-[#0a1930] to-[#1a2347] text-white border border-[#4fc3f7] hover:border-[#29b6f6] hover:scale-105'
                 }`}
+                style={{ fontFamily: '"IBM Plex Mono"' }}
               >
-                <div className={`w-5 h-5 mr-2 ${activeTab === index ? 'text-white' : 'text-gray-500'}`}>
+                <div className={`w-5 h-5 mr-2 ${activeTab === index ? 'text-white' : 'text-white/80'}`}>
                   {renderIcon(way.iconType)}
                 </div>
                 {way.title}
@@ -119,27 +120,27 @@ const ThreeWaysSection: React.FC = () => {
             
             return (
               <div key={index} className="max-w-5xl mx-auto">
-                <div className="p-8 rounded-2xl bg-white border border-gray-200/50 shadow-sm">
+                <div className="p-8 bg-gradient-to-b from-[#0a1930] to-[#1a2347] border border-[#4fc3f7] shadow-lg">
                   {/* Tab Header */}
                   <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-blue-600 text-white mb-4 shadow-sm">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-[#4fc3f7] to-[#29b6f6] text-white mb-4 shadow-sm">
                       {way.iconType === "core" && <Settings size={32} className="text-white" />}
                       {way.iconType === "playground" && <Monitor size={32} className="text-white" />}
                       {way.iconType === "cli" && <Terminal size={32} className="text-white" />}
                     </div>
-                    <h3 className="text-3xl font-bold text-gray-900 mb-2">
-                      {way.title} <span className="text-gray-500 font-normal">{way.subtitle}</span>
+                    <h3 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: '"IBM Plex Mono"' }}>
+                      {way.title} <span className="text-white/60 font-normal">{way.subtitle}</span>
                     </h3>
                   </div>
 
                   {/* Features Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                     {way.features.map((feature, featureIndex) => (
-                      <div key={featureIndex} className="p-6 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-300">
-                        <h4 className="text-lg font-bold text-gray-900 mb-3">
+                      <div key={featureIndex} className="p-6 bg-[#0a1930]/50 border border-[#4fc3f7]/30 hover:border-[#4fc3f7] transition-colors duration-300">
+                        <h4 className="text-lg font-bold text-white mb-3" style={{ fontFamily: '"IBM Plex Mono"' }}>
                           {feature.title}
                         </h4>
-                        <p className="text-gray-600 text-sm leading-relaxed">
+                        <p className="text-white/80 text-sm leading-relaxed" style={{ fontFamily: '"IBM Plex Mono"' }}>
                           {feature.description}
                         </p>
                       </div>
@@ -147,9 +148,9 @@ const ThreeWaysSection: React.FC = () => {
                   </div>
 
                   {/* Benefit Callout */}
-                  <div className="p-6 bg-blue-50 rounded-xl border border-blue-200/50 text-center">
-                    <h4 className="text-lg font-bold mb-2 text-blue-900">Why it matters for users:</h4>
-                    <p className="text-blue-700">{way.benefit}</p>
+                  <div className="p-6 bg-[#4fc3f7]/10 border border-[#4fc3f7]/50 text-center">
+                    <h4 className="text-lg font-bold mb-2 text-[#4fc3f7]" style={{ fontFamily: '"IBM Plex Mono"' }}>Why it matters for users:</h4>
+                    <p className="text-white/90" style={{ fontFamily: '"IBM Plex Mono"' }}>{way.benefit}</p>
                   </div>
                 </div>
               </div>

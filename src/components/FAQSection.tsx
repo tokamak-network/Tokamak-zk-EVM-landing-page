@@ -74,16 +74,16 @@ const FAQSection: React.FC = () => {
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className={`group rounded-3xl bg-white border border-gray-200/50 hover:border-gray-300/50 shadow-sm hover:shadow-lg transition-all duration-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+              className={`group bg-white border border-gray-200/50 hover:border-gray-300/50 shadow-sm hover:shadow-lg transition-all duration-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
               style={{ animationDelay: `${index * 200}ms` }}
             >
               {/* Question */}
               <button
                 onClick={() => setOpenFAQ(openFAQ === index ? null : index)}
-                className="w-full p-8 text-left flex items-center justify-between hover:bg-gray-50/50 rounded-3xl transition-all duration-300"
+                className="w-full p-8 text-left flex items-center justify-between hover:bg-gray-50/50 transition-all duration-300"
               >
                 <div className="flex items-center space-x-4">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${
+                  <div className={`w-12 h-12 bg-gradient-to-r ${
                     openFAQ === index ? 'from-blue-500 to-blue-700' : 'from-gray-200 to-gray-300'
                   } flex items-center justify-center transition-all duration-300 ${
                     openFAQ === index ? 'text-white scale-110' : 'text-gray-600'
@@ -99,7 +99,7 @@ const FAQSection: React.FC = () => {
                   </h3>
                 </div>
                 
-                <div className={`w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center transition-all duration-300 ${
+                <div className={`w-8 h-8 bg-gray-100 flex items-center justify-center transition-all duration-300 ${
                   openFAQ === index ? 'rotate-180 bg-blue-100' : 'group-hover:bg-gray-200'
                 }`}>
                   <svg 
@@ -133,7 +133,7 @@ const FAQSection: React.FC = () => {
 
         {/* Bottom CTA */}
         <div className={`text-center mt-16 transition-all duration-1000 delay-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <div className="p-8 bg-white rounded-3xl border border-gray-200/50 shadow-sm">
+          <div className="p-8 bg-white border border-gray-200/50 shadow-sm">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">
               Still have questions?
             </h3>
@@ -141,14 +141,14 @@ const FAQSection: React.FC = () => {
               Join our community or check out the documentation for more details.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="group inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-blue-800 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+              <button className="group inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold hover:from-blue-600 hover:to-blue-800 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
                 <span>Join Discord</span>
                 <svg className="ml-2 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
               </button>
               
-              <button className="group inline-flex items-center px-6 py-3 text-blue-700 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 hover:border-blue-300 transform hover:scale-105 transition-all duration-300">
+              <button className="group inline-flex items-center px-6 py-3 text-white bg-blue-700 border-2 border-blue-700 hover:bg-blue-800 hover:border-blue-800 transform hover:scale-105 transition-all duration-300">
                 <span>Read Docs</span>
                 <svg className="ml-2 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />

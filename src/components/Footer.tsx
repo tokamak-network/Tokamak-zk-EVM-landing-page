@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
   const LogoImage = "/assets/header/logo.svg";
 
   return (
-    <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+    <footer className="bg-gradient-to-b from-[#1a2347] to-[#0a1930] text-white border-t-2 border-[#4fc3f7]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo and Description */}

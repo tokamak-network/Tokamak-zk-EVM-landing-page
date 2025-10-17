@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 
 // Using public assets - no imports needed for SVGs in public folder
@@ -8,31 +8,21 @@ const LogoImage = "/assets/header/logo.svg";
 
 const AnimatedBanner = () => {
   return (
-    <div className="relative h-1 bg-gradient-to-r from-blue-500 via-blue-700 to-blue-400 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent w-1/3 animate-pulse"></div>
-    </div>
+    <div className="w-full h-2 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 via-indigo-500 to-purple-500"></div>
   );
 };
 
 const Navigation = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   const scrollToSection = (sectionId: string) => {
+    // Check if mobile screen (1359px and below)
+    const isMobile = window.innerWidth <= 1359;
+
     const element = document.getElementById(sectionId);
     if (element) {
       const elementPosition =
         element.getBoundingClientRect().top + window.pageYOffset;
-      const navigationHeight = 80;
+      // Calculate navigation height offset
+      const navigationHeight = isMobile ? 62 : 80; // Mobile navigation height: ~62px, Desktop: 80px
       const targetPosition = elementPosition - navigationHeight;
 
       window.scrollTo({
@@ -40,7 +30,6 @@ const Navigation = () => {
         behavior: "smooth",
       });
     }
-    setIsMobileMenuOpen(false);
   };
 
   const navItems = [
@@ -51,118 +40,104 @@ const Navigation = () => {
 
   return (
     <>
-      {/* Professional Clean Navigation */}
-      <nav
-        className={`fixed inset-x-0 top-0 z-[100] transition-all duration-500 ease-out bg-transparent`}
+      {/* Mobile Logo Section - NOT sticky */}
+      <div className="desktop:hidden flex justify-center items-center bg-gradient-to-r from-[#0a1930] to-[#1a2347] py-4">
+        <Image
+          src={LogoImage}
+          alt="logo"
+          width={318}
+          height={27}
+          style={{
+            width: "318px",
+            height: "27px",
+            flexShrink: 0,
+            aspectRatio: "106/9",
+          }}
+        />
+      </div>
+
+      {/* Desktop Navigation - sticky */}
+      <div className="hidden desktop:flex h-[80px] items-center justify-between pl-[40px] border-t-[2px] border-b-[2px] border-[#4fc3f7] bg-gradient-to-r from-[#0a1930] to-[#1a2347] sticky top-0 z-50">
+        <div className="flex items-center">
+          <Image src={LogoImage} alt="logo" width={334} height={27} />
+        </div>
+
+        {/* Centered Navigation Items */}
+        <div className="flex gap-x-[72px] font-[500] text-[20px] text-white">
+          {navItems.map((item) => (
+            <span
+              key={item.id}
+              style={{ cursor: "pointer" }}
+              onClick={() => scrollToSection(item.id)}
+              className="hover:text-[#4fc3f7] hover:scale-110 transition-all duration-300"
+            >
+              {item.label}
+            </span>
+          ))}
+        </div>
+
+        {/* CTA Button */}
+        <button
+          onClick={() => window.open("https://github.com/tokamak-network/Tokamak-zk-EVM", "_blank")}
+          style={{
+            display: "flex",
+            padding: "0px 32px",
+            alignItems: "center",
+            gap: "72px",
+            alignSelf: "stretch",
+            borderLeft: "2px solid #4fc3f7",
+            background: "linear-gradient(to right, #1e3a8a, #3730a3)",
+            color: "#FFF",
+            fontFamily: '"IBM Plex Mono"',
+            fontSize: "20px",
+            fontStyle: "normal",
+            fontWeight: 600,
+            lineHeight: "normal",
+            letterSpacing: "-0.1px",
+            cursor: "pointer",
+          }}
+          className="hover:shadow-lg hover:shadow-[#4fc3f7]/50 transition-all duration-300"
+        >
+          Get Started
+        </button>
+      </div>
+
+      {/* Mobile Navigation - sticky */}
+      <div
+        className="desktop:hidden flex w-full bg-gradient-to-r from-[#0a1930] to-[#1a2347] sticky top-0 z-50"
+        style={{
+          borderTop: "2px solid #4fc3f7",
+          borderBottom: "2px solid #4fc3f7",
+        }}
       >
-        <div className={`${isScrolled ? "max-w-5xl" : "max-w-7xl"} mx-auto px-4 sm:px-6 lg:px-8 transition-[max-width] duration-500`}>
-          <div className={`flex items-center justify-between ${isScrolled ? "h-14 sm:h-16 px-4 sm:px-6 rounded-full bg-white/90 backdrop-blur-xl shadow-lg ring-1 ring-black/5 mt-3" : "h-20 mt-0"}`}>
-            {/* Logo Section - Left Side */}
-            <div className="flex-shrink-0 group">
-              <button
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="transform hover:scale-105 transition-all duration-300 ease-out cursor-pointer"
-              >
-                <Image
-                  src={LogoImage}
-                  alt="Tokamak Network"
-                  width={200}
-                  height={17}
-                  className="h-4 md:h-6 w-auto filter drop-shadow-sm"
-                />
-              </button>
-            </div>
-
-            {/* Desktop Navigation Links - Center */}
-            <div className="hidden md:block">
-              <div className="flex items-center space-x-10">
-                {navItems.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => scrollToSection(item.id)}
-                    className={`relative px-4 py-2 text-sm font-medium transition-colors duration-300 group ${isScrolled ? "text-gray-800 hover:text-blue-600" : "text-gray-700 hover:text-blue-600"}`}
-                  >
-                    {item.label}
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-700 transition-all duration-300 group-hover:w-full rounded-full"></span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* CTA Button - Right Side */}
-            <div className="hidden md:block">
-              <a
-                href="https://github.com/tokamak-network/Tokamak-zk-EVM"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative inline-flex items-center px-7 py-3 text-sm font-semibold rounded-full text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 overflow-hidden group"
-              >
-                <span className="relative z-10">Get Started</span>
-                <svg className="ml-2 -mr-1 w-4 h-4 relative z-10 transform group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </a>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="inline-flex items-center justify-center p-2 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-600 transition-all duration-200"
-              >
-                <svg
-                  className={`${isMobileMenuOpen ? 'hidden' : 'block'} h-6 w-6 transform transition-transform duration-300`}
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-                <svg
-                  className={`${isMobileMenuOpen ? 'block' : 'hidden'} h-6 w-6 transform transition-transform duration-300 rotate-180`}
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+        {navItems.map((item, index) => (
+          <div
+            key={item.id}
+            className="flex cursor-pointer"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: "8px",
+              flex: "1 0 0",
+              alignSelf: "stretch",
+              background: "linear-gradient(to right, #1e3a8a, #3730a3)",
+              color: "#FFF",
+              fontFamily: '"IBM Plex Mono"',
+              fontSize: "18px",
+              fontStyle: "normal",
+              fontWeight: 500,
+              lineHeight: "normal",
+              letterSpacing: "-0.11px",
+              padding: "16px 0",
+              borderRight: index < navItems.length - 1 ? "2px solid #4fc3f7" : "none",
+            }}
+            onClick={() => scrollToSection(item.id)}
+          >
+            {item.label}
           </div>
-        </div>
-
-        {/* Mobile Navigation Menu */}
-        <div className={`md:hidden transition-all duration-300 ease-out ${isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
-          <div className="px-4 pt-2 pb-6 space-y-2 bg-white/95 backdrop-blur-xl border-t border-gray-100 shadow-xl">
-            {navItems.map((item, index) => (
-              <button
-                key={item.id}
-                onClick={() => scrollToSection(item.id)}
-                className="block w-full text-left px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 transition-all duration-200 transform hover:translate-x-2"
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                {item.label}
-              </button>
-            ))}
-            <div className="mt-6 px-4">
-              <a
-                href="https://github.com/tokamak-network/Tokamak-zk-EVM"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-              >
-                Get Started
-                <svg className="ml-2 -mr-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </a>
-            </div>
-          </div>
-        </div>
-      </nav>
+        ))}
+      </div>
     </>
   );
 };

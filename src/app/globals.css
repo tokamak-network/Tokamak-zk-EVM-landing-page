@@ -1,44 +1,265 @@
-@import "tailwindcss";
+/* 글로벌 폰트 설정 - @import must be first */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Jersey+10&display=swap");
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 기본 스타일 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 모바일에서 수평 스크롤 방지 */
+html {
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  cursor: none; /* Hide default cursor */
+  max-width: 100vw;
 }
 
-/* Tokamak Design System Components */
-.text-hero-title {
-  color: #00477a;
-  font-size: 90px;
-  font-weight: bold;
-  text-align: center;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-gradient-to-b from-[#0a1930] to-[#1a2347] text-white;
+  }
 }
 
-.text-hero-subtitle {
-  color: #002139;
-  font-size: 26px;
-  text-align: center;
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 bg-gradient-to-r from-secondary-600 to-secondary-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent;
+  }
+
+  .card {
+    @apply bg-gradient-to-b from-[#0a1930] to-[#1a2347] rounded-xl shadow-lg border border-[#4fc3f7] p-6 transition-all duration-300 hover:shadow-xl;
+  }
+
+  .hero-gradient {
+    @apply bg-gradient-to-br from-primary-500 via-secondary-500 to-accent-500;
+  }
+
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .glow {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .pixel-border {
+    border-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='none'><defs><pattern id='pixel' width='20' height='20' patternUnits='userSpaceOnUse'><rect width='20' height='20' fill='%23334155'/></pattern></defs><rect width='100' height='100' fill='url(%23pixel)'/></svg>")
+      1;
+  }
+
+  .retro-shadow {
+    box-shadow: 8px 8px 0px #0f172a;
+  }
+
+  .neon-glow {
+    text-shadow: 0 0 5px currentColor, 0 0 10px currentColor,
+      0 0 15px currentColor;
+  }
+
+  .text-hero-title {
+    color: #00477a !important;
+    text-shadow: -2px -2px 0 #7ed7ff, -2px 0 0 #7ed7ff, -2px 2px 0 #7ed7ff,
+      0 -2px 0 #7ed7ff, 0 2px 0 #7ed7ff, 2px -2px 0 #7ed7ff, 2px 0 0 #7ed7ff,
+      2px 2px 0 #7ed7ff !important;
+    filter: drop-shadow(2px 2px 0 #00477a) !important;
+    font-family: "Jersey 10", "Press Start 2P", monospace !important;
+    font-size: 90px !important;
+    font-style: normal !important;
+    font-weight: 400 !important;
+    line-height: normal !important;
+    letter-spacing: 8.1px !important;
+  }
+
+  .text-hero-title-70 {
+    color: #00477a !important;
+    text-shadow: -2px -2px 0 #7ed7ff, -2px 0 0 #7ed7ff, -2px 2px 0 #7ed7ff,
+      0 -2px 0 #7ed7ff, 0 2px 0 #7ed7ff, 2px -2px 0 #7ed7ff, 2px 0 0 #7ed7ff,
+      2px 2px 0 #7ed7ff !important;
+    filter: drop-shadow(2px 2px 0 #00477a) !important;
+    font-family: "Jersey 10", "Press Start 2P", monospace !important;
+    font-size: 70px !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    line-height: normal !important;
+    letter-spacing: 6.3px !important;
+    text-align: center !important;
+  }
+
+  .text-hero-title-70-compact {
+    color: #00477a !important;
+    text-shadow: -2px -2px 0 #7ed7ff, -2px 0 0 #7ed7ff, -2px 2px 0 #7ed7ff,
+      0 -2px 0 #7ed7ff, 0 2px 0 #7ed7ff, 2px -2px 0 #7ed7ff, 2px 0 0 #7ed7ff,
+      2px 2px 0 #7ed7ff !important;
+    filter: drop-shadow(2px 2px 0 #00477a) !important;
+    font-family: "Jersey 10", "Press Start 2P", monospace !important;
+    font-size: 70px !important;
+    font-style: normal !important;
+    font-weight: 400 !important;
+    line-height: normal !important;
+    letter-spacing: 2px !important;
+  }
+
+  .space-background {
+    background: linear-gradient(to bottom, #0a1930 0%, #1a2347 100%);
+  }
+
+  .cosmic-star {
+    animation: twinkle 2s infinite alternate;
+  }
+
+  @keyframes twinkle {
+    0% { opacity: 0.3; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.2); }
+  }
+
+  .animate-scroll-left {
+    animation: scrollLeft 50s linear infinite;
+  }
+
+  .animate-scroll-right {
+    animation: scrollRight 50s linear infinite;
+  }
+
+  @keyframes scrollLeft {
+    0% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes scrollRight {
+    0% {
+      transform: translateX(-50%);
+    }
+    100% {
+      transform: translateX(0%);
+    }
+  }
 }
 
-.grid-background {
-  background-color: #ccefff;
+/* 스크롤바 스타일링 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-700 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-600;
+}
+
+/* 다크 모드 지원 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+/* 반응형 텍스트 크기 */
+@media (max-width: 640px) {
+  .responsive-text {
+    font-size: clamp(1rem, 4vw, 1.5rem);
+  }
+}
+
+/* 모바일 hero title 반응형 */
+@media (max-width: 1359px) {
+  .text-hero-title-70 {
+    font-size: 50px !important;
+    letter-spacing: 4.5px !important;
+  }
+}
+
+/* Playground text responsive adjustments */
+.playground-text {
+  font-family: 'Jersey 10' !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  font-size: 156px !important;
+  line-height: 100% !important;
+  letter-spacing: 7% !important;
+  text-align: center !important;
+  background: #57D2FF !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: #57D2FF !important;
+  box-shadow: 0px 6px 0px 0px #0E3260 !important;
+  display: inline-block !important;
+}
+
+@media (max-width: 1024px) {
+  .playground-text {
+    font-size: 120px !important;
+    box-shadow: 0px 5px 0px 0px #0E3260 !important;
+  }
 }
 
 @media (max-width: 768px) {
-  .text-hero-title {
-    font-size: 50px;
+  .playground-text {
+    font-size: 80px !important;
+    box-shadow: 0px 4px 0px 0px #0E3260 !important;
   }
-  
-  .text-hero-subtitle {
-    font-size: 20px;
+}
+
+@media (max-width: 640px) {
+  .playground-text {
+    font-size: 60px !important;
+    box-shadow: 0px 3px 0px 0px #0E3260 !important;
+    letter-spacing: 5% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .playground-text {
+    font-size: 48px !important;
+    box-shadow: 0px 3px 0px 0px #0E3260 !important;
+    letter-spacing: 4% !important;
   }
 }
 
@@ -109,90 +330,11 @@ body {
   animation: bounce-slow 3s ease-in-out infinite;
 }
 
-/* Enhanced Interactive Animations */
-@keyframes twinkle {
-  0%, 100% {
-    opacity: 0.3;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.2);
-  }
-}
-
-@keyframes ripple {
-  0% {
-    transform: scale(0);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(4);
-    opacity: 0;
-  }
-}
-
-.animate-twinkle {
-  animation: twinkle 2s ease-in-out infinite;
-}
-
-.animate-ripple {
-  animation: ripple 0.6s ease-out;
-}
-
-/* Custom Cursor - Simpler and More Reliable */
-*, 
-*:before, 
-*:after {
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%233b82f6' stroke='%23ffffff' stroke-width='2'/%3E%3C/svg%3E") 8 8, auto !important;
-}
-
-/* Hover cursor for interactive elements */
-button, 
-a, 
-input, 
-textarea, 
-select, 
-[role="button"], 
-.cursor-pointer, 
-[onclick],
-button *, 
-a *,
-input *,
-textarea *,
-select * {
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='8' fill='%231d4ed8' stroke='%23ffffff' stroke-width='2'/%3E%3C/svg%3E") 10 10, pointer !important;
-}
-
-/* Hide custom cursor on mobile devices */
-@media (pointer: coarse) {
-  *, 
-  *:before, 
-  *:after,
-  button, 
-  a, 
-  input, 
-  textarea, 
-  select, 
-  [role="button"], 
-  .cursor-pointer, 
-  [onclick],
-  button *, 
-  a *,
-  input *,
-  textarea *,
-  select * {
-    cursor: auto !important;
-  }
-  
-  button, 
-  a, 
-  input, 
-  textarea, 
-  select, 
-  [role="button"], 
-  .cursor-pointer, 
-  [onclick] {
-    cursor: pointer !important;
+/* 애니메이션 성능 최적화 */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
