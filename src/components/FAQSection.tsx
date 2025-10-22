@@ -141,7 +141,7 @@ const FAQSection: React.FC = () => {
               Join our community or check out the documentation for more details.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="group inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold hover:from-blue-600 hover:to-blue-800 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+              <button className="group inline-flex items-center px-6 py-3 bg-[#028bee] text-white font-semibold hover:bg-[#0277d4] transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
                 <span>Join Discord</span>
                 <svg className="ml-2 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />

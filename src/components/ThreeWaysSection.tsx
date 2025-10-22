@@ -99,7 +99,7 @@ const ThreeWaysSection: React.FC = () => {
                 onClick={() => setActiveTab(index)}
                 className={`mx-2 mb-4 px-6 py-3 font-semibold transition-all duration-300 flex items-center ${
                   activeTab === index
-                    ? 'bg-gradient-to-r from-[#4fc3f7] to-[#29b6f6] text-white shadow-lg scale-105'
+                    ? 'bg-[#028bee] text-white shadow-lg scale-105'
                     : 'bg-gradient-to-b from-[#0a1930] to-[#1a2347] text-white border border-[#4fc3f7] hover:border-[#29b6f6] hover:scale-105'
                 }`}
                 style={{ fontFamily: '"IBM Plex Mono"' }}
@@ -123,7 +123,7 @@ const ThreeWaysSection: React.FC = () => {
                 <div className="p-8 bg-gradient-to-b from-[#0a1930] to-[#1a2347] border border-[#4fc3f7] shadow-lg">
                   {/* Tab Header */}
                   <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-[#4fc3f7] to-[#29b6f6] text-white mb-4 shadow-sm">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-[#028bee] text-white mb-4 shadow-sm">
                       {way.iconType === "core" && <Settings size={32} className="text-white" />}
                       {way.iconType === "playground" && <Monitor size={32} className="text-white" />}
                       {way.iconType === "cli" && <Terminal size={32} className="text-white" />}

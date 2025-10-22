@@ -136,7 +136,7 @@ const Overview = () => {
             href="https://github.com/tokamak-network/Tokamak-zk-EVM-playgrounds"
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative inline-flex items-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-[#4fc3f7] to-[#29b6f6] hover:from-[#29b6f6] hover:to-[#4fc3f7] transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl relative z-50"
+            className="group relative inline-flex items-center px-8 py-4 text-lg font-semibold text-white bg-[#028bee] hover:bg-[#0277d4] transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl relative z-50"
             style={{
               fontFamily: '"IBM Plex Mono"',
             }}

@@ -86,7 +86,7 @@ const Navigation = () => {
             gap: "72px",
             alignSelf: "stretch",
             borderLeft: "2px solid #4fc3f7",
-            background: "linear-gradient(to right, #1e3a8a, #3730a3)",
+            background: "#028bee",
             color: "#FFF",
             fontFamily: '"IBM Plex Mono"',
             fontSize: "20px",
@@ -96,7 +96,7 @@ const Navigation = () => {
             letterSpacing: "-0.1px",
             cursor: "pointer",
           }}
-          className="hover:shadow-lg hover:shadow-[#4fc3f7]/50 transition-all duration-300"
+          className="hover:shadow-lg hover:shadow-[#4fc3f7]/50 hover:bg-[#0277d4] transition-all duration-300"
         >
           Get Started
         </button>
@@ -121,7 +121,7 @@ const Navigation = () => {
               gap: "8px",
               flex: "1 0 0",
               alignSelf: "stretch",
-              background: "linear-gradient(to right, #1e3a8a, #3730a3)",
+              background: "#028bee",
               color: "#FFF",
               fontFamily: '"IBM Plex Mono"',
               fontSize: "18px",
