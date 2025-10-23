@@ -13,11 +13,18 @@ const AnimatedBanner = () => {
 };
 
 const Navigation = () => {
-  const scrollToSection = (sectionId: string) => {
+  const handleNavigation = (item: { id: string; label: string; isLink?: boolean; href?: string }) => {
+    // If it's a link, navigate to the page
+    if (item.isLink && item.href) {
+      window.location.href = item.href;
+      return;
+    }
+
+    // Otherwise, scroll to section
     // Check if mobile screen (1359px and below)
     const isMobile = window.innerWidth <= 1359;
 
-    const element = document.getElementById(sectionId);
+    const element = document.getElementById(item.id);
     if (element) {
       const elementPosition =
         element.getBoundingClientRect().top + window.pageYOffset;
@@ -36,6 +43,7 @@ const Navigation = () => {
     { id: "who-section", label: "Who" },
     { id: "two-ways-section", label: "How" },
     { id: "why-different-section", label: "Why" },
+    { id: "blog", label: "Blog", isLink: true, href: "/blog" },
   ];
 
   return (
@@ -68,7 +76,7 @@ const Navigation = () => {
             <span
               key={item.id}
               style={{ cursor: "pointer" }}
-              onClick={() => scrollToSection(item.id)}
+              onClick={() => handleNavigation(item)}
               className="hover:text-[#4fc3f7] hover:scale-110 transition-all duration-300"
             >
               {item.label}
@@ -132,7 +140,7 @@ const Navigation = () => {
               padding: "16px 0",
               borderRight: index < navItems.length - 1 ? "2px solid #4fc3f7" : "none",
             }}
-            onClick={() => scrollToSection(item.id)}
+            onClick={() => handleNavigation(item)}
           >
             {item.label}
           </div>
