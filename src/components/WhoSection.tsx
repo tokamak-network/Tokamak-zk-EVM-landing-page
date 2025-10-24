@@ -23,7 +23,7 @@ const WhoSection: React.FC = () => {
   }, []);
 
   const renderIcon = (iconType: string) => {
-    const iconProps = { size: 24, className: "text-white" };
+    const iconProps = { size: 24, className: "text-[#4fc3f7]" };
     
     switch (iconType) {
       case "code":
@@ -89,7 +89,7 @@ const WhoSection: React.FC = () => {
             >
               {/* Professional Icon */}
               <div className="flex items-center mb-6">
-                <div className={`w-12 h-12 bg-gradient-to-r ${persona.color} flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300`}>
+                <div className="w-12 h-12 bg-[#0a1930] border-2 border-[#4fc3f7] flex items-center justify-center shadow-md group-hover:scale-110 group-hover:shadow-[#4fc3f7]/50 transition-all duration-300">
                   {renderIcon(persona.iconType)}
                 </div>
                 <div className="ml-4">

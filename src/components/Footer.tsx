@@ -103,27 +103,7 @@ const Footer: React.FC = () => {
               </li>
               <li>
                 <a 
-                  href="https://medium.com/tokamak-network" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-white transition-colors duration-300 hover:translate-x-1 transform inline-block"
-                >
-                  Medium Blog
-                </a>
-              </li>
-              <li>
-                <a 
-                  href="https://discord.gg/JYnN2e3W" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-white transition-colors duration-300 hover:translate-x-1 transform inline-block"
-                >
-                  Community
-                </a>
-              </li>
-              <li>
-                <a 
-                  href="https://github.com/tokamak-network/Tokamak-zk-EVM"
+                  href="https://github.com/tokamak-network/Tokamak-zk-EVM-playgrounds/releases"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-300 hover:text-white transition-colors duration-300 hover:translate-x-1 transform inline-block"
@@ -138,7 +118,7 @@ const Footer: React.FC = () => {
         {/* Bottom Section */}
         <div className="border-t border-gray-700 mt-8 pt-8 text-center">
           <p className="text-gray-400 text-sm">
-            © 2025 Tokamak Network. All rights reserved.
+            © 2025 Tokamak Network zk-EVM. All rights reserved.
           </p>
         </div>
       </div>

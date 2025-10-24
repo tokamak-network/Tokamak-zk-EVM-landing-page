@@ -110,6 +110,7 @@ const Overview = () => {
             className="text-6xl md:text-8xl lg:text-[12rem] font-bold mt-4 bg-gradient-to-r from-[#4fc3f7] to-[#29b6f6] bg-clip-text text-transparent"
             style={{
               fontFamily: '"Jersey 10", "Press Start 2P", monospace',
+              letterSpacing: '0.5rem',
             }}
           >
             Tokamak zk-EVM
@@ -133,7 +134,7 @@ const Overview = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
           {/* Primary CTA - Playground */}
           <a
-            href="https://github.com/tokamak-network/Tokamak-zk-EVM-playgrounds"
+            href="https://github.com/tokamak-network/Tokamak-zk-EVM-playgrounds/releases"
             target="_blank"
             rel="noopener noreferrer"
             className="group relative inline-flex items-center px-8 py-4 text-lg font-semibold text-white bg-[#028bee] hover:bg-[#0277d4] transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl relative z-50"

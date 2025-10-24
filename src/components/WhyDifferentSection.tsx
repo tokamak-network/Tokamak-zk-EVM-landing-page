@@ -73,7 +73,7 @@ const WhyDifferentSection: React.FC = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className={`text-center mb-20 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6" style={{ fontFamily: '"Jersey 10", "Press Start 2P", monospace' }}>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6" style={{ fontFamily: '"Jersey 10", "Press Start 2P", monospace', letterSpacing: '0.2rem' }}>
             Why This Is Different
           </h2>
           <p className="text-xl text-white/80 max-w-3xl mx-auto" style={{ fontFamily: '"IBM Plex Mono"' }}>
@@ -105,8 +105,8 @@ const WhyDifferentSection: React.FC = () => {
                 </p>
 
                 {/* Highlight Badge */}
-                <div className={`inline-flex items-center px-4 py-2 bg-gradient-to-r ${diff.color} text-white text-sm font-semibold shadow-md mt-auto`} style={{ fontFamily: '"IBM Plex Mono"' }}>
-                  <span className="w-2 h-2 bg-white mr-2"></span>
+                <div className={`inline-flex items-center px-4 py-2 bg-[#0a1930] border border-[#4fc3f7] text-[#4fc3f7] text-sm font-semibold shadow-md mt-auto`} style={{ fontFamily: '"IBM Plex Mono"' }}>
+                  <span className="w-2 h-2 bg-[#4fc3f7] mr-2"></span>
                   {diff.highlight}
                 </div>
               </div>
@@ -116,10 +116,9 @@ const WhyDifferentSection: React.FC = () => {
 
         {/* Bottom CTA */}
         <div className={`text-center mt-16 transition-all duration-1000 delay-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <div className="inline-flex items-center px-6 py-3 bg-[#4fc3f7]/20 backdrop-blur-md border border-[#4fc3f7] text-white" style={{ fontFamily: '"IBM Plex Mono"' }}>
-            <span className="w-2 h-2 bg-[#4fc3f7] mr-3 animate-pulse"></span>
-            <span className="text-sm font-medium">Ready to try on your machine today</span>
-          </div>
+          <p className="text-white/70 text-base" style={{ fontFamily: '"IBM Plex Mono"' }}>
+            Ready to try on your machine today
+          </p>
         </div>
       </div>
     </section>

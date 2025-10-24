@@ -86,7 +86,7 @@ const Navigation = () => {
 
         {/* CTA Button */}
         <button
-          onClick={() => window.open("https://github.com/tokamak-network/Tokamak-zk-EVM", "_blank")}
+          onClick={() => window.open("https://github.com/tokamak-network/Tokamak-zk-EVM-playgrounds/releases", "_blank")}
           style={{
             display: "flex",
             padding: "0px 32px",
