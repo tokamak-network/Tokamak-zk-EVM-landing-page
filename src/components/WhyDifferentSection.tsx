@@ -117,7 +117,7 @@ const WhyDifferentSection: React.FC = () => {
         {/* Bottom CTA */}
         <div className={`text-center mt-16 transition-all duration-1000 delay-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <p className="text-white/70 text-base" style={{ fontFamily: '"IBM Plex Mono"' }}>
-            Ready to try on your machine today
+            Ready to try on your machine today?
           </p>
         </div>
       </div>

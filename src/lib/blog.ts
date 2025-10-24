@@ -1,6 +1,12 @@
 import { notion, n2m, DATABASE_ID } from "./notion";
 import { BlogPost, NotionPage } from "@/types/blog";
 
+// Type for Notion database response
+interface NotionDatabase {
+  title?: Array<{ plain_text?: string }>;
+  data_sources?: Array<{ id: string }>;
+}
+
 /**
  * Fetch all published blog posts from Notion
  */
@@ -15,11 +21,11 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
       database_id: DATABASE_ID,
     });
     
-    console.log("✅ [BLOG] Database retrieved:", (database as any).title?.[0]?.plain_text || "Untitled");
-    console.log("📚 [BLOG] Data sources:", (database as any).data_sources?.length || 0);
+    console.log("✅ [BLOG] Database retrieved:", (database as NotionDatabase).title?.[0]?.plain_text || "Untitled");
+    console.log("📚 [BLOG] Data sources:", (database as NotionDatabase).data_sources?.length || 0);
     
     // Get the first data source ID
-    const dataSourceId = (database as any).data_sources?.[0]?.id;
+    const dataSourceId = (database as NotionDatabase).data_sources?.[0]?.id;
     
     if (!dataSourceId) {
       console.error("❌ [BLOG] No data sources found in database");
@@ -81,7 +87,7 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
       database_id: DATABASE_ID,
     });
     
-    const dataSourceId = (database as any).data_sources?.[0]?.id;
+    const dataSourceId = (database as NotionDatabase).data_sources?.[0]?.id;
     
     if (!dataSourceId) {
       console.error("❌ [BLOG] No data sources found");
@@ -156,7 +162,7 @@ export async function getAllBlogSlugs(): Promise<string[]> {
       database_id: DATABASE_ID,
     });
     
-    const dataSourceId = (database as any).data_sources?.[0]?.id;
+    const dataSourceId = (database as NotionDatabase).data_sources?.[0]?.id;
     
     if (!dataSourceId) {
       console.error("❌ [BLOG] No data sources found");
