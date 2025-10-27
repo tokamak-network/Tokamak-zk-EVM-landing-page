@@ -23,7 +23,7 @@ const WhyDifferentSection: React.FC = () => {
   }, []);
 
   const renderIcon = (iconType: string) => {
-    const iconProps = { size: 24, className: "text-white" };
+    const iconProps = { size: 24, className: "text-[#4fc3f7]" };
     
     switch (iconType) {
       case "performance":
@@ -90,7 +90,7 @@ const WhyDifferentSection: React.FC = () => {
               style={{ animationDelay: `${index * 200}ms` }}
             >
               {/* Icon */}
-              <div className={`w-16 h-16 bg-gradient-to-r ${diff.color} flex items-center justify-center mb-6 group-hover:scale-105 transition-transform duration-300 shadow-lg`}>
+              <div className="w-16 h-16 bg-[#0a1930] border-2 border-[#4fc3f7] flex items-center justify-center mb-6 group-hover:scale-105 group-hover:shadow-[#4fc3f7]/50 transition-all duration-300 shadow-md">
                 {renderIcon(diff.iconType)}
               </div>
 
