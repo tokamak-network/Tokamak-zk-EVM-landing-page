@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 const Footer: React.FC = () => {
   const LogoImage = "/assets/header/logo.svg";
@@ -69,20 +70,20 @@ const Footer: React.FC = () => {
                 </a>
               </li>
               <li>
-                <a 
+                <Link 
                   href="/#who-section" 
                   className="text-gray-300 hover:text-white transition-colors duration-300 hover:translate-x-1 transform inline-block"
                 >
                   Who This Is For
-                </a>
+                </Link>
               </li>
               <li>
-                <a 
+                <Link 
                   href="/#two-ways-section" 
                   className="text-gray-300 hover:text-white transition-colors duration-300 hover:translate-x-1 transform inline-block"
                 >
                   How to Use
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
