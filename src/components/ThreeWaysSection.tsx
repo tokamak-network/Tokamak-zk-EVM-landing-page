@@ -54,7 +54,9 @@ const ThreeWaysSection: React.FC = () => {
           description: "Teaches ZK by doing: every step is visible and repeatable."
         }
       ],
-      benefit: "Instant, tangible ZK without command lines."
+      benefit: "Instant, tangible ZK without command lines.",
+      ctaText: "Try Playground",
+      ctaLink: "https://github.com/tokamak-network/Tokamak-zk-EVM-playgrounds/releases"
     },
     {
       title: "Developer CLI",
@@ -71,7 +73,9 @@ const ThreeWaysSection: React.FC = () => {
           description: "Same lightweight circuits and prover as the GUI."
         }
       ],
-      benefit: "Automation and scale from your own machine."
+      benefit: "Automation and scale from your own machine.",
+      ctaText: "Get CLI",
+      ctaLink: "https://github.com/tokamak-network/Tokamak-zk-EVM-playgrounds/releases"
     }
   ];
 
@@ -147,10 +151,33 @@ const ThreeWaysSection: React.FC = () => {
                     ))}
                   </div>
 
-                  {/* Benefit Callout */}
-                  <div className="p-6 bg-[#4fc3f7]/10 border border-[#4fc3f7]/50 text-center">
-                    <h4 className="text-lg font-bold mb-2 text-[#4fc3f7]" style={{ fontFamily: '"IBM Plex Mono"' }}>Why it matters for users:</h4>
-                    <p className="text-white/90" style={{ fontFamily: '"IBM Plex Mono"' }}>{way.benefit}</p>
+                  {/* Benefit Callout with CTA */}
+                  <div className="p-6 bg-[#4fc3f7]/10 border border-[#4fc3f7]/50">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                      {/* Text on the left */}
+                      <div className="flex-1 text-center md:text-left">
+                        <h4 className="text-lg font-bold mb-2 text-[#4fc3f7]" style={{ fontFamily: '"IBM Plex Mono"' }}>Why it matters for users:</h4>
+                        <p className="text-white/90" style={{ fontFamily: '"IBM Plex Mono"' }}>{way.benefit}</p>
+                      </div>
+                      
+                      {/* Button on the right */}
+                      <a
+                        href={way.ctaLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-[#028bee] text-white font-semibold transition-all duration-300 hover:bg-[#0277d4] hover:scale-105 shadow-lg hover:shadow-xl group whitespace-nowrap"
+                        style={{ fontFamily: '"IBM Plex Mono"' }}
+                      >
+                        <span>{way.ctaText}</span>
+                        <svg 
+                          className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" 
+                          fill="currentColor" 
+                          viewBox="0 0 20 20"
+                        >
+                          <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>

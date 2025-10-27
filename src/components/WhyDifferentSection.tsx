@@ -115,10 +115,37 @@ const WhyDifferentSection: React.FC = () => {
         </div>
 
         {/* Bottom CTA */}
-        <div className={`text-center mt-16 transition-all duration-1000 delay-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <p className="text-white/70 text-base" style={{ fontFamily: '"IBM Plex Mono"' }}>
-            Ready to try on your machine today?
-          </p>
+        <div className={`mt-20 transition-all duration-1000 delay-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div className="w-full p-8 md:p-12 bg-gradient-to-b from-[#0a1930] to-[#1a2347] border-2 border-[#4fc3f7] shadow-lg">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+              {/* Text on the left */}
+              <div className="flex-1 text-center md:text-left">
+                <h3 className="text-3xl md:text-4xl font-bold text-white leading-tight" style={{ fontFamily: '"Jersey 10", "Press Start 2P", monospace', letterSpacing: '0.2rem' }}>
+                  Ready to try on your machine today?
+                </h3>
+              </div>
+              
+              {/* Button on the right */}
+              <div className="flex-shrink-0">
+                <a
+                  href="https://github.com/tokamak-network/Tokamak-zk-EVM-playgrounds/releases"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-[#028bee] text-white font-semibold text-lg transition-all duration-300 hover:bg-[#0277d4] hover:scale-105 shadow-lg hover:shadow-xl group whitespace-nowrap"
+                  style={{ fontFamily: '"IBM Plex Mono"' }}
+                >
+                  <span>Launch Playground</span>
+                  <svg 
+                    className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" 
+                    fill="currentColor" 
+                    viewBox="0 0 20 20"
+                  >
+                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
