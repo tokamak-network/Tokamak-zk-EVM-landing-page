@@ -3,7 +3,7 @@ export interface BlogPost {
   title: string;
   slug: string;
   description: string;
-  published: boolean;
+  published: string; // "Prod" or "Staging"
   publishDate: string;
   tags: string[];
   coverImage?: string;
@@ -24,7 +24,7 @@ export interface NotionPage {
       rich_text: Array<{ plain_text: string }>;
     };
     Published: {
-      checkbox: boolean;
+      select: { name: string } | null;
     };
     PublishDate: {
       date: { start: string } | null;

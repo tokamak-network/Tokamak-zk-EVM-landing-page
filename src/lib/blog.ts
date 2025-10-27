@@ -7,12 +7,16 @@ interface NotionDatabase {
   data_sources?: Array<{ id: string }>;
 }
 
+// Get the blog environment from env variable (default to "Staging")
+const BLOG_ENVIRONMENT = process.env.BLOG_ENVIRONMENT?.toLowerCase() === "prod" ? "Prod" : "Staging";
+
 /**
  * Fetch all published blog posts from Notion
  */
 export async function getBlogPosts(): Promise<BlogPost[]> {
   console.log("\n📚 [BLOG] ========== FETCHING BLOG POSTS ==========");
   console.log("📚 [BLOG] Database ID:", DATABASE_ID);
+  console.log("📚 [BLOG] Environment:", BLOG_ENVIRONMENT);
   
   try {
     // First, retrieve the database to get data source IDs
@@ -38,8 +42,8 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
       data_source_id: dataSourceId,
       filter: {
         property: "Published",
-        checkbox: {
-          equals: true,
+        select: {
+          equals: BLOG_ENVIRONMENT,
         },
       },
       sorts: [
@@ -80,6 +84,7 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
   console.log("\n📄 [BLOG] ========== FETCHING SINGLE POST ==========");
   console.log("📄 [BLOG] Slug:", slug);
   console.log("📄 [BLOG] Database ID:", DATABASE_ID);
+  console.log("📄 [BLOG] Environment:", BLOG_ENVIRONMENT);
   
   try {
     // Retrieve database to get data source ID
@@ -102,8 +107,8 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
         and: [
           {
             property: "Published",
-            checkbox: {
-              equals: true,
+            select: {
+              equals: BLOG_ENVIRONMENT,
             },
           },
           {
@@ -155,6 +160,7 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
 export async function getAllBlogSlugs(): Promise<string[]> {
   console.log("\n🔗 [BLOG] ========== FETCHING ALL SLUGS ==========");
   console.log("🔗 [BLOG] Database ID:", DATABASE_ID);
+  console.log("🔗 [BLOG] Environment:", BLOG_ENVIRONMENT);
   
   try {
     // Retrieve database to get data source ID
@@ -175,8 +181,8 @@ export async function getAllBlogSlugs(): Promise<string[]> {
       data_source_id: dataSourceId,
       filter: {
         property: "Published",
-        checkbox: {
-          equals: true,
+        select: {
+          equals: BLOG_ENVIRONMENT,
         },
       },
     });
@@ -218,7 +224,7 @@ function parseNotionPage(page: NotionPage): BlogPost {
     const description = page.properties.Description.rich_text[0]?.plain_text || "";
     console.log("  📌 Description:", description.substring(0, 50) + "...");
     
-    const published = page.properties.Published.checkbox;
+    const published = page.properties.Published.select?.name || "Staging";
     console.log("  📌 Published:", published);
     
     const publishDate = page.properties.PublishDate.date?.start || new Date().toISOString();

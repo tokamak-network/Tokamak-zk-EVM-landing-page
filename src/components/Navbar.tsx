@@ -21,6 +21,15 @@ const Navigation = () => {
     }
 
     // Otherwise, scroll to section
+    // Check if we're on the home page
+    const isHomePage = window.location.pathname === '/';
+    
+    // If not on home page, navigate to home page with hash
+    if (!isHomePage) {
+      window.location.href = `/#${item.id}`;
+      return;
+    }
+
     // Check if mobile screen (1359px and below)
     const isMobile = window.innerWidth <= 1359;
 
