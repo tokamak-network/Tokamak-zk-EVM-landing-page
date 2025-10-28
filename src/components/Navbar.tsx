@@ -69,13 +69,15 @@ const Navigation = () => {
             height: "27px",
             flexShrink: 0,
             aspectRatio: "106/9",
+            cursor: "pointer",
           }}
+          onClick={() => window.location.href = "/"}
         />
       </div>
 
       {/* Desktop Navigation - sticky */}
       <div className="hidden desktop:flex h-[80px] items-center justify-between pl-[40px] border-t-[2px] border-b-[2px] border-[#4fc3f7] bg-gradient-to-r from-[#0a1930] to-[#1a2347] sticky top-0 z-50">
-        <div className="flex items-center">
+        <div className="flex items-center cursor-pointer" onClick={() => window.location.href = "/"}>
           <Image src={LogoImage} alt="logo" width={334} height={27} />
         </div>
 
