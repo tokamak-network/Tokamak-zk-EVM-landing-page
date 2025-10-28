@@ -22,12 +22,12 @@ export default async function BlogPage() {
   console.log("🌐 [PAGE] ==========================================\n");
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       <Navbar />
       
       {/* Cosmic Background with Stars */}
       <div
-        className="relative overflow-hidden"
+        className="relative overflow-hidden flex-grow"
         style={{
           background: "linear-gradient(to bottom, #0a1930 0%, #1a2347 100%)",
         }}
@@ -64,7 +64,7 @@ export default async function BlogPage() {
         {/* Blog Posts Grid */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
           {posts.length === 0 ? (
-            <div className="text-center">
+            <div className="text-center py-20 min-h-[320px] flex items-center justify-center">
               <p
                 className="text-white text-lg"
                 style={{
