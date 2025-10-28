@@ -58,10 +58,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         }}
       >
         {/* Cosmic Elements */}
-        <div className="absolute text-white text-lg animate-pulse" style={{ top: "10%", left: "10%", animationDelay: "0s" }}>✦</div>
-        <div className="absolute text-white text-sm animate-pulse" style={{ top: "20%", right: "15%", animationDelay: "1s" }}>✦</div>
-        <div className="absolute text-white text-xl animate-pulse" style={{ top: "30%", left: "20%", animationDelay: "2s" }}>✦</div>
-        <div className="absolute text-white text-lg animate-pulse" style={{ top: "15%", right: "25%", animationDelay: "0.5s" }}>+</div>
+        <div className="hidden md:block absolute text-white text-lg animate-pulse" style={{ top: "10%", left: "10%", animationDelay: "0s" }}>✦</div>
+        <div className="hidden md:block absolute text-white text-sm animate-pulse" style={{ top: "20%", right: "15%", animationDelay: "1s" }}>✦</div>
+        <div className="hidden md:block absolute text-white text-xl animate-pulse" style={{ top: "30%", left: "20%", animationDelay: "2s" }}>✦</div>
+        <div className="hidden md:block absolute text-white text-lg animate-pulse" style={{ top: "15%", right: "25%", animationDelay: "0.5s" }}>+</div>
         
         {/* Back Button */}
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
