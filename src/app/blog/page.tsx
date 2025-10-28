@@ -33,11 +33,11 @@ export default async function BlogPage() {
         }}
       >
         {/* Cosmic Elements */}
-        <div className="absolute text-white text-lg animate-pulse" style={{ top: "10%", left: "10%", animationDelay: "0s" }}>✦</div>
-        <div className="absolute text-white text-sm animate-pulse" style={{ top: "20%", right: "15%", animationDelay: "1s" }}>✦</div>
-        <div className="absolute text-white text-xl animate-pulse" style={{ top: "30%", left: "20%", animationDelay: "2s" }}>✦</div>
-        <div className="absolute text-white text-lg animate-pulse" style={{ top: "15%", right: "25%", animationDelay: "0.5s" }}>+</div>
-        <div className="absolute text-white text-sm animate-pulse" style={{ bottom: "40%", left: "15%", animationDelay: "1.5s" }}>+</div>
+        <div className="hidden md:block absolute text-white text-lg animate-pulse" style={{ top: "10%", left: "10%", animationDelay: "0s" }}>✦</div>
+        <div className="hidden md:block absolute text-white text-sm animate-pulse" style={{ top: "20%", right: "15%", animationDelay: "1s" }}>✦</div>
+        <div className="hidden md:block absolute text-white text-xl animate-pulse" style={{ top: "30%", left: "20%", animationDelay: "2s" }}>✦</div>
+        <div className="hidden md:block absolute text-white text-lg animate-pulse" style={{ top: "15%", right: "25%", animationDelay: "0.5s" }}>+</div>
+        <div className="hidden md:block absolute text-white text-sm animate-pulse" style={{ bottom: "40%", left: "15%", animationDelay: "1.5s" }}>+</div>
         
         {/* Header Section */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
@@ -63,7 +63,7 @@ export default async function BlogPage() {
         {/* Blog Posts Grid */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
           {posts.length === 0 ? (
-            <div className="text-center py-20">
+            <div className="text-center">
               <p
                 className="text-white text-lg"
                 style={{
