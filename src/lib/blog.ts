@@ -233,12 +233,12 @@ function parseNotionPage(page: NotionPage): BlogPost {
     const tags = page.properties.Tags.multi_select.map((tag) => tag.name);
     console.log("  📌 Tags:", tags.join(", "));
     
-    const author = page.properties.Author?.rich_text[0]?.plain_text || "Tokamak Network";
+    const author = page.properties.Author?.rich_text?.[0]?.plain_text || "Tokamak Network";
     console.log("  📌 Author:", author);
 
     // Get cover image from property or page cover
     let coverImage = "";
-    if (page.properties.CoverImage?.files[0]) {
+    if (page.properties.CoverImage?.files?.[0]) {
       const file = page.properties.CoverImage.files[0];
       coverImage = file.file?.url || file.external?.url || "";
       console.log("  📌 Cover Image (from property):", coverImage ? "✅" : "❌");
