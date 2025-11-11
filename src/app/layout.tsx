@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Mono } from "next/font/google";
 import { Jersey_10 } from "next/font/google";
 import "./globals.css";
+import RefreshButton from "@/components/RefreshButton";
 
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -38,6 +39,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const showRefreshButton = process.env.BLOG_ENVIRONMENT === 'staging';
+
   return (
     <html lang="ko" className="scroll-smooth" suppressHydrationWarning>
       <head></head>
@@ -45,6 +48,7 @@ export default function RootLayout({
         className={`${ibmPlexMono.variable} ${jersey10.variable} bg-gradient-to-b from-[#0a1930] to-[#1a2347] text-white antialiased`}
       >
         <div className="min-h-screen">{children}</div>
+        {showRefreshButton && <RefreshButton />}
       </body>
     </html>
   );
