@@ -39,7 +39,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const showRefreshButton = process.env.BLOG_ENVIRONMENT === 'staging';
+  const showRefreshButton = process.env.NEXT_PUBLIC_BLOG_ENVIRONMENT === 'staging';
 
   return (
     <html lang="ko" className="scroll-smooth" suppressHydrationWarning>
