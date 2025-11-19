@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { BlogPost } from "@/types/blog";
 import { Search, X, Calendar } from "lucide-react";
 
@@ -32,7 +33,7 @@ export default function BlogList({ posts }: BlogListProps) {
 
   // Filter and sort posts
   const filteredPosts = useMemo(() => {
-    let filtered = posts.filter((post) => {
+    const filtered = posts.filter((post) => {
       // Search filter
       const matchesSearch =
         searchQuery === "" ||
@@ -220,11 +221,12 @@ export default function BlogList({ posts }: BlogListProps) {
             >
               {/* Cover Image */}
               {post.coverImage && (
-                <div className="w-full h-48 overflow-hidden border-b-2 border-[#4fc3f7]">
-                  <img
+                <div className="w-full h-48 overflow-hidden border-b-2 border-[#4fc3f7] relative">
+                  <Image
                     src={post.coverImage}
                     alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
               )}

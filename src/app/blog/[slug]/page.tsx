@@ -1,6 +1,7 @@
 import { getBlogPostBySlug, getAllBlogSlugs } from "@/lib/blog";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Navbar from "@/components/Navbar";
@@ -80,11 +81,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         {/* Cover Image */}
         {post.coverImage && (
           <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-            <div className="aspect-video w-full overflow-hidden border-2 border-[#4fc3f7]">
-              <img
+            <div className="aspect-video w-full overflow-hidden border-2 border-[#4fc3f7] relative">
+              <Image
                 src={post.coverImage}
                 alt={post.title}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
               />
             </div>
           </div>
@@ -232,13 +234,20 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     {children}
                   </pre>
                 ),
-                img: ({ src, alt }) => (
-                  <img
-                    src={src}
-                    alt={alt || ""}
-                    className="border-2 border-[#4fc3f7] my-8 w-full"
-                  />
-                ),
+                img: ({ src, alt }) => {
+                  const imageSrc = typeof src === 'string' ? src : '';
+                  return (
+                    <span className="block relative w-full" style={{ minHeight: '400px' }}>
+                      <Image
+                        src={imageSrc}
+                        alt={alt || ""}
+                        width={1200}
+                        height={600}
+                        className="border-2 border-[#4fc3f7] my-8 w-full h-auto"
+                      />
+                    </span>
+                  );
+                },
                 hr: () => (
                   <hr className="border-[#4fc3f7] my-8" />
                 ),
