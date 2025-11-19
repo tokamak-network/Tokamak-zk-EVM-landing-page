@@ -215,13 +215,22 @@ function parseNotionPage(page: NotionPage): BlogPost {
   console.log("🔄 [PARSE] Parsing Notion page:", page.id);
   
   try {
-    const title = page.properties.Title.title[0]?.plain_text || "Untitled";
+    // Concatenate all title segments (fixes issue with colons and special characters)
+    const title = page.properties.Title.title
+      .map((text) => text.plain_text)
+      .join("") || "Untitled";
     console.log("  📌 Title:", title);
     
-    const slug = page.properties.Slug.rich_text[0]?.plain_text || "";
+    // Concatenate all slug segments
+    const slug = page.properties.Slug.rich_text
+      .map((text) => text.plain_text)
+      .join("") || "";
     console.log("  📌 Slug:", slug);
     
-    const description = page.properties.Description.rich_text[0]?.plain_text || "";
+    // Concatenate all description segments
+    const description = page.properties.Description.rich_text
+      .map((text) => text.plain_text)
+      .join("") || "";
     console.log("  📌 Description:", description.substring(0, 50) + "...");
     
     const published = page.properties.Published.select?.name || "Staging";
@@ -233,7 +242,10 @@ function parseNotionPage(page: NotionPage): BlogPost {
     const tags = page.properties.Tags.multi_select.map((tag) => tag.name);
     console.log("  📌 Tags:", tags.join(", "));
     
-    const author = page.properties.Author?.rich_text?.[0]?.plain_text || "Tokamak Network";
+    // Concatenate all author segments
+    const author = page.properties.Author?.rich_text
+      ?.map((text) => text.plain_text)
+      .join("") || "Tokamak Network";
     console.log("  📌 Author:", author);
 
     // Get cover image from property or page cover
