@@ -64,7 +64,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <div className="hidden md:block absolute text-white text-lg animate-pulse" style={{ top: "15%", right: "25%", animationDelay: "0.5s" }}>+</div>
         
         {/* Back Button */}
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <div className="relative z-10  max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
           <Link
             href="/blog"
             className="inline-flex items-center gap-2 text-[#4fc3f7] hover:text-[#028bee] transition-colors font-semibold border-2 border-[#4fc3f7] hover:border-[#028bee] px-4 py-2"
@@ -91,7 +91,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         )}
 
         {/* Article Header */}
-        <article className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <article className="relative z-10  max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Tags */}
           {post.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-6">
