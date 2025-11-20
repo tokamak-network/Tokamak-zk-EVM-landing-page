@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { BlogPost } from "@/types/blog";
 import { Search, X, Calendar } from "lucide-react";
 
@@ -217,24 +216,63 @@ export default function BlogList({ posts }: BlogListProps) {
             <Link
               key={post.id}
               href={`/blog/${post.slug}`}
-              className="group relative bg-gradient-to-b from-[#0a1930] to-[#1a2347] border-2 border-[#4fc3f7] hover:border-[#029bee] transition-all duration-300 hover:shadow-lg hover:shadow-[#4fc3f7]/20 overflow-hidden"
+              className="group relative bg-gradient-to-b from-[#0a1930] to-[#1a2347] border-2 border-[#4fc3f7] hover:border-[#029bee] transition-all duration-300 hover:shadow-lg hover:shadow-[#4fc3f7]/20 overflow-hidden flex flex-col"
             >
-              {/* Cover Image */}
-              {post.coverImage && (
-                <div className="w-full h-48 overflow-hidden border-b-2 border-[#4fc3f7] relative">
-                  <Image
+              {/* Cover Image or Placeholder */}
+              {post.coverImage ? (
+                <div className="w-full h-48 overflow-hidden border-b-2 border-[#4fc3f7]">
+                  <img
                     src={post.coverImage}
                     alt={post.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
+                </div>
+              ) : (
+                <div className="w-full h-48 bg-gradient-to-br from-[#0a1930] via-[#1a2347] to-[#0a1930] border-b-2 border-[#4fc3f7] flex flex-col items-center justify-center relative overflow-hidden">
+                  {/* Decorative Background Pattern */}
+                  <div className="absolute inset-0 opacity-5">
+                    <div className="absolute top-4 left-4 text-6xl text-[#4fc3f7]">✦</div>
+                    <div className="absolute bottom-4 right-4 text-6xl text-[#4fc3f7]">✦</div>
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-8xl text-[#4fc3f7]">⚙</div>
+                  </div>
+                  
+                  {/* Main Content */}
+                  <div className="relative z-10 flex flex-col items-center gap-4 px-4">
+                    {/* Brand Text */}
+                    <h3
+                      className="text-2xl font-bold text-[#4fc3f7] text-center"
+                      style={{
+                        fontFamily: '"Jersey 10", "Press Start 2P", monospace',
+                        letterSpacing: '0.1rem',
+                      }}
+                    >
+                      Tokamak zk-EVM
+                    </h3>
+                    
+                    {/* Tags as Badges */}
+                    {post.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-2 justify-center">
+                        {post.tags.slice(0, 3).map((tag) => (
+                          <span
+                            key={tag}
+                            className="px-3 py-1 text-xs bg-[#028bee]/80 text-white border border-[#4fc3f7]/50 backdrop-blur-sm"
+                            style={{
+                              fontFamily: '"IBM Plex Mono"',
+                            }}
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
-              {/* Content */}
-              <div className="p-6">
-                {/* Tags */}
-                {post.tags.length > 0 && (
+              {/* Content - Flex Grow */}
+              <div className="p-6 flex flex-col flex-grow">
+                {/* Tags (only show if has image) */}
+                {post.coverImage && post.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-3">
                     {post.tags.slice(0, 3).map((tag) => (
                       <span
@@ -262,7 +300,7 @@ export default function BlogList({ posts }: BlogListProps) {
 
                 {/* Description */}
                 <p
-                  className="text-white mb-4 line-clamp-3"
+                  className="text-white mb-4 line-clamp-3 flex-grow"
                   style={{
                     fontFamily: '"IBM Plex Mono"',
                     fontSize: "0.9rem",
@@ -272,35 +310,38 @@ export default function BlogList({ posts }: BlogListProps) {
                   {post.description}
                 </p>
 
-                {/* Meta */}
-                <div
-                  className="flex items-center gap-4 text-sm text-[#4fc3f7]/70"
-                  style={{
-                    fontFamily: '"IBM Plex Mono"',
-                  }}
-                >
-                  <div className="flex items-center gap-1">
-                    <Calendar size={14} />
-                    {new Date(post.publishDate).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}
+                {/* Meta and Read More - Always at Bottom */}
+                <div className="mt-auto">
+                  {/* Meta */}
+                  <div
+                    className="flex items-center gap-4 text-sm text-[#4fc3f7]/70 mb-4"
+                    style={{
+                      fontFamily: '"IBM Plex Mono"',
+                    }}
+                  >
+                    <div className="flex items-center gap-1">
+                      <Calendar size={14} />
+                      {new Date(post.publishDate).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </div>
+                    {post.author && (
+                      <>
+                        <span>•</span>
+                        <span>{post.author}</span>
+                      </>
+                    )}
                   </div>
-                  {post.author && (
-                    <>
-                      <span>•</span>
-                      <span>{post.author}</span>
-                    </>
-                  )}
-                </div>
 
-                {/* Read More */}
-                <div
-                  className="mt-4 inline-flex items-center gap-2 text-[#4fc3f7] group-hover:text-[#028bee] transition-all font-semibold"
-                  style={{ fontFamily: '"IBM Plex Mono"' }}
-                >
-                  <span>Read more →</span>
+                  {/* Read More */}
+                  <div
+                    className="inline-flex items-center gap-2 text-[#4fc3f7] group-hover:text-[#028bee] transition-all font-semibold"
+                    style={{ fontFamily: '"IBM Plex Mono"' }}
+                  >
+                    <span>Read more →</span>
+                  </div>
                 </div>
               </div>
             </Link>

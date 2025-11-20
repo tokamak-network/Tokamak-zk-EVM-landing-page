@@ -250,15 +250,21 @@ function parseNotionPage(page: NotionPage): BlogPost {
 
     // Get cover image from property or page cover
     let coverImage = "";
+    console.log("  🔍 Checking CoverImage property...");
+    console.log("  🔍 CoverImage exists:", !!page.properties.CoverImage);
+    console.log("  🔍 CoverImage.files:", page.properties.CoverImage?.files);
+    
     if (page.properties.CoverImage?.files?.[0]) {
       const file = page.properties.CoverImage.files[0];
+      console.log("  🔍 File object:", JSON.stringify(file, null, 2));
       coverImage = file.file?.url || file.external?.url || "";
-      console.log("  📌 Cover Image (from property):", coverImage ? "✅" : "❌");
+      console.log("  📌 Cover Image (from property):", coverImage ? `✅ ${coverImage.substring(0, 50)}...` : "❌ Empty URL");
     } else if (page.cover) {
+      console.log("  🔍 Page cover object:", JSON.stringify(page.cover, null, 2));
       coverImage = page.cover.file?.url || page.cover.external?.url || "";
-      console.log("  📌 Cover Image (from page):", coverImage ? "✅" : "❌");
+      console.log("  📌 Cover Image (from page cover):", coverImage ? `✅ ${coverImage.substring(0, 50)}...` : "❌ Empty URL");
     } else {
-      console.log("  📌 Cover Image: ❌ No image");
+      console.log("  📌 Cover Image: ❌ No image found in property or page cover");
     }
 
     console.log("✅ [PARSE] Successfully parsed page:", title);
