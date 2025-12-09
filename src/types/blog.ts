@@ -1,3 +1,5 @@
+import type { ExtendedRecordMap } from "notion-types";
+
 export interface BlogPost {
   id: string;
   title: string;
@@ -8,7 +10,7 @@ export interface BlogPost {
   tags: string[];
   coverImage?: string;
   author?: string;
-  content?: string; // Markdown content
+  recordMap?: ExtendedRecordMap; // Full page content for react-notion-x
 }
 
 export interface NotionPage {
@@ -44,4 +46,3 @@ export interface NotionPage {
     external?: { url: string };
   };
 }
-
