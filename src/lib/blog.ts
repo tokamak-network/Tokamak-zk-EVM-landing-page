@@ -1,4 +1,4 @@
-import { notion, n2m, DATABASE_ID } from "./notion";
+import { notion, notionAPI, DATABASE_ID } from "./notion";
 import { BlogPost, NotionPage } from "@/types/blog";
 
 // Type for Notion database response
@@ -78,7 +78,28 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
 }
 
 /**
- * Fetch a single blog post by slug
+ * Helper function to fetch recordMap with retry logic
+ */
+async function fetchRecordMapWithRetry(pageId: string, maxRetries: number = 3): Promise<Awaited<ReturnType<typeof notionAPI.getPage>> | null> {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`📝 [BLOG] Fetching recordMap (attempt ${attempt}/${maxRetries})...`);
+      const recordMap = await notionAPI.getPage(pageId);
+      return recordMap;
+    } catch (error) {
+      console.error(`⚠️  [BLOG] RecordMap fetch attempt ${attempt} failed:`, error instanceof Error ? error.message : String(error));
+      if (attempt < maxRetries) {
+        const delay = attempt * 1000; // Exponential backoff: 1s, 2s, 3s
+        console.log(`⏳ [BLOG] Retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Fetch a single blog post by slug with full page content (recordMap)
  */
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
   console.log("\n📄 [BLOG] ========== FETCHING SINGLE POST ==========");
@@ -130,20 +151,22 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
     }
 
     const page = response.results[0] as unknown as NotionPage;
-    console.log("📄 [BLOG] Parsing post...");
+    console.log("📄 [BLOG] Parsing post metadata...");
     const post = parseNotionPage(page);
 
-    // Fetch the page content as markdown
-    console.log("📝 [BLOG] Converting Notion content to Markdown...");
-    const mdblocks = await n2m.pageToMarkdown(page.id);
-    const mdString = n2m.toMarkdownString(mdblocks);
-    post.content = mdString.parent;
-
-    console.log("✅ [BLOG] Post fetched successfully!");
-    console.log("📄 [BLOG] Title:", post.title);
-    console.log("📄 [BLOG] Content length:", post.content?.length || 0, "characters");
-    console.log("📄 [BLOG] ================================================\n");
+    // Fetch the page content as recordMap using unofficial client with retry
+    const recordMap = await fetchRecordMapWithRetry(page.id);
     
+    if (recordMap) {
+      post.recordMap = recordMap;
+      console.log("✅ [BLOG] Post fetched successfully!");
+      console.log("📄 [BLOG] Title:", post.title);
+      console.log("📄 [BLOG] RecordMap blocks:", Object.keys(recordMap.block || {}).length);
+    } else {
+      console.warn("⚠️  [BLOG] Could not fetch recordMap after retries, returning post without content");
+    }
+    
+    console.log("📄 [BLOG] ================================================\n");
     return post;
   } catch (error) {
     console.error("\n❌ [BLOG] ERROR FETCHING SINGLE POST:");
@@ -206,6 +229,40 @@ export async function getAllBlogSlugs(): Promise<string[]> {
     console.error("🔗 [BLOG] ==========================================\n");
     return [];
   }
+}
+
+/**
+ * Fetch recent blog posts (for homepage or sidebar)
+ */
+export async function getRecentBlogPosts(limit: number = 3): Promise<BlogPost[]> {
+  console.log("\n📰 [BLOG] ========== FETCHING RECENT POSTS ==========");
+  console.log("📰 [BLOG] Limit:", limit);
+  
+  const posts = await getBlogPosts();
+  const recentPosts = posts.slice(0, limit);
+  
+  console.log("✅ [BLOG] Returning", recentPosts.length, "recent posts");
+  console.log("📰 [BLOG] ==========================================\n");
+  
+  return recentPosts;
+}
+
+/**
+ * Fetch blog posts filtered by tag
+ */
+export async function getBlogPostsByTag(tag: string): Promise<BlogPost[]> {
+  console.log("\n🏷️  [BLOG] ========== FETCHING POSTS BY TAG ==========");
+  console.log("🏷️  [BLOG] Tag:", tag);
+  
+  const posts = await getBlogPosts();
+  const filteredPosts = posts.filter((post) => 
+    post.tags.some((t) => t.toLowerCase() === tag.toLowerCase())
+  );
+  
+  console.log("✅ [BLOG] Found", filteredPosts.length, "posts with tag:", tag);
+  console.log("🏷️  [BLOG] ==========================================\n");
+  
+  return filteredPosts;
 }
 
 /**
@@ -285,4 +342,3 @@ function parseNotionPage(page: NotionPage): BlogPost {
     throw error;
   }
 }
-
