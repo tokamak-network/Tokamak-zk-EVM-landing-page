@@ -1,10 +1,10 @@
 import { getBlogPostBySlug, getAllBlogSlugs } from "@/lib/blog";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import NotionContent from "@/components/NotionContent";
+import { BlogTracker } from "@/components/Analytics";
 
 // Revalidate every hour (3600 seconds)
 export const revalidate = 3600;
@@ -50,6 +50,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   return (
     <div className="min-h-screen">
       <Navbar />
+      
+      {/* Analytics: Track blog post engagement */}
+      <BlogTracker
+        slug={slug}
+        title={post.title}
+        tags={post.tags}
+        author={post.author}
+      />
       
       <div
         className="relative overflow-hidden"

@@ -18,6 +18,7 @@
     "notion-client": "^7.7.1",
     "notion-to-md": "^3.1.9",
     "notion-types": "^7.7.1",
+    "posthog-js": "^1.304.0",
     "prismjs": "^1.30.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",

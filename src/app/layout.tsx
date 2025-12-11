@@ -1,7 +1,8 @@
-import React from "react";
+import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import "./globals.css";
 import RefreshButton from "@/components/RefreshButton";
+import { PostHogProvider } from "@/components/Analytics";
 
 export const metadata: Metadata = {
   title: "Own Your Privacy - Tokamak zk-EVM",
@@ -34,8 +35,12 @@ export default function RootLayout({
         className="bg-gradient-to-b from-[#0a1930] to-[#1a2347] text-white antialiased"
         style={{ fontFamily: '"IBM Plex Mono", monospace' }}
       >
-        <div className="min-h-screen">{children}</div>
-        {showRefreshButton && <RefreshButton />}
+        <Suspense fallback={null}>
+          <PostHogProvider>
+            <div className="min-h-screen">{children}</div>
+            {showRefreshButton && <RefreshButton />}
+          </PostHogProvider>
+        </Suspense>
       </body>
     </html>
   );
