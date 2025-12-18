@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import NotionContent from "@/components/NotionContent";
 import { BlogTracker } from "@/components/Analytics";
+import VisualizationsSection from "@/components/VisualizationsSection";
 
 // Revalidate every hour (3600 seconds)
 export const revalidate = 3600;
@@ -158,6 +159,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </p>
             </div>
           )}
+
+          {/* AI-Generated Visualizations */}
+          <VisualizationsSection slug={slug} />
 
           {/* Back to Blog */}
           <div className="mt-16 pt-8 border-t-2 border-[#4fc3f7]">
