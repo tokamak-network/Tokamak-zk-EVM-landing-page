@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import RefreshButton from "@/components/RefreshButton";
 import { PostHogProvider } from "@/components/Analytics";
+import ChatWidget from "@/components/ChatWidget";
 
 export const metadata: Metadata = {
   title: "Own Your Privacy - Tokamak zk-EVM",
@@ -39,6 +40,7 @@ export default function RootLayout({
           <PostHogProvider>
             <div className="min-h-screen">{children}</div>
             {showRefreshButton && <RefreshButton />}
+            <ChatWidget />
           </PostHogProvider>
         </Suspense>
       </body>
