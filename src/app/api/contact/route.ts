@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
       timeZoneName: 'short'
     });
 
-    // Format the email content - designed to look like a message, not a form
+    // Format the email content - minimal and clean design
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -125,177 +125,67 @@ export async function POST(request: NextRequest) {
           <meta charset="utf-8">
           <style>
             body {
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-              background-color: #f5f5f5;
-              color: #333333;
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+              color: #333;
               padding: 20px;
               margin: 0;
               line-height: 1.6;
+              background: #fff;
             }
             .container {
-              max-width: 600px;
+              max-width: 560px;
               margin: 0 auto;
-              background: #ffffff;
-              border-radius: 12px;
-              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-              overflow: hidden;
             }
-            .header {
-              background: linear-gradient(135deg, #0a1930 0%, #1a2347 100%);
-              padding: 24px 30px;
-              border-bottom: 3px solid #4fc3f7;
-            }
-            .header-content {
-              display: flex;
-              align-items: center;
-            }
-            .avatar {
-              width: 50px;
-              height: 50px;
-              background: linear-gradient(135deg, #028bee 0%, #4fc3f7 100%);
-              border-radius: 50%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              margin-right: 16px;
-              font-size: 22px;
-              color: white;
-              font-weight: bold;
-            }
-            .sender-info h2 {
-              color: #ffffff;
-              margin: 0 0 4px 0;
-              font-size: 18px;
-              font-weight: 600;
-            }
-            .sender-info p {
-              color: #4fc3f7;
-              margin: 0;
-              font-size: 14px;
-            }
-            .message-body {
-              padding: 30px;
-            }
-            .message-text {
-              font-size: 16px;
-              color: #333333;
-              background: #f8f9fa;
-              padding: 20px;
-              border-radius: 8px;
-              border-left: 4px solid #4fc3f7;
-              margin: 0;
+            .message {
+              font-size: 15px;
+              color: #333;
+              padding: 16px 0;
+              border-bottom: 1px solid #eee;
+              margin-bottom: 16px;
               white-space: pre-wrap;
             }
-            .meta-info {
-              padding: 20px 30px;
-              background: #f8f9fa;
-              border-top: 1px solid #e9ecef;
+            .meta {
+              font-size: 13px;
+              color: #666;
             }
-            .meta-row {
-              display: flex;
-              justify-content: space-between;
-              margin-bottom: 8px;
-              font-size: 14px;
-            }
-            .meta-row:last-child {
-              margin-bottom: 0;
-            }
-            .meta-label {
-              color: #6c757d;
-            }
-            .meta-value {
-              color: #333333;
-              font-weight: 500;
-            }
-            .meta-value a {
-              color: #028bee;
+            .meta a {
+              color: #0066cc;
               text-decoration: none;
-            }
-            .meta-value a:hover {
-              text-decoration: underline;
-            }
-            .reply-btn {
-              display: inline-block;
-              background: linear-gradient(135deg, #028bee 0%, #4fc3f7 100%);
-              color: white;
-              padding: 12px 24px;
-              border-radius: 8px;
-              text-decoration: none;
-              font-weight: 600;
-              font-size: 14px;
-              margin-top: 16px;
             }
             .footer {
-              padding: 16px 30px;
-              background: #0a1930;
-              text-align: center;
-            }
-            .footer p {
-              color: rgba(255, 255, 255, 0.6);
-              margin: 0;
+              margin-top: 24px;
+              padding-top: 16px;
+              border-top: 1px solid #eee;
               font-size: 12px;
-            }
-            .footer a {
-              color: #4fc3f7;
-              text-decoration: none;
+              color: #999;
             }
           </style>
         </head>
         <body>
           <div class="container">
-            <div class="header">
-              <div class="header-content">
-                <div class="avatar">${name.charAt(0).toUpperCase()}</div>
-                <div class="sender-info">
-                  <h2>${name}</h2>
-                  <p>sent you a message</p>
-                </div>
-              </div>
-            </div>
+            <p class="message">${message.replace(/\n/g, "<br>")}</p>
             
-            <div class="message-body">
-              <p class="message-text">${message.replace(/\n/g, "<br>")}</p>
-              
-              <a href="mailto:${email}?subject=Re: Your message to Tokamak Support" class="reply-btn">
-                Reply to ${name}
-              </a>
-            </div>
+            <p class="meta">
+              <strong>${name}</strong> &lt;<a href="mailto:${email}">${email}</a>&gt;<br>
+              ${timestamp}
+            </p>
             
-            <div class="meta-info">
-              <div class="meta-row">
-                <span class="meta-label">From:</span>
-                <span class="meta-value"><a href="mailto:${email}">${email}</a></span>
-              </div>
-              <div class="meta-row">
-                <span class="meta-label">Received:</span>
-                <span class="meta-value">${timestamp}</span>
-              </div>
-              <div class="meta-row">
-                <span class="meta-label">Via:</span>
-                <span class="meta-value">Tokamak zk-EVM Support Chat</span>
-              </div>
-            </div>
-            
-            <div class="footer">
-              <p>This message was received via the <a href="https://tokamak.network">Tokamak zk-EVM</a> website support chat.</p>
-            </div>
+            <p class="footer">
+              Received via Tokamak zk-EVM Support
+            </p>
           </div>
         </body>
       </html>
     `;
 
     const textContent = `
-${name} sent you a message
-${"=".repeat(name.length + 21)}
+${message}
 
-"${message}"
+—
+${name} <${email}>
+${timestamp}
 
----
-From: ${name} <${email}>
-Received: ${timestamp}
-Via: Tokamak zk-EVM Support Chat
-
-Reply directly to this email to respond to ${name}.
+Received via Tokamak zk-EVM Support
     `.trim();
 
     // Send email to all recipients
