@@ -106,7 +106,18 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Format the email content
+    // Get current timestamp
+    const timestamp = new Date().toLocaleString('en-US', { 
+      weekday: 'long',
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short'
+    });
+
+    // Format the email content - designed to look like a message, not a form
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -114,86 +125,159 @@ export async function POST(request: NextRequest) {
           <meta charset="utf-8">
           <style>
             body {
-              font-family: 'IBM Plex Mono', monospace, Arial, sans-serif;
-              background-color: #0a1930;
-              color: #ffffff;
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+              background-color: #f5f5f5;
+              color: #333333;
               padding: 20px;
               margin: 0;
+              line-height: 1.6;
             }
             .container {
               max-width: 600px;
               margin: 0 auto;
-              background: linear-gradient(180deg, #0a1930 0%, #1a2347 100%);
-              border: 2px solid #4fc3f7;
+              background: #ffffff;
               border-radius: 12px;
-              padding: 30px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              overflow: hidden;
             }
             .header {
-              text-align: center;
-              padding-bottom: 20px;
-              border-bottom: 1px solid rgba(79, 195, 247, 0.3);
-              margin-bottom: 20px;
+              background: linear-gradient(135deg, #0a1930 0%, #1a2347 100%);
+              padding: 24px 30px;
+              border-bottom: 3px solid #4fc3f7;
             }
-            .header h1 {
+            .header-content {
+              display: flex;
+              align-items: center;
+            }
+            .avatar {
+              width: 50px;
+              height: 50px;
+              background: linear-gradient(135deg, #028bee 0%, #4fc3f7 100%);
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin-right: 16px;
+              font-size: 22px;
+              color: white;
+              font-weight: bold;
+            }
+            .sender-info h2 {
+              color: #ffffff;
+              margin: 0 0 4px 0;
+              font-size: 18px;
+              font-weight: 600;
+            }
+            .sender-info p {
               color: #4fc3f7;
               margin: 0;
-              font-size: 24px;
+              font-size: 14px;
             }
-            .field {
-              margin-bottom: 20px;
+            .message-body {
+              padding: 30px;
             }
-            .label {
-              color: #4fc3f7;
-              font-size: 12px;
-              text-transform: uppercase;
-              letter-spacing: 1px;
-              margin-bottom: 5px;
-            }
-            .value {
-              color: #ffffff;
+            .message-text {
               font-size: 16px;
-              padding: 10px;
-              background: rgba(79, 195, 247, 0.1);
-              border: 1px solid rgba(79, 195, 247, 0.3);
+              color: #333333;
+              background: #f8f9fa;
+              padding: 20px;
               border-radius: 8px;
-            }
-            .message-value {
+              border-left: 4px solid #4fc3f7;
+              margin: 0;
               white-space: pre-wrap;
-              line-height: 1.6;
+            }
+            .meta-info {
+              padding: 20px 30px;
+              background: #f8f9fa;
+              border-top: 1px solid #e9ecef;
+            }
+            .meta-row {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 8px;
+              font-size: 14px;
+            }
+            .meta-row:last-child {
+              margin-bottom: 0;
+            }
+            .meta-label {
+              color: #6c757d;
+            }
+            .meta-value {
+              color: #333333;
+              font-weight: 500;
+            }
+            .meta-value a {
+              color: #028bee;
+              text-decoration: none;
+            }
+            .meta-value a:hover {
+              text-decoration: underline;
+            }
+            .reply-btn {
+              display: inline-block;
+              background: linear-gradient(135deg, #028bee 0%, #4fc3f7 100%);
+              color: white;
+              padding: 12px 24px;
+              border-radius: 8px;
+              text-decoration: none;
+              font-weight: 600;
+              font-size: 14px;
+              margin-top: 16px;
             }
             .footer {
+              padding: 16px 30px;
+              background: #0a1930;
               text-align: center;
-              padding-top: 20px;
-              border-top: 1px solid rgba(79, 195, 247, 0.3);
-              margin-top: 20px;
+            }
+            .footer p {
               color: rgba(255, 255, 255, 0.6);
+              margin: 0;
               font-size: 12px;
+            }
+            .footer a {
+              color: #4fc3f7;
+              text-decoration: none;
             }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="header">
-              <h1>New Contact Form Submission</h1>
+              <div class="header-content">
+                <div class="avatar">${name.charAt(0).toUpperCase()}</div>
+                <div class="sender-info">
+                  <h2>${name}</h2>
+                  <p>sent you a message</p>
+                </div>
+              </div>
             </div>
             
-            <div class="field">
-              <div class="label">Name</div>
-              <div class="value">${name}</div>
+            <div class="message-body">
+              <p class="message-text">${message.replace(/\n/g, "<br>")}</p>
+              
+              <a href="mailto:${email}?subject=Re: Your message to Tokamak Support" class="reply-btn">
+                Reply to ${name}
+              </a>
             </div>
             
-            <div class="field">
-              <div class="label">Email</div>
-              <div class="value"><a href="mailto:${email}" style="color: #4fc3f7;">${email}</a></div>
-            </div>
-            
-            <div class="field">
-              <div class="label">Message</div>
-              <div class="value message-value">${message.replace(/\n/g, "<br>")}</div>
+            <div class="meta-info">
+              <div class="meta-row">
+                <span class="meta-label">From:</span>
+                <span class="meta-value"><a href="mailto:${email}">${email}</a></span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Received:</span>
+                <span class="meta-value">${timestamp}</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Via:</span>
+                <span class="meta-value">Tokamak zk-EVM Support Chat</span>
+              </div>
             </div>
             
             <div class="footer">
-              Sent from Tokamak zk-EVM Landing Page Contact Form
+              <p>This message was received via the <a href="https://tokamak.network">Tokamak zk-EVM</a> website support chat.</p>
             </div>
           </div>
         </body>
@@ -201,27 +285,27 @@ export async function POST(request: NextRequest) {
     `;
 
     const textContent = `
-New Contact Form Submission
-===========================
+${name} sent you a message
+${"=".repeat(name.length + 21)}
 
-Name: ${name}
-Email: ${email}
-
-Message:
-${message}
+"${message}"
 
 ---
-Sent from Tokamak zk-EVM Landing Page Contact Form
+From: ${name} <${email}>
+Received: ${timestamp}
+Via: Tokamak zk-EVM Support Chat
+
+Reply directly to this email to respond to ${name}.
     `.trim();
 
     // Send email to all recipients
     console.log("📧 [CONTACT] Sending email to:", recipients.join(", "));
     
     const result = await transporter.sendMail({
-      from: `"Tokamak Contact Form" <${smtpEmail}>`,
+      from: `"${name} via Tokamak Support" <${smtpEmail}>`,
       to: recipients.join(", "),
       replyTo: email,
-      subject: `[Tokamak Contact] New message from ${name}`,
+      subject: `${name} sent you a message`,
       text: textContent,
       html: htmlContent,
     });
