@@ -3,6 +3,25 @@ import posthog from 'posthog-js';
 // Check if we're in the browser
 const isBrowser = typeof window !== 'undefined';
 
+// Debug mode - logs events to console in development
+const isDebug = isBrowser && (
+  process.env.NODE_ENV === 'development' || 
+  process.env.NEXT_PUBLIC_ANALYTICS_DEBUG === 'true'
+);
+
+/**
+ * Log analytics events to console in debug mode
+ */
+function debugLog(eventName: string, properties?: Record<string, unknown>) {
+  if (isDebug) {
+    console.log(
+      `%c[Analytics] ${eventName}`,
+      'color: #4fc3f7; font-weight: bold;',
+      properties || ''
+    );
+  }
+}
+
 /**
  * Initialize PostHog - called once in the PostHogProvider
  */
@@ -24,6 +43,8 @@ export function initPostHog() {
     capture_pageleave: true, // Capture when user leaves the page
     persistence: 'localStorage+cookie', // For returning visitor tracking
   });
+  
+  debugLog('PostHog initialized', { host: posthogHost });
 }
 
 /**
@@ -32,6 +53,7 @@ export function initPostHog() {
 export function trackEvent(eventName: string, properties?: Record<string, unknown>) {
   if (!isBrowser) return;
   
+  debugLog(eventName, properties);
   posthog.capture(eventName, properties);
 }
 
@@ -41,9 +63,9 @@ export function trackEvent(eventName: string, properties?: Record<string, unknow
 export function trackPageView(url?: string) {
   if (!isBrowser) return;
   
-  posthog.capture('$pageview', {
-    $current_url: url || window.location.href,
-  });
+  const props = { $current_url: url || window.location.href };
+  debugLog('$pageview', props);
+  posthog.capture('$pageview', props);
 }
 
 /**
@@ -52,26 +74,43 @@ export function trackPageView(url?: string) {
 export function trackBlogView(slug: string, title: string, tags: string[], author?: string) {
   if (!isBrowser) return;
   
-  posthog.capture('blog_post_viewed', {
+  const props = {
     slug,
     title,
     tags,
     author: author || 'Unknown',
     $current_url: window.location.href,
-  });
+  };
+  debugLog('blog_post_viewed', props);
+  posthog.capture('blog_post_viewed', props);
 }
 
 /**
- * Track time spent reading a blog post
+ * Track time spent reading a blog post (active time only)
+ * @param slug - Blog post slug
+ * @param totalSeconds - Total time on page
+ * @param activeSeconds - Active reading time (tab visible)
+ * @param trigger - What triggered this event
  */
-export function trackBlogReadTime(slug: string, timeSeconds: number) {
+export function trackBlogReadTime(
+  slug: string, 
+  totalSeconds: number, 
+  activeSeconds: number,
+  trigger: 'visibility_change' | 'page_unload' | 'unmount' | 'heartbeat'
+) {
   if (!isBrowser) return;
   
-  posthog.capture('blog_time_spent', {
+  const props = {
     slug,
-    seconds: timeSeconds,
-    minutes: Math.round(timeSeconds / 60 * 10) / 10, // Round to 1 decimal
-  });
+    total_seconds: totalSeconds,
+    active_seconds: activeSeconds,
+    active_minutes: Math.round(activeSeconds / 60 * 10) / 10,
+    total_minutes: Math.round(totalSeconds / 60 * 10) / 10,
+    engagement_ratio: totalSeconds > 0 ? Math.round((activeSeconds / totalSeconds) * 100) : 0,
+    trigger,
+  };
+  debugLog('blog_time_spent', props);
+  posthog.capture('blog_time_spent', props);
 }
 
 /**
@@ -80,24 +119,30 @@ export function trackBlogReadTime(slug: string, timeSeconds: number) {
 export function trackBlogScrollDepth(slug: string, depth: 25 | 50 | 75 | 100) {
   if (!isBrowser) return;
   
-  posthog.capture('blog_scroll_depth', {
+  const props = {
     slug,
     depth,
     depth_label: `${depth}%`,
-  });
+  };
+  debugLog('blog_scroll_depth', props);
+  posthog.capture('blog_scroll_depth', props);
 }
 
 /**
  * Track blog read completion (reached end of article)
  */
-export function trackBlogReadComplete(slug: string, title: string, timeSeconds: number) {
+export function trackBlogReadComplete(slug: string, title: string, totalSeconds: number, activeSeconds: number) {
   if (!isBrowser) return;
   
-  posthog.capture('blog_read_complete', {
+  const props = {
     slug,
     title,
-    total_time_seconds: timeSeconds,
-  });
+    total_time_seconds: totalSeconds,
+    active_time_seconds: activeSeconds,
+    engagement_ratio: totalSeconds > 0 ? Math.round((activeSeconds / totalSeconds) * 100) : 0,
+  };
+  debugLog('blog_read_complete', props);
+  posthog.capture('blog_read_complete', props);
 }
 
 /**
@@ -106,10 +151,12 @@ export function trackBlogReadComplete(slug: string, title: string, timeSeconds: 
 export function trackSectionView(sectionName: string) {
   if (!isBrowser) return;
   
-  posthog.capture('section_viewed', {
+  const props = {
     section_name: sectionName,
     $current_url: window.location.href,
-  });
+  };
+  debugLog('section_viewed', props);
+  posthog.capture('section_viewed', props);
 }
 
 /**
@@ -118,12 +165,14 @@ export function trackSectionView(sectionName: string) {
 export function trackCTAClick(buttonName: string, location: string, href?: string) {
   if (!isBrowser) return;
   
-  posthog.capture('cta_clicked', {
+  const props = {
     button_name: buttonName,
     location,
     href,
     $current_url: window.location.href,
-  });
+  };
+  debugLog('cta_clicked', props);
+  posthog.capture('cta_clicked', props);
 }
 
 /**
@@ -132,11 +181,29 @@ export function trackCTAClick(buttonName: string, location: string, href?: strin
 export function trackSocialClick(platform: string, location: string) {
   if (!isBrowser) return;
   
-  posthog.capture('social_link_clicked', {
+  const props = {
     platform,
     location,
     $current_url: window.location.href,
-  });
+  };
+  debugLog('social_link_clicked', props);
+  posthog.capture('social_link_clicked', props);
+}
+
+/**
+ * Track blog reading heartbeat (for long reading sessions)
+ * Sent every 30 seconds while user is actively reading
+ */
+export function trackBlogHeartbeat(slug: string, activeSeconds: number, scrollDepth: number) {
+  if (!isBrowser) return;
+  
+  const props = {
+    slug,
+    active_seconds: activeSeconds,
+    current_scroll_depth: scrollDepth,
+  };
+  debugLog('blog_reading_heartbeat', props);
+  posthog.capture('blog_reading_heartbeat', props);
 }
 
 /**
@@ -175,6 +242,45 @@ export function isPostHogLoaded(): boolean {
   if (!isBrowser) return false;
   
   return posthog.__loaded ?? false;
+}
+
+/**
+ * Debug function to check PostHog status
+ * Call this from browser console: window.checkPostHog()
+ */
+export function checkPostHogStatus() {
+  if (!isBrowser) {
+    console.log('[Analytics] Not in browser');
+    return { status: 'not_in_browser' };
+  }
+  
+  const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+  const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST;
+  
+  const status = {
+    isLoaded: posthog.__loaded ?? false,
+    hasKey: !!posthogKey,
+    keyPreview: posthogKey ? `${posthogKey.substring(0, 8)}...` : 'NOT SET',
+    host: posthogHost || 'https://us.i.posthog.com (default)',
+    distinctId: posthog.get_distinct_id?.() || 'unknown',
+    sessionId: posthog.get_session_id?.() || 'unknown',
+  };
+  
+  console.log('%c[PostHog Status]', 'color: #4fc3f7; font-weight: bold; font-size: 14px;');
+  console.table(status);
+  
+  if (!status.isLoaded) {
+    console.warn('⚠️ PostHog is NOT loaded! Check your NEXT_PUBLIC_POSTHOG_KEY in .env.local');
+  } else {
+    console.log('✅ PostHog is loaded and ready to send events');
+  }
+  
+  return status;
+}
+
+// Expose to window for debugging in browser console
+if (isBrowser) {
+  (window as unknown as { checkPostHog: typeof checkPostHogStatus }).checkPostHog = checkPostHogStatus;
 }
 
 export default posthog;
