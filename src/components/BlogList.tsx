@@ -314,27 +314,29 @@ export default function BlogList({ posts }: BlogListProps) {
 
                 {/* Meta and Read More - Always at Bottom */}
                 <div className="mt-auto">
-                  {/* Meta */}
+                  {/* Meta - Single line with truncation */}
                   <div
-                    className="flex items-center gap-4 text-sm text-[#4fc3f7]/70 mb-4"
+                    className="text-sm text-[#4fc3f7]/70 mb-4"
                     style={{
                       fontFamily: '"IBM Plex Mono"',
                     }}
                   >
-                    <div className="flex items-center gap-1">
-                      <Calendar size={14} />
-                      {new Date(post.publishDate).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
+                    <div className="flex items-center gap-2">
+                      <Calendar size={14} className="flex-shrink-0" />
+                      <span className="whitespace-nowrap">
+                        {new Date(post.publishDate).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                      {post.author && (
+                        <>
+                          <span className="flex-shrink-0">•</span>
+                          <span className="truncate max-w-[120px]" title={post.author}>{post.author}</span>
+                        </>
+                      )}
                     </div>
-                    {post.author && (
-                      <>
-                        <span>•</span>
-                        <span>{post.author}</span>
-                      </>
-                    )}
                   </div>
 
                   {/* Read More */}

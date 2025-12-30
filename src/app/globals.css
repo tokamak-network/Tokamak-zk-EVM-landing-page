@@ -389,28 +389,22 @@ body {
 .notion-content-wrapper li {
   font-size: 16px !important;
   line-height: 1.75 !important;
+  color: #ffffff !important;
 }
 
-/* Headings - keep Notion's sizes, just add color */
+/* Headings - WHITE, not blue */
 .notion-content-wrapper .notion-h1,
 .notion-content-wrapper .notion-h2,
 .notion-content-wrapper .notion-h3 {
-  color: #5fd4ff !important;
+  color: #ffffff !important;
 }
 
-/* Text - bright white for max readability */
+/* Text - WHITE for max readability */
 .notion-content-wrapper .notion-text {
-  color: #f0f0f0 !important;
+  color: #ffffff !important;
 }
 
-/* Headings - bright cyan, easy to see */
-.notion-content-wrapper .notion-h1,
-.notion-content-wrapper .notion-h2,
-.notion-content-wrapper .notion-h3 {
-  color: #5fd4ff !important;
-}
-
-/* Links - bright yellow for visibility on dark bg */
+/* Links - keep yellow for visibility */
 .notion-content-wrapper .notion-link {
   color: #ffd700 !important;
   text-decoration: underline;
@@ -423,80 +417,81 @@ body {
 /* Code blocks */
 .notion-content-wrapper .notion-code {
   background: rgba(15, 25, 45, 0.95) !important;
-  border: 1px solid rgba(100, 200, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 .notion-content-wrapper .notion-code > code {
-  color: #f0f0f0 !important;
+  color: #ffffff !important;
 }
 
-/* Inline code */
+/* Inline code - subtle gray background, white text */
 .notion-content-wrapper code.notion-inline-code {
-  background: rgba(100, 200, 255, 0.25) !important;
-  color: #5fd4ff !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
 }
 
-/* Blockquotes/Callouts */
+/* Blockquotes/Callouts - white border, white text */
 .notion-content-wrapper .notion-quote {
-  border-left: 4px solid #5fd4ff !important;
-  background: rgba(30, 50, 85, 0.6) !important;
-  color: #f0f0f0 !important;
+  border-left: 4px solid rgba(255, 255, 255, 0.5) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #ffffff !important;
 }
 
 .notion-content-wrapper .notion-callout {
-  background: rgba(30, 50, 85, 0.6) !important;
-  border: 1px solid rgba(100, 200, 255, 0.3) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
 }
 
 /* Lists */
 .notion-content-wrapper .notion-list {
-  color: #f0f0f0 !important;
+  color: #ffffff !important;
 }
 
 /* Toggle blocks */
 .notion-content-wrapper .notion-toggle {
-  background: rgba(30, 50, 85, 0.4) !important;
-  border: 1px solid rgba(100, 200, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Divider */
+/* Divider - white */
 .notion-content-wrapper .notion-hr {
-  border-color: rgba(100, 200, 255, 0.4) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
-/* Images - minimal border */
+/* Images - subtle white border */
 .notion-content-wrapper .notion-asset-wrapper {
-  border: 1px solid rgba(100, 200, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-/* Tables - Full width, high contrast text */
+/* Tables - Full width, WHITE text */
 .notion-content-wrapper .notion-simple-table {
   width: 100% !important;
-  border: 1px solid rgba(100, 200, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
   border-collapse: collapse !important;
 }
 
 .notion-content-wrapper .notion-simple-table th,
 .notion-content-wrapper .notion-simple-table td {
-  border: 1px solid rgba(100, 200, 255, 0.2) !important;
-  color: #f0f0f0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
   padding: 12px 16px !important;
 }
 
 .notion-content-wrapper .notion-simple-table th {
-  background: rgba(30, 50, 85, 0.7) !important;
-  color: #5fd4ff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
 }
 
 .notion-content-wrapper .notion-simple-table tr:nth-child(even) td {
-  background: rgba(30, 50, 85, 0.3) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
 }
 
 /* Also handle collection tables */
 .notion-content-wrapper .notion-table,
 .notion-content-wrapper .notion-collection-table {
   width: 100% !important;
-  border: 1px solid rgba(100, 200, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
   border-collapse: collapse !important;
 }
 
@@ -504,8 +499,8 @@ body {
 .notion-content-wrapper .notion-table td,
 .notion-content-wrapper .notion-collection-table th,
 .notion-content-wrapper .notion-collection-table td {
-  border: 1px solid rgba(100, 200, 255, 0.2) !important;
-  color: #f0f0f0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
   padding: 12px 16px !important;
 }
 
@@ -516,23 +511,23 @@ body {
   width: 100% !important;
 }
 
-/* Bookmarks */
+/* Bookmarks - white */
 .notion-content-wrapper .notion-bookmark {
-  border: 1px solid rgba(100, 200, 255, 0.3) !important;
-  background: rgba(30, 50, 85, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
 }
 
 .notion-content-wrapper .notion-bookmark-title {
-  color: #5fd4ff !important;
+  color: #ffffff !important;
 }
 
 .notion-content-wrapper .notion-bookmark-description {
-  color: #c0c0c0 !important;
+  color: #cccccc !important;
 }
 
 /* Equation blocks */
 .notion-content-wrapper .notion-equation {
-  color: #f0f0f0 !important;
+  color: #ffffff !important;
 }
 
 /* Remove default notion page padding/margins and override max-width */
@@ -561,30 +556,30 @@ body {
   display: none !important;
 }
 
-/* Toggle summary text */
+/* Toggle summary text - white */
 .notion-content-wrapper .notion-toggle > summary {
-  color: #5fd4ff !important;
+  color: #ffffff !important;
   cursor: pointer;
 }
 
 /* Video embeds */
 .notion-content-wrapper .notion-asset-wrapper-video {
-  border: 1px solid rgba(100, 200, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 /* File attachments */
 .notion-content-wrapper .notion-file {
-  border: 1px solid rgba(100, 200, 255, 0.3) !important;
-  background: rgba(30, 50, 85, 0.5) !important;
-  color: #f0f0f0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #ffffff !important;
 }
 
 /* Checkbox/Todo items */
 .notion-content-wrapper .notion-to-do {
-  color: #f0f0f0 !important;
+  color: #ffffff !important;
 }
 
 .notion-content-wrapper .notion-to-do-checked {
   text-decoration: line-through;
-  color: #808080 !important;
+  color: #888888 !important;
 }
