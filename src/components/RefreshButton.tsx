@@ -28,7 +28,7 @@ export default function RefreshButton() {
     <button
       onClick={handleRefresh}
       disabled={isRefreshing}
-      className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-[#00D4FF] to-[#0066FF] hover:from-[#00B8E6] hover:to-[#0052CC] text-white font-semibold px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+      className="fixed bottom-6 left-6 z-50 bg-gradient-to-r from-[#00D4FF] to-[#0066FF] hover:from-[#00B8E6] hover:to-[#0052CC] text-white font-semibold px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
       title="Refresh to see latest changes"
     >
       <svg
