@@ -15,6 +15,10 @@ export const metadata: Metadata = {
     shortcut: "/favicon.ico",
     apple: "/favicon.ico",
   },
+  // Google Search Console verification (from env)
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION || "",
+  },
 };
 
 export const viewport = {
