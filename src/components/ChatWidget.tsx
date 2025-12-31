@@ -2,8 +2,9 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send, Loader2, CheckCircle, UserCircle } from "lucide-react";
+import { useBlogContext } from "./BlogContext";
 
-type ConversationStep = "greeting" | "name" | "email" | "message" | "sending" | "success" | "error";
+type ConversationStep = "greeting" | "blogQuestion" | "name" | "email" | "message" | "sending" | "success" | "error";
 
 interface Message {
   id: string;
@@ -62,9 +63,13 @@ export default function ChatWidget() {
   const [userData, setUserData] = useState({ name: "", email: "", message: "" });
   const [isTyping, setIsTyping] = useState(false);
   const [isReturningUser, setIsReturningUser] = useState(false);
+  const [isBlogRelatedQuestion, setIsBlogRelatedQuestion] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const hasInitialized = useRef(false);
+  
+  // Get blog context (will be null if not on a blog page)
+  const blogContext = useBlogContext();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -120,7 +125,12 @@ export default function ChatWidget() {
       const storedUser = getStoredUser();
       
       setTimeout(() => {
-        if (storedUser) {
+        // Check if we're on a blog page (blogContext exists when on a blog page)
+        if (blogContext) {
+          // On a blog page - ask if question is about the blog
+          addBotMessage(`Hi there! 👋 I see you're reading "${blogContext.title}". Is your question related to this blog post, or is it a general question?`);
+          setStep("blogQuestion");
+        } else if (storedUser) {
           // Returning user - skip name and email steps
           setUserData({ name: storedUser.name, email: storedUser.email, message: "" });
           setIsReturningUser(true);
@@ -143,11 +153,16 @@ export default function ChatWidget() {
     setMessages([]);
     setStep("greeting");
     setInputValue("");
+    setIsBlogRelatedQuestion(false);
     
     const storedUser = getStoredUser();
     
     setTimeout(() => {
-      if (storedUser) {
+      // Check if we're on a blog page
+      if (blogContext) {
+        addBotMessage(`Hi there! 👋 I see you're reading "${blogContext.title}". Is your question related to this blog post, or is it a general question?`);
+        setStep("blogQuestion");
+      } else if (storedUser) {
         // Returning user - keep their info and go directly to message
         setUserData({ name: storedUser.name, email: storedUser.email, message: "" });
         setIsReturningUser(true);
@@ -171,23 +186,76 @@ export default function ChatWidget() {
     setUserData({ name: "", email: "", message: "" });
     setInputValue("");
     setIsReturningUser(false);
+    setIsBlogRelatedQuestion(false);
     
     setTimeout(() => {
-      addBotMessage("Hi there! 👋 I'm here to help. What's your name?");
-      setStep("name");
+      if (blogContext) {
+        addBotMessage(`Hi there! 👋 I see you're reading "${blogContext.title}". Is your question related to this blog post, or is it a general question?`);
+        setStep("blogQuestion");
+      } else {
+        addBotMessage("Hi there! 👋 I'm here to help. What's your name?");
+        setStep("name");
+      }
     }, 300);
+  };
+
+  // Handle blog question response
+  const handleBlogQuestionResponse = (isBlogRelated: boolean) => {
+    setIsBlogRelatedQuestion(isBlogRelated);
+    addUserMessage(isBlogRelated ? "About this blog post" : "General question");
+    
+    const storedUser = getStoredUser();
+    
+    setTimeout(() => {
+      if (isBlogRelated) {
+        addBotMessage(`Great! I'll send your question to the blog author${blogContext?.author ? ` (${blogContext.author})` : ""}. `);
+      }
+      
+      setTimeout(() => {
+        if (storedUser) {
+          setUserData({ name: storedUser.name, email: storedUser.email, message: "" });
+          setIsReturningUser(true);
+          addBotMessage(`Welcome back, ${storedUser.name}! 👋 What would you like to ask?`);
+          setStep("message");
+        } else {
+          addBotMessage("What's your name?");
+          setStep("name");
+        }
+      }, isBlogRelated ? 600 : 0);
+    }, 600);
   };
 
   const sendContactEmail = async (data: { name: string; email: string; message: string }) => {
     console.log("📧 [ChatWidget] Sending contact email with data:", data);
+    console.log("📧 [ChatWidget] Blog related:", isBlogRelatedQuestion);
+    console.log("📧 [ChatWidget] Blog context:", blogContext);
+    
     setStep("sending");
     try {
+      // Build the request payload
+      const payload: {
+        name: string;
+        email: string;
+        message: string;
+        authorEmails?: string;
+        blogTitle?: string;
+      } = { ...data };
+      
+      // Add blog-related fields if this is a blog question
+      if (isBlogRelatedQuestion && blogContext) {
+        payload.blogTitle = blogContext.title;
+        // Only add authorEmails if it's configured
+        if (blogContext.authorEmail) {
+          payload.authorEmails = blogContext.authorEmail;
+        }
+      }
+      
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -200,9 +268,20 @@ export default function ChatWidget() {
       saveUserToStorage(data.name, data.email);
       
       setStep("success");
-      addBotMessage(
-        `Thanks ${data.name}! 🎉 We've received your message and will get back to you at ${data.email} soon.`
-      );
+      
+      let successMessage: string;
+      if (isBlogRelatedQuestion && blogContext?.authorEmail && blogContext?.author) {
+        // Blog question with author email configured
+        successMessage = `Thanks ${data.name}! 🎉 Your question has been sent to the blog author (${blogContext.author}). They'll get back to you at ${data.email} soon.`;
+      } else if (isBlogRelatedQuestion && blogContext) {
+        // Blog question but no author email (sent to default recipients)
+        successMessage = `Thanks ${data.name}! 🎉 Your question about "${blogContext.title}" has been received. We'll get back to you at ${data.email} soon.`;
+      } else {
+        // General question
+        successMessage = `Thanks ${data.name}! 🎉 We've received your message and will get back to you at ${data.email} soon.`;
+      }
+      
+      addBotMessage(successMessage);
     } catch (error) {
       console.error("📧 [ChatWidget] Error:", error);
       setStep("error");
@@ -433,6 +512,32 @@ export default function ChatWidget() {
               >
                 Start New Conversation
               </button>
+            ) : step === "blogQuestion" ? (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleBlogQuestionResponse(true)}
+                  className="flex-1 py-3 rounded-xl font-medium text-sm transition-all hover:opacity-90"
+                  style={{
+                    background: "linear-gradient(135deg, #028bee 0%, #4fc3f7 100%)",
+                    color: "#ffffff",
+                    fontFamily: '"IBM Plex Mono", monospace',
+                  }}
+                >
+                  About this blog
+                </button>
+                <button
+                  onClick={() => handleBlogQuestionResponse(false)}
+                  className="flex-1 py-3 rounded-xl font-medium text-sm transition-all hover:opacity-90"
+                  style={{
+                    background: "rgba(79, 195, 247, 0.2)",
+                    border: "1px solid rgba(79, 195, 247, 0.5)",
+                    color: "#ffffff",
+                    fontFamily: '"IBM Plex Mono", monospace',
+                  }}
+                >
+                  General question
+                </button>
+              </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex gap-2">
                 <input

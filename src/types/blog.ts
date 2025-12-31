@@ -10,6 +10,7 @@ export interface BlogPost {
   tags: string[];
   coverImage?: string;
   author?: string;
+  authorEmail?: string; // Comma-separated emails for multiple authors
   recordMap?: ExtendedRecordMap; // Full page content for react-notion-x
 }
 
@@ -38,6 +39,9 @@ export interface NotionPage {
       files: Array<{ file?: { url: string }; external?: { url: string } }>;
     };
     Author?: {
+      rich_text: Array<{ plain_text: string }>;
+    };
+    AuthorEmail?: {
       rich_text: Array<{ plain_text: string }>;
     };
   };
