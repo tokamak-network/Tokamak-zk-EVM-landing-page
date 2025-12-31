@@ -4,6 +4,7 @@ import "./globals.css";
 import RefreshButton from "@/components/RefreshButton";
 import { PostHogProvider } from "@/components/Analytics";
 import ChatWidget from "@/components/ChatWidget";
+import { GlobalBlogProvider } from "@/components/BlogContext";
 
 export const metadata: Metadata = {
   title: "Own Your Privacy - Tokamak zk-EVM",
@@ -42,9 +43,11 @@ export default function RootLayout({
       >
         <Suspense fallback={null}>
           <PostHogProvider>
-            <div className="min-h-screen">{children}</div>
-            {showRefreshButton && <RefreshButton />}
-            <ChatWidget />
+            <GlobalBlogProvider>
+              <div className="min-h-screen">{children}</div>
+              {showRefreshButton && <RefreshButton />}
+              <ChatWidget />
+            </GlobalBlogProvider>
           </PostHogProvider>
         </Suspense>
       </body>

@@ -305,6 +305,12 @@ function parseNotionPage(page: NotionPage): BlogPost {
       .join("") || "Tokamak Network";
     console.log("  📌 Author:", author);
 
+    // Concatenate all author email segments (can be comma-separated for multiple authors)
+    const authorEmail = page.properties.AuthorEmail?.rich_text
+      ?.map((text) => text.plain_text)
+      .join("") || "";
+    console.log("  📌 Author Email:", authorEmail || "Not set");
+
     // Get cover image from property or page cover
     let coverImage = "";
     console.log("  🔍 Checking CoverImage property...");
@@ -336,6 +342,7 @@ function parseNotionPage(page: NotionPage): BlogPost {
       tags,
       coverImage,
       author,
+      authorEmail: authorEmail || undefined,
     };
   } catch (error) {
     console.error("❌ [PARSE] Error parsing page:", error);

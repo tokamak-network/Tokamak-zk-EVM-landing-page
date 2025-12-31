@@ -259,7 +259,7 @@ export default function BlogList({ posts }: BlogListProps) {
                     
                     {/* Post Title */}
                     <h3
-                      className="text-lg font-bold text-[#4fc3f7] text-center line-clamp-3"
+                      className="text-lg font-bold text-white text-center line-clamp-3"
                       style={{
                         fontFamily: '"IBM Plex Mono"',
                         letterSpacing: '0.02rem',
@@ -292,7 +292,7 @@ export default function BlogList({ posts }: BlogListProps) {
 
                 {/* Title */}
                 <h2
-                  className="text-2xl font-bold mb-3 text-[#4fc3f7] group-hover:text-[#29b6f6] transition-colors"
+                  className="text-2xl font-bold mb-3 text-white group-hover:text-[#4fc3f7] transition-colors"
                   style={{
                     fontFamily: '"IBM Plex Mono"',
                   }}

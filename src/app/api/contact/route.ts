@@ -5,6 +5,8 @@ interface ContactRequest {
   name: string;
   email: string;
   message: string;
+  authorEmails?: string; // Comma-separated author emails for blog-related questions
+  blogTitle?: string; // Blog post title for blog-related questions
 }
 
 function validateEmail(email: string): boolean {
@@ -60,34 +62,80 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { name, email, message } = body as ContactRequest;
+    const { name, email, message, authorEmails, blogTitle } = body as ContactRequest;
     console.log("📧 [CONTACT] Extracted data - Name:", name, "| Email:", email, "| Message length:", message?.length);
+    console.log("📧 [CONTACT] Blog context - Author Emails:", authorEmails || "N/A", "| Blog Title:", blogTitle || "N/A");
+
+    // Check if this is a blog-related question (blogTitle is set when user selects "About this blog")
+    const isBlogRelated = !!blogTitle;
+    const hasAuthorEmails = !!(authorEmails && authorEmails.trim());
+    console.log("📧 [CONTACT] Is blog-related question:", isBlogRelated);
+    console.log("📧 [CONTACT] Has author emails:", hasAuthorEmails);
 
     // Check environment variables
     const smtpEmail = process.env.SMTP_EMAIL;
     const smtpPassword = process.env.SMTP_PASSWORD;
-    const recipientEmails = process.env.CONTACT_RECIPIENT_EMAILS;
+    const defaultRecipientEmails = process.env.CONTACT_RECIPIENT_EMAILS;
 
     console.log("📧 [CONTACT] SMTP Config - Email:", smtpEmail ? `${smtpEmail.substring(0, 5)}...` : "NOT SET");
     console.log("📧 [CONTACT] SMTP Config - Password:", smtpPassword ? "SET (hidden)" : "NOT SET");
-    console.log("📧 [CONTACT] SMTP Config - Recipients:", recipientEmails ? recipientEmails : "NOT SET");
+    console.log("📧 [CONTACT] SMTP Config - Default Recipients:", defaultRecipientEmails ? defaultRecipientEmails : "NOT SET");
 
-    if (!smtpEmail || !smtpPassword || !recipientEmails) {
+    if (!smtpEmail || !smtpPassword) {
       console.error("📧 [CONTACT] ERROR: Missing SMTP configuration environment variables");
       console.error("📧 [CONTACT] - SMTP_EMAIL:", !!smtpEmail);
       console.error("📧 [CONTACT] - SMTP_PASSWORD:", !!smtpPassword);
-      console.error("📧 [CONTACT] - CONTACT_RECIPIENT_EMAILS:", !!recipientEmails);
       return NextResponse.json(
         { error: "Server configuration error. Please try again later." },
         { status: 500 }
       );
     }
 
-    // Parse comma-separated recipient emails
-    const recipients = recipientEmails
-      .split(",")
-      .map((email) => email.trim())
-      .filter((email) => email.length > 0);
+    // Determine recipients based on whether it's a blog-related question with author emails
+    let recipients: string[];
+    
+    if (hasAuthorEmails && authorEmails) {
+      // Blog-related question with author emails: send to author emails
+      recipients = authorEmails
+        .split(",")
+        .map((email) => email.trim())
+        .filter((email) => email.length > 0 && validateEmail(email));
+      
+      console.log("📧 [CONTACT] Sending to blog author(s):", recipients.join(", "));
+      
+      if (recipients.length === 0) {
+        console.error("📧 [CONTACT] No valid author emails found, falling back to default recipients");
+        // Fall back to default recipients if author emails are invalid
+        if (!defaultRecipientEmails) {
+          return NextResponse.json(
+            { error: "Server configuration error. Please try again later." },
+            { status: 500 }
+          );
+        }
+        recipients = defaultRecipientEmails
+          .split(",")
+          .map((email) => email.trim())
+          .filter((email) => email.length > 0);
+      }
+    } else {
+      // General question OR blog question without author emails: send to default recipients
+      if (!defaultRecipientEmails) {
+        console.error("📧 [CONTACT] ERROR: No default recipient emails configured");
+        return NextResponse.json(
+          { error: "Server configuration error. Please try again later." },
+          { status: 500 }
+        );
+      }
+      
+      recipients = defaultRecipientEmails
+        .split(",")
+        .map((email) => email.trim())
+        .filter((email) => email.length > 0);
+      
+      if (isBlogRelated) {
+        console.log("📧 [CONTACT] Blog-related question but no author emails, sending to default recipients with blog context");
+      }
+    }
 
     if (recipients.length === 0) {
       console.error("No valid recipient emails configured");
@@ -118,6 +166,17 @@ export async function POST(request: NextRequest) {
     });
 
     // Format the email content - minimal and clean design
+    const blogContextHtml = isBlogRelated && blogTitle 
+      ? `<p class="blog-context" style="font-size: 13px; color: #028bee; background: #f0f8ff; padding: 12px; border-left: 3px solid #028bee; margin-bottom: 16px;">
+          <strong>Question about blog post:</strong><br>
+          "${blogTitle}"
+        </p>`
+      : "";
+    
+    const blogContextText = isBlogRelated && blogTitle
+      ? `[Question about blog post: "${blogTitle}"]\n\n`
+      : "";
+
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -163,6 +222,7 @@ export async function POST(request: NextRequest) {
         </head>
         <body>
           <div class="container">
+            ${blogContextHtml}
             <p class="message">${message.replace(/\n/g, "<br>")}</p>
             
             <p class="meta">
@@ -171,7 +231,7 @@ export async function POST(request: NextRequest) {
             </p>
             
             <p class="footer">
-              Received via Tokamak zk-EVM Support
+              Received via Tokamak zk-EVM ${isBlogRelated ? "Blog" : "Support"}
             </p>
           </div>
         </body>
@@ -179,23 +239,33 @@ export async function POST(request: NextRequest) {
     `;
 
     const textContent = `
-${message}
+${blogContextText}${message}
 
 —
 ${name} <${email}>
 ${timestamp}
 
-Received via Tokamak zk-EVM Support
+Received via Tokamak zk-EVM ${isBlogRelated ? "Blog" : "Support"}
     `.trim();
+
+    // Determine subject line based on context
+    const subject = isBlogRelated && blogTitle
+      ? `Question about "${blogTitle}" from ${name}`
+      : `${name} sent you a message`;
+    
+    const fromName = isBlogRelated 
+      ? `${name} via Tokamak Blog`
+      : `${name} via Tokamak Support`;
 
     // Send email to all recipients
     console.log("📧 [CONTACT] Sending email to:", recipients.join(", "));
+    console.log("📧 [CONTACT] Subject:", subject);
     
     const result = await transporter.sendMail({
-      from: `"${name} via Tokamak Support" <${smtpEmail}>`,
+      from: `"${fromName}" <${smtpEmail}>`,
       to: recipients.join(", "),
       replyTo: email,
-      subject: `${name} sent you a message`,
+      subject,
       text: textContent,
       html: htmlContent,
     });
