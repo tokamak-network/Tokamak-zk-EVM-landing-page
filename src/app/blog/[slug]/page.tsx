@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getBlogPostBySlug, getAllBlogSlugs } from "@/lib/blog";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -7,6 +8,7 @@ import NotionContent from "@/components/NotionContent";
 import { BlogTracker } from "@/components/Analytics";
 import VisualizationsSection from "@/components/VisualizationsSection";
 import { BlogProvider } from "@/components/BlogContext";
+import type { BlogPost } from "@/types/blog";
 
 // Revalidate every hour (3600 seconds)
 export const revalidate = 3600;
@@ -20,34 +22,116 @@ export async function generateStaticParams() {
 }
 
 // Generate metadata for SEO
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
   const { slug } = await params;
   const post = await getBlogPostBySlug(slug);
 
   if (!post) {
     return {
-      title: "Post Not Found - Tokamak Network",
+      title: "Post Not Found",
+      description: "The requested blog post could not be found.",
+      robots: {
+        index: false,
+        follow: true,
+      },
     };
   }
 
+  const ogImage = post.coverImage || "/og-image.png";
+  const postUrl = `/blog/${slug}`;
+
   return {
-    title: `${post.title} - Tokamak Network Blog`,
-    description: post.description,
+    title: post.title,
+    description:
+      post.description ||
+      `Read "${post.title}" on the Tokamak zk-EVM blog. Insights on zero-knowledge proofs and privacy technology.`,
+    keywords: [
+      ...post.tags,
+      "Tokamak Network",
+      "zk-EVM",
+      "Zero Knowledge",
+      "Blockchain",
+    ],
+    authors: post.author ? [{ name: post.author }] : [{ name: "Tokamak Network" }],
+    alternates: {
+      canonical: postUrl,
+    },
     openGraph: {
       title: post.title,
       description: post.description,
-      images: post.coverImage ? [post.coverImage] : [],
+      url: postUrl,
+      type: "article",
+      publishedTime: post.publishDate,
+      authors: post.author ? [post.author] : ["Tokamak Network"],
+      tags: post.tags,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description,
+      images: [ogImage],
     },
   };
 }
 
-export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+// Generate JSON-LD structured data for a blog post
+function generateArticleJsonLd(post: BlogPost, slug: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "@id": `https://zkp.tokamak.network/blog/${slug}/#article`,
+    headline: post.title,
+    description: post.description,
+    image: post.coverImage || "https://zkp.tokamak.network/og-image.png",
+    datePublished: post.publishDate,
+    dateModified: post.publishDate,
+    author: {
+      "@type": "Person",
+      name: post.author || "Tokamak Network",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Tokamak Network",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://zkp.tokamak.network/assets/header/logo.svg",
+      },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://zkp.tokamak.network/blog/${slug}`,
+    },
+    keywords: post.tags.join(", "),
+    articleSection: "Technology",
+    inLanguage: "en-US",
+  };
+}
+
+export default async function BlogPostPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
   const post = await getBlogPostBySlug(slug);
 
   if (!post) {
     notFound();
   }
+
+  const articleJsonLd = generateArticleJsonLd(post, slug);
 
   return (
     <BlogProvider
@@ -56,9 +140,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       authorEmail={post.authorEmail}
       author={post.author}
     >
+      {/* JSON-LD Structured Data for Article */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       <div className="min-h-screen">
         <Navbar />
-        
+
         {/* Analytics: Track blog post engagement */}
         <BlogTracker
           slug={slug}

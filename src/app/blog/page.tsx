@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getBlogPosts } from "@/lib/blog";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -6,9 +7,64 @@ import BlogList from "@/components/BlogList";
 // Revalidate every 30 minutes (1800 seconds)
 export const revalidate = 1800;
 
-export const metadata = {
-  title: "Blog - Tokamak Network",
-  description: "Latest insights, updates, and technical articles from Tokamak Network",
+export const metadata: Metadata = {
+  title: "Blog",
+  description:
+    "Latest insights, updates, and technical articles from Tokamak Network. Explore zero-knowledge proofs, zk-EVM development, privacy technology, and blockchain innovation.",
+  keywords: [
+    "Tokamak Blog",
+    "zk-EVM Articles",
+    "Zero Knowledge Proofs",
+    "Blockchain Technology",
+    "Privacy Tech",
+    "Ethereum Layer 2",
+    "Web3 Development",
+  ],
+  alternates: {
+    canonical: "/blog",
+  },
+  openGraph: {
+    title: "Blog | Tokamak zk-EVM",
+    description:
+      "Latest insights, updates, and technical articles from Tokamak Network. Explore zero-knowledge proofs and privacy technology.",
+    url: "/blog",
+    type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Tokamak zk-EVM Blog",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Blog | Tokamak zk-EVM",
+    description:
+      "Latest insights, updates, and technical articles from Tokamak Network.",
+    images: ["/og-image.png"],
+  },
+};
+
+// JSON-LD Structured Data for Blog Listing
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "@id": "https://zkp.tokamak.network/blog/#blog",
+  mainEntityOfPage: "https://zkp.tokamak.network/blog",
+  name: "Tokamak zk-EVM Blog",
+  description:
+    "Latest insights, updates, and technical articles from Tokamak Network about zero-knowledge proofs and privacy technology.",
+  publisher: {
+    "@type": "Organization",
+    name: "Tokamak Network",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://zkp.tokamak.network/assets/header/logo.svg",
+    },
+  },
+  url: "https://zkp.tokamak.network/blog",
 };
 
 export default async function BlogPage() {
@@ -22,68 +78,75 @@ export default async function BlogPage() {
   console.log("🌐 [PAGE] ==========================================\n");
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      
-      {/* Cosmic Background with Stars */}
-      <div
-        className="relative overflow-hidden flex-grow"
-        style={{
-          background: "linear-gradient(to bottom, #0a1930 0%, #1a2347 100%)",
-        }}
-      >
-        {/* Cosmic Elements */}
-        <div className="hidden md:block absolute text-white text-lg animate-pulse" style={{ top: "10%", left: "10%", animationDelay: "0s" }}>✦</div>
-        <div className="hidden md:block absolute text-white text-sm animate-pulse" style={{ top: "20%", right: "15%", animationDelay: "1s" }}>✦</div>
-        <div className="hidden md:block absolute text-white text-xl animate-pulse" style={{ top: "30%", left: "20%", animationDelay: "2s" }}>✦</div>
-        <div className="hidden md:block absolute text-white text-lg animate-pulse" style={{ top: "15%", right: "25%", animationDelay: "0.5s" }}>+</div>
-        <div className="hidden md:block absolute text-white text-sm animate-pulse" style={{ bottom: "40%", left: "15%", animationDelay: "1.5s" }}>+</div>
-        
-        {/* Header Section */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
-          <h1
-            className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-[#4fc3f7] to-[#29b6f6] bg-clip-text text-transparent text-center"
-            style={{
-              fontFamily: '"Jersey 10", "Press Start 2P", monospace',
-            }}
-          >
-            Blog
-          </h1>
-          <p
-            className="text-white text-lg max-w-3xl mx-auto text-center"
-            style={{
-              fontFamily: '"IBM Plex Mono"',
-              lineHeight: "1.6",
-            }}
-          >
-            Latest insights, updates, and technical articles from Tokamak Network
-          </p>
+    <>
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+
+        {/* Cosmic Background with Stars */}
+        <div
+          className="relative overflow-hidden flex-grow"
+          style={{
+            background: "linear-gradient(to bottom, #0a1930 0%, #1a2347 100%)",
+          }}
+        >
+          {/* Cosmic Elements */}
+          <div className="hidden md:block absolute text-white text-lg animate-pulse" style={{ top: "10%", left: "10%", animationDelay: "0s" }}>✦</div>
+          <div className="hidden md:block absolute text-white text-sm animate-pulse" style={{ top: "20%", right: "15%", animationDelay: "1s" }}>✦</div>
+          <div className="hidden md:block absolute text-white text-xl animate-pulse" style={{ top: "30%", left: "20%", animationDelay: "2s" }}>✦</div>
+          <div className="hidden md:block absolute text-white text-lg animate-pulse" style={{ top: "15%", right: "25%", animationDelay: "0.5s" }}>+</div>
+          <div className="hidden md:block absolute text-white text-sm animate-pulse" style={{ bottom: "40%", left: "15%", animationDelay: "1.5s" }}>+</div>
+
+          {/* Header Section */}
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+            <h1
+              className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-[#4fc3f7] to-[#29b6f6] bg-clip-text text-transparent text-center"
+              style={{
+                fontFamily: '"Jersey 10", "Press Start 2P", monospace',
+              }}
+            >
+              Blog
+            </h1>
+            <p
+              className="text-white text-lg max-w-3xl mx-auto text-center"
+              style={{
+                fontFamily: '"IBM Plex Mono"',
+                lineHeight: "1.6",
+              }}
+            >
+              Latest insights, updates, and technical articles from Tokamak Network
+            </p>
+          </div>
+
+          {/* Blog Posts with Filters */}
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+            {posts.length === 0 ? (
+              <div className="text-center py-20 min-h-[320px] flex items-center justify-center">
+                <p
+                  className="text-white text-lg"
+                  style={{
+                    fontFamily: '"IBM Plex Mono"',
+                  }}
+                >
+                  No blog posts yet. Check back soon!
+                </p>
+              </div>
+            ) : (
+              <BlogList posts={posts} />
+            )}
+          </div>
+
+          {/* Rainbow Stripe at bottom */}
+          <div className="w-full h-4 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 via-indigo-500 to-purple-500"></div>
         </div>
 
-        {/* Blog Posts with Filters */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-          {posts.length === 0 ? (
-            <div className="text-center py-20 min-h-[320px] flex items-center justify-center">
-              <p
-                className="text-white text-lg"
-                style={{
-                  fontFamily: '"IBM Plex Mono"',
-                }}
-              >
-                No blog posts yet. Check back soon!
-              </p>
-            </div>
-          ) : (
-            <BlogList posts={posts} />
-          )}
-        </div>
-
-        {/* Rainbow Stripe at bottom */}
-        <div className="w-full h-4 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 via-indigo-500 to-purple-500"></div>
+        <Footer />
       </div>
-
-      <Footer />
-    </div>
+    </>
   );
 }
 
