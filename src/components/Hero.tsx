@@ -80,9 +80,9 @@ const Hero: React.FC = () => {
           </div>
 
           {/* Main Title */}
-          <div className="flex flex-nowrap items-center justify-center gap-4 md:gap-8">
+          <div className="flex flex-nowrap items-center justify-center gap-4 md:gap-6">
             <h1
-              className="text-6xl md:text-8xl lg:text-9xl font-bold text-white text-center"
+              className="text-5xl md:text-7xl lg:text-8xl font-bold text-white text-center"
               style={{
                 fontFamily: '"Jersey 10", "Press Start 2P", monospace',
                 letterSpacing: '0.1rem',
@@ -91,7 +91,7 @@ const Hero: React.FC = () => {
               Tokamak Network
             </h1>
             <span
-              className="text-6xl md:text-8xl lg:text-9xl font-bold text-[#4fc3f7]"
+              className="text-5xl md:text-7xl lg:text-8xl font-bold text-[#4fc3f7]"
               style={{
                 fontFamily: '"Jersey 10", "Press Start 2P", monospace',
                 letterSpacing: '0.2rem',

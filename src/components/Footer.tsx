@@ -25,9 +25,9 @@ const Footer: React.FC = () => {
               <Image
                 src={LogoImage}
                 alt="Tokamak Network"
-                width={200}
-                height={17}
-                className="h-6 w-auto filter brightness-0 invert"
+                width={240}
+                height={26}
+                className="h-8 w-auto filter brightness-0 invert"
               />
             </div>
             <p className="text-gray-300 mb-6 max-w-md leading-relaxed">
@@ -127,7 +127,7 @@ const Footer: React.FC = () => {
         {/* Bottom Section */}
         <div className="border-t border-gray-700 mt-8 pt-8 text-center">
           <p className="text-gray-400 text-sm">
-            © 2025 Tokamak Network ZKP. All rights reserved.
+            © 2026 Tokamak Network ZKP. All rights reserved.
           </p>
         </div>
       </div>
