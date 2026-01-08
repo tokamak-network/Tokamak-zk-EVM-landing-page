@@ -66,7 +66,7 @@ const Hero: React.FC = () => {
         className="relative z-10 min-h-screen flex flex-col justify-center items-center"
       >
         {/* Main Content */}
-        <div className={`flex flex-col items-center text-center space-y-8 px-2 w-full transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <div className={`flex flex-col items-center text-center space-y-6 md:space-y-8 px-4 sm:px-6 w-full transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#4fc3f7]/10 border border-[#4fc3f7]/20 backdrop-blur-sm">
@@ -80,9 +80,9 @@ const Hero: React.FC = () => {
           </div>
 
           {/* Main Title */}
-          <div className="flex flex-nowrap items-center justify-center gap-4 md:gap-6">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-8">
             <h1
-              className="text-5xl md:text-7xl lg:text-8xl font-bold text-white text-center"
+              className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-white text-center"
               style={{
                 fontFamily: '"Jersey 10", "Press Start 2P", monospace',
                 letterSpacing: '0.1rem',
@@ -91,7 +91,7 @@ const Hero: React.FC = () => {
               Tokamak Network
             </h1>
             <span
-              className="text-5xl md:text-7xl lg:text-8xl font-bold text-[#4fc3f7]"
+              className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-[#4fc3f7]"
               style={{
                 fontFamily: '"Jersey 10", "Press Start 2P", monospace',
                 letterSpacing: '0.2rem',
@@ -102,9 +102,9 @@ const Hero: React.FC = () => {
           </div>
 
           {/* Description */}
-          <div className="max-w-3xl">
+          <div className="max-w-3xl px-2">
             <p
-              className="text-white/70 text-lg md:text-xl leading-relaxed"
+              className="text-white/70 text-base sm:text-lg md:text-xl leading-relaxed"
               style={{
                 fontFamily: '"IBM Plex Mono"',
               }}
@@ -115,11 +115,11 @@ const Hero: React.FC = () => {
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mt-2 sm:mt-4 w-full sm:w-auto px-4 sm:px-0">
             {/* Primary CTA */}
             <a
               href="#solutions-section"
-              className="group inline-flex items-center px-8 py-4 text-lg font-semibold text-white bg-[#028bee] hover:bg-[#0277d4] transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="group inline-flex items-center justify-center w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white bg-[#028bee] hover:bg-[#0277d4] transition-all duration-300 shadow-lg hover:shadow-xl"
               style={{
                 fontFamily: '"IBM Plex Mono"',
               }}
@@ -135,7 +135,7 @@ const Hero: React.FC = () => {
               href="https://github.com/tokamak-network"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center px-8 py-4 text-lg font-semibold text-[#4fc3f7] border-2 border-[#4fc3f7]/50 hover:border-[#4fc3f7] hover:bg-[#4fc3f7]/10 transition-all duration-300 backdrop-blur-sm"
+              className="group inline-flex items-center justify-center w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-[#4fc3f7] border-2 border-[#4fc3f7]/50 hover:border-[#4fc3f7] hover:bg-[#4fc3f7]/10 transition-all duration-300 backdrop-blur-sm"
               style={{
                 fontFamily: '"IBM Plex Mono"',
               }}
