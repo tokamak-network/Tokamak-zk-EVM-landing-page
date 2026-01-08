@@ -36,7 +36,7 @@ const VideoSection: React.FC = () => {
             See It In Action
           </h2>
           <p className="text-xl text-white/80 mx-auto" style={{ fontFamily: '"IBM Plex Mono"' }}>
-            Watch how Tokamak zk-EVM brings zero-knowledge privacy to Ethereum
+            Watch how Tokamak ZKP solutions bring privacy and scalability to Ethereum
           </p>
         </div>
 

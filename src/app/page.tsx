@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import SolutionsSection from "@/components/SolutionsSection";
 import WhoSection from "@/components/WhoSection";
 import ThreeWaysSection from "@/components/ThreeWaysSection";
 import VideoSection from "@/components/VideoSection";
@@ -10,16 +11,16 @@ import { SectionTracker } from "@/components/Analytics";
 
 // Homepage-specific metadata
 export const metadata: Metadata = {
-  title: "Own Your Privacy | Tokamak zk-EVM",
+  title: "Tokamak Network ZKP | Zero-Knowledge Proof Solutions",
   description:
-    "Experience true privacy with Tokamak Network's zero-knowledge Ethereum Virtual Machine. Your data, your control. Build private, scalable dApps on Ethereum with cutting-edge ZK technology.",
+    "High-throughput zero-knowledge proof solutions for Ethereum. Powering zk-EVM rollups, threshold signatures, and private application channels with production-grade performance.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Own Your Privacy | Tokamak zk-EVM",
+    title: "Tokamak Network ZKP | Zero-Knowledge Proof Solutions",
     description:
-      "Experience true privacy with Tokamak Network's zero-knowledge Ethereum Virtual Machine. Your data, your control.",
+      "High-throughput zero-knowledge proof solutions for Ethereum. Powering zk-EVM rollups, threshold signatures, and private application channels.",
     url: "/",
     type: "website",
     images: [
@@ -27,15 +28,15 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Tokamak zk-EVM - Privacy-First Zero-Knowledge Ethereum",
+        alt: "Tokamak Network ZKP - Zero-Knowledge Proof Solutions for Ethereum",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Own Your Privacy | Tokamak zk-EVM",
+    title: "Tokamak Network ZKP | Zero-Knowledge Proof Solutions",
     description:
-      "Experience true privacy with Tokamak Network's zero-knowledge Ethereum Virtual Machine.",
+      "High-throughput zero-knowledge proof solutions for Ethereum. Powering zk-EVM rollups, threshold signatures, and private channels.",
     images: ["/og-image.png"],
   },
 };
@@ -54,8 +55,8 @@ const jsonLd = {
         url: "https://zkp.tokamak.network/assets/header/logo.svg",
       },
       sameAs: [
-        "https://twitter.com/tokaborator",
-        "https://discord.gg/tokamak",
+        "https://twitter.com/TokamakZKPWorld",
+        "https://t.me/+9My2ZmBemYs2YTFk",
         "https://github.com/tokamak-network",
       ],
     },
@@ -63,9 +64,9 @@ const jsonLd = {
       "@type": "WebSite",
       "@id": "https://zkp.tokamak.network/#website",
       url: "https://zkp.tokamak.network",
-      name: "Tokamak zk-EVM",
+      name: "Tokamak Network ZKP",
       description:
-        "Privacy-First Zero-Knowledge Ethereum Virtual Machine by Tokamak Network",
+        "High-throughput zero-knowledge proof solutions for Ethereum by Tokamak Network",
       publisher: {
         "@id": "https://zkp.tokamak.network/#organization",
       },
@@ -74,9 +75,9 @@ const jsonLd = {
       "@type": "WebPage",
       "@id": "https://zkp.tokamak.network/#webpage",
       url: "https://zkp.tokamak.network",
-      name: "Own Your Privacy | Tokamak zk-EVM",
+      name: "Tokamak Network ZKP | Zero-Knowledge Proof Solutions",
       description:
-        "Experience true privacy with Tokamak Network's zero-knowledge Ethereum Virtual Machine. Your data, your control.",
+        "High-throughput zero-knowledge proof solutions for Ethereum. Powering zk-EVM rollups, threshold signatures, and private application channels.",
       isPartOf: {
         "@id": "https://zkp.tokamak.network/#website",
       },
@@ -90,11 +91,11 @@ const jsonLd = {
     },
     {
       "@type": "SoftwareApplication",
-      name: "Tokamak zk-EVM",
+      name: "Tokamak ZKP",
       applicationCategory: "BlockchainApplication",
       operatingSystem: "Ethereum",
       description:
-        "Zero-knowledge Ethereum Virtual Machine for privacy-preserving smart contracts and transactions",
+        "Zero-knowledge proof solutions for Ethereum including zk-EVM rollups, threshold signatures, and private application channels",
       offers: {
         "@type": "Offer",
         price: "0",
@@ -107,6 +108,7 @@ const jsonLd = {
 // Section IDs to track for analytics
 const TRACKED_SECTIONS = [
   "overview", // Hero section
+  "solutions-section", // Solutions Section
   "who-section", // Who This Is For
   "two-ways-section", // Three Ways Section
   "video-section", // Video Section
@@ -129,9 +131,10 @@ export default function Home() {
 
         <main>
           <Hero />
+          <SolutionsSection />
           <WhoSection />
           <ThreeWaysSection />
-          <VideoSection />
+          {/* <VideoSection /> */}
           <WhyDifferentSection />
         </main>
         <Footer />

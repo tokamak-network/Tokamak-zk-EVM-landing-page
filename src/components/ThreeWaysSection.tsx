@@ -40,57 +40,102 @@ const ThreeWaysSection: React.FC = () => {
 
   const ways = [
     {
-      title: "Playground",
-      subtitle: "(no-code GUI)",
+      title: "Build Rollups",
+      subtitle: "(zk-EVM)",
+      iconType: "core",
+      color: "blue",
+      features: [
+        {
+          title: "EVM Compatible",
+          description: "Deploy existing Solidity contracts without modification. Full compatibility with Ethereum tooling and infrastructure."
+        },
+        {
+          title: "Ethereum Security",
+          description: "Every state transition is verified by zero-knowledge proofs, inheriting Ethereum's security guarantees."
+        },
+        {
+          title: "Scalable Throughput",
+          description: "Process thousands of transactions off-chain while posting succinct proofs to L1."
+        }
+      ],
+      benefit: "Scale your dApps with Ethereum-grade security.",
+      ctaText: "View on GitHub",
+      ctaLink: "https://github.com/tokamak-network/Tokamak-zk-EVM"
+    },
+    {
+      title: "Secure Assets",
+      subtitle: "(Threshold Signatures)",
       iconType: "playground",
       color: "blue",
       features: [
         {
-          title: "Paste & Prove",
-          description: "Paste a transaction hash, press Prove, get a zero-knowledge proof and verify it end-to-end. No code required."
+          title: "Distributed Key Control",
+          description: "Split critical keys among multiple parties. No single point of failure or trust."
         },
         {
-          title: "Learn by Doing",
-          description: "Teaches ZK by doing: every step is visible and repeatable."
+          title: "Threshold Authorization",
+          description: "Require M-of-N participants to approve before any transaction goes through."
+        },
+        {
+          title: "On-chain Simplicity",
+          description: "Appears as a single standard signature on-chain—compatible with existing wallets and protocols."
         }
       ],
-      benefit: "Instant, tangible ZK without command lines.",
-      ctaText: "Try Playground",
-      ctaLink: "https://github.com/tokamak-network/Tokamak-zk-EVM-playgrounds/releases"
+      benefit: "Enterprise-grade key management for DAOs and teams.",
+      ctaText: "View on GitHub",
+      ctaLink: "https://github.com/tokamak-network/threshold-signature-Frost"
     },
     {
-      title: "Developer CLI",
-      subtitle: "(automation ready)",
+      title: "Private Channels",
+      subtitle: "(App Isolation)",
       iconType: "cli",
       color: "blue",
       features: [
         {
-          title: "Script & Integrate",
-          description: "Script proof jobs, integrate with CI, and move from Playground experiments into production pipelines."
+          title: "Private Execution",
+          description: "Create isolated execution lanes where transactions and balances remain hidden from the public."
         },
         {
-          title: "Same Core Technology",
-          description: "Same lightweight circuits and prover as the GUI."
+          title: "ZK-Verified State",
+          description: "Ethereum only sees state roots and proofs—never the underlying transaction data."
+        },
+        {
+          title: "Application Specific",
+          description: "Each app gets its own private channel, ensuring complete isolation between different use cases."
         }
       ],
-      benefit: "Automation and scale from your own machine.",
-      ctaText: "Get CLI",
-      ctaLink: "https://github.com/tokamak-network/Tokamak-zk-EVM-playgrounds/releases"
+      benefit: "True privacy for sensitive applications.",
+      ctaText: "View on GitHub",
+      ctaLink: "https://github.com/tokamak-network/Tokamak-zkp-channel-manager"
     }
   ];
 
 
 
   return (
-    <section id="two-ways-section" className="py-24 bg-gradient-to-b from-[#1a2347] to-[#0a1930]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section 
+      id="two-ways-section" 
+      className="relative z-10 py-24 overflow-hidden"
+      style={{
+        background: "linear-gradient(180deg, #1a2347 0%, #0d1f3c 50%, #0a1930 100%)",
+        boxShadow: "0 -20px 60px rgba(0, 0, 0, 0.8)"
+      }}
+    >
+      {/* Top accent line */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#4fc3f7]/40 to-transparent" />
+      
+      {/* Background elements */}
+      <div className="absolute top-1/3 left-10 w-72 h-72 bg-[#4fc3f7]/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/3 right-10 w-80 h-80 bg-[#029cdc]/5 rounded-full blur-3xl pointer-events-none" />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className={`text-center mb-16 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6" style={{ fontFamily: '"Jersey 10", "Press Start 2P", monospace' }}>
-            Two Ways to Use It
+            How to Use It
           </h2>
           <p className="text-xl text-white/80 max-w-3xl mx-auto" style={{ fontFamily: '"IBM Plex Mono"' }}>
-            Choose your entry point into zero-knowledge privacy
+            Multiple paths to zero-knowledge powered applications
           </p>
         </div>
 

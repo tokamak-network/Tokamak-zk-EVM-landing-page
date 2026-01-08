@@ -331,6 +331,111 @@ body {
   animation: bounce-slow 3s ease-in-out infinite;
 }
 
+/* Gradient text animation */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  animation: gradient-shift 4s ease infinite;
+}
+
+/* Card hover glow effect */
+.solution-card-glow {
+  position: relative;
+}
+
+.solution-card-glow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 1rem;
+  padding: 2px;
+  background: linear-gradient(135deg, #4fc3f7, #ffd93d, #a855f7);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.solution-card-glow:hover::before {
+  opacity: 1;
+}
+
+/* Staggered fade-in animation */
+@keyframes stagger-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-stagger-1 {
+  animation: stagger-fade-in 0.6s ease-out 0.1s forwards;
+  opacity: 0;
+}
+
+.animate-stagger-2 {
+  animation: stagger-fade-in 0.6s ease-out 0.2s forwards;
+  opacity: 0;
+}
+
+.animate-stagger-3 {
+  animation: stagger-fade-in 0.6s ease-out 0.3s forwards;
+  opacity: 0;
+}
+
+/* Subtle shimmer effect for cards */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-effect {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+/* Pulse ring animation for icons */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s ease-out infinite;
+}
+
 /* 애니메이션 성능 최적화 */
 @media (prefers-reduced-motion: reduce) {
   * {
