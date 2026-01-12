@@ -49,9 +49,8 @@ const Navigation = () => {
   };
 
   const navItems = [
-    { id: "who-section", label: "Who" },
-    { id: "two-ways-section", label: "How" },
-    { id: "why-different-section", label: "Why" },
+    { id: "solutions-section", label: "Solutions" },
+    { id: "two-ways-section", label: "How to Use" },
     { id: "blog", label: "Blog", isLink: true, href: "/blog" },
   ];
 

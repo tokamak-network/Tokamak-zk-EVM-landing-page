@@ -16,29 +16,29 @@ interface Solution {
 
 const solutions: Solution[] = [
   {
-    id: "zk-snark",
+    id: "private-channels",
     number: "01",
-    title: "Tokamak zk-SNARK",
-    tagline: "High-throughput proofs for production",
-    description: "The proving system that powers the Tokamak ecosystem. Designed for real rollup workloads with low latency and predictable performance.",
+    title: "Tokamak Private App Channels",
+    tagline: "Your own private execution lane",
+    description: "Autonomous, private, and independent Layer 2 channels created, operated, and closed by users. Ethereum only sees state roots and ZK proofs.",
     features: [
-      "GPU-accelerated prover",
-      "Gas-efficient verifier",
-      "Production-grade"
+      "User-controlled L2",
+      "Hidden transactions",
+      "App isolation"
     ],
-    status: "available",
-    iconType: "zap"
+    status: "coming-soon",
+    iconType: "shield"
   },
   {
     id: "zk-evm",
     number: "02",
     title: "Tokamak zk-EVM",
     tagline: "Ethereum-compatible zk-rollup",
-    description: "A zk-rollup running a fully EVM-compatible virtual machine. Scale on L2 while inheriting Ethereum security.",
+    description: "Affordable on-chain verification with low proving overhead—so you can generate zero-knowledge proofs even on a gaming laptop. Full EVM compatibility with Ethereum security.",
     features: [
-      "Full EVM compatibility",
-      "Ethereum security",
-      "L2 scalability"
+      "Low proving overhead",
+      "Gaming laptop capable",
+      "Full EVM compatibility"
     ],
     status: "available",
     iconType: "layers"
@@ -46,11 +46,11 @@ const solutions: Solution[] = [
   {
     id: "threshold-signature",
     number: "03",
-    title: "Threshold Signature",
+    title: "Threshold Signature App",
     tagline: "Shared control, single signature",
-    description: "Securely share control of critical keys. Multiple participants approve, but on-chain it appears as a single signature.",
+    description: "Securely share control of critical keys with minimal signer interaction—no need for all participants to be online at the same time. On-chain it appears as a single signature.",
     features: [
-      "Multi-party control",
+      "Async signing",
       "Threshold authorization",
       "Wallet compatible"
     ],
@@ -58,18 +58,18 @@ const solutions: Solution[] = [
     iconType: "key"
   },
   {
-    id: "private-channels",
+    id: "zk-snark",
     number: "04",
-    title: "Private App Channels",
-    tagline: "Your own private execution lane",
-    description: "Create private, independent execution lanes. Users interact privately while Ethereum only sees state roots and ZK proofs.",
+    title: "Tokamak zk-SNARK",
+    tagline: "Modular ZK circuits like FPGA",
+    description: "Build bespoke ZK-SNARK circuits like an FPGA: snap together pre-verified building blocks to skip huge RAM circuits and eliminate per-app setup—faster proofs, faster iteration.",
     features: [
-      "Private execution",
-      "Hidden transactions",
-      "App isolation"
+      "Modular building blocks",
+      "No per-app setup",
+      "Fast iteration"
     ],
-    status: "coming-soon",
-    iconType: "shield"
+    status: "available",
+    iconType: "zap"
   }
 ];
 

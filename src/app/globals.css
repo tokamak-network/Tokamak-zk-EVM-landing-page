@@ -33,6 +33,19 @@ body {
   body {
     @apply bg-gradient-to-b from-[#0a1930] to-[#1a2347] text-white;
   }
+
+  /* Typography - Heading letter-spacing for better readability */
+  h1 {
+    letter-spacing: 0.3rem;
+  }
+
+  h2 {
+    letter-spacing: 0.18rem;
+  }
+
+  h3 {
+    letter-spacing: 0.25rem;
+  }
 }
 
 @layer components {
@@ -432,9 +445,35 @@ body {
   }
 }
 
-.animate-pulse-ring {
+  .animate-pulse-ring {
   animation: pulse-ring 2s ease-out infinite;
 }
+
+  /* Scrollbar hide utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Tab panel fade-in animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-out;
+  }
 
 /* 애니메이션 성능 최적화 */
 @media (prefers-reduced-motion: reduce) {

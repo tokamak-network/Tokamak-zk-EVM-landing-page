@@ -85,7 +85,6 @@ const Hero: React.FC = () => {
               className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-white text-center"
               style={{
                 fontFamily: '"Jersey 10", "Press Start 2P", monospace',
-                letterSpacing: '0.1rem',
               }}
             >
               Tokamak Network
@@ -94,7 +93,7 @@ const Hero: React.FC = () => {
               className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-[#4fc3f7]"
               style={{
                 fontFamily: '"Jersey 10", "Press Start 2P", monospace',
-                letterSpacing: '0.2rem',
+                letterSpacing: '0.3rem',
               }}
             >
               ZKP

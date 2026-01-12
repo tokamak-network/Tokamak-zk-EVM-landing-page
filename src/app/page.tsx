@@ -2,10 +2,7 @@ import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import SolutionsSection from "@/components/SolutionsSection";
-import WhoSection from "@/components/WhoSection";
 import ThreeWaysSection from "@/components/ThreeWaysSection";
-import VideoSection from "@/components/VideoSection";
-import WhyDifferentSection from "@/components/WhyDifferentSection";
 import Footer from "@/components/Footer";
 import { SectionTracker } from "@/components/Analytics";
 
@@ -109,10 +106,7 @@ const jsonLd = {
 const TRACKED_SECTIONS = [
   "overview", // Hero section
   "solutions-section", // Solutions Section
-  "who-section", // Who This Is For
-  "two-ways-section", // Three Ways Section
-  "video-section", // Video Section
-  "why-different-section", // Why Different Section
+  "two-ways-section", // How to Use Section
 ];
 
 export default function Home() {
@@ -132,10 +126,7 @@ export default function Home() {
         <main>
           <Hero />
           <SolutionsSection />
-          <WhoSection />
           <ThreeWaysSection />
-          {/* <VideoSection /> */}
-          <WhyDifferentSection />
         </main>
         <Footer />
       </div>
