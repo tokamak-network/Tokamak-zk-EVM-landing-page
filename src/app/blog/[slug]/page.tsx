@@ -10,6 +10,66 @@ import VisualizationsSection from "@/components/VisualizationsSection";
 import { BlogProvider } from "@/components/BlogContext";
 import type { BlogPost } from "@/types/blog";
 
+// SEO Helper: Extract meaningful keywords from title
+function extractKeywordsFromTitle(title: string): string[] {
+  // Common stop words to filter out
+  const stopWords = new Set([
+    "a", "an", "the", "and", "or", "but", "in", "on", "at", "to", "for", "of",
+    "with", "by", "from", "as", "is", "was", "are", "were", "been", "be",
+    "have", "has", "had", "do", "does", "did", "will", "would", "could", "should",
+    "may", "might", "must", "shall", "can", "need", "dare", "ought", "used",
+    "this", "that", "these", "those", "i", "you", "he", "she", "it", "we", "they",
+    "what", "which", "who", "whom", "whose", "where", "when", "why", "how",
+    "all", "each", "every", "both", "few", "more", "most", "other", "some", "such",
+    "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very",
+    "just", "also", "now", "here", "there", "then", "once", "about", "into", "over"
+  ]);
+
+  return title
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, " ") // Remove special chars except hyphens
+    .split(/\s+/)
+    .filter(word => word.length > 2 && !stopWords.has(word))
+    .slice(0, 10); // Limit to 10 keywords
+}
+
+// SEO Helper: Estimate word count from Notion recordMap
+function estimateWordCount(recordMap: BlogPost["recordMap"]): number {
+  if (!recordMap?.block) return 0;
+
+  let wordCount = 0;
+  const blocks = Object.values(recordMap.block);
+
+  for (const block of blocks) {
+    const value = block?.value;
+    if (!value) continue;
+
+    // Extract text from various block types
+    const textArrays = [
+      value.properties?.title,
+      value.properties?.caption,
+    ].filter(Boolean);
+
+    for (const textArray of textArrays) {
+      if (Array.isArray(textArray)) {
+        for (const segment of textArray) {
+          if (Array.isArray(segment) && typeof segment[0] === "string") {
+            wordCount += segment[0].split(/\s+/).filter(Boolean).length;
+          }
+        }
+      }
+    }
+  }
+
+  return wordCount || 500; // Default estimate if extraction fails
+}
+
+// SEO Helper: Calculate reading time in minutes
+function calculateReadingTime(wordCount: number): number {
+  const wordsPerMinute = 200; // Average reading speed
+  return Math.max(1, Math.ceil(wordCount / wordsPerMinute));
+}
+
 // Revalidate every hour (3600 seconds)
 export const revalidate = 3600;
 
@@ -21,7 +81,7 @@ export async function generateStaticParams() {
   }));
 }
 
-// Generate metadata for SEO
+// Generate metadata for SEO - Enhanced for better search ranking
 export async function generateMetadata({
   params,
 }: {
@@ -41,81 +101,192 @@ export async function generateMetadata({
     };
   }
 
-  const ogImage = post.coverImage || "/og-image.png";
-  const postUrl = `/blog/${slug}`;
+  const fullUrl = `https://zkp.tokamak.network/blog/${slug}`;
+  // Note: OG and Twitter images are dynamically generated via opengraph-image.tsx and twitter-image.tsx
+
+  // Extract keywords from title for better relevance signals
+  const titleKeywords = extractKeywordsFromTitle(post.title);
+
+  // Combine title keywords with tags for comprehensive keyword coverage
+  const allKeywords = [
+    ...new Set([
+      ...titleKeywords,
+      ...post.tags.map(tag => tag.toLowerCase()),
+      "tokamak network",
+      "zk-evm",
+      "zero knowledge",
+      "blockchain",
+      "ethereum",
+      "layer 2",
+    ]),
+  ];
+
+  // Generate optimized description that includes title keywords
+  const optimizedDescription =
+    post.description ||
+    `${post.title} - Learn about ${titleKeywords.slice(0, 3).join(", ")} on the Tokamak zk-EVM blog. Expert insights on zero-knowledge proofs and privacy technology.`;
 
   return {
     title: post.title,
-    description:
-      post.description ||
-      `Read "${post.title}" on the Tokamak zk-EVM blog. Insights on zero-knowledge proofs and privacy technology.`,
-    keywords: [
-      ...post.tags,
-      "Tokamak Network",
-      "zk-EVM",
-      "Zero Knowledge",
-      "Blockchain",
-    ],
+    description: optimizedDescription,
+    keywords: allKeywords,
     authors: post.author ? [{ name: post.author }] : [{ name: "Tokamak Network" }],
     alternates: {
-      canonical: postUrl,
+      canonical: fullUrl,
     },
     openGraph: {
       title: post.title,
-      description: post.description,
-      url: postUrl,
+      description: optimizedDescription,
+      url: fullUrl,
       type: "article",
       publishedTime: post.publishDate,
+      modifiedTime: post.publishDate,
       authors: post.author ? [post.author] : ["Tokamak Network"],
+      section: "Technology",
       tags: post.tags,
-      images: [
-        {
-          url: ogImage,
-          width: 1200,
-          height: 630,
-          alt: post.title,
-        },
-      ],
+      // Images are dynamically generated via opengraph-image.tsx
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
-      description: post.description,
-      images: [ogImage],
+      description: optimizedDescription,
+      // Images are dynamically generated via twitter-image.tsx
+    },
+    // Additional robots directives for better indexing
+    robots: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
     },
   };
 }
 
-// Generate JSON-LD structured data for a blog post
-function generateArticleJsonLd(post: BlogPost, slug: string) {
+// Generate comprehensive JSON-LD structured data for SEO
+function generateBlogPostJsonLd(post: BlogPost, slug: string) {
+  const postUrl = `https://zkp.tokamak.network/blog/${slug}`;
+  const wordCount = estimateWordCount(post.recordMap);
+  const readingTimeMinutes = calculateReadingTime(wordCount);
+  const titleKeywords = extractKeywordsFromTitle(post.title);
+
+  // Combine all keywords for schema
+  const allKeywords = [...new Set([...titleKeywords, ...post.tags.map(t => t.toLowerCase())])].join(", ");
+
   return {
     "@context": "https://schema.org",
-    "@type": "Article",
-    "@id": `https://zkp.tokamak.network/blog/${slug}/#article`,
-    headline: post.title,
-    description: post.description,
-    image: post.coverImage || "https://zkp.tokamak.network/og-image.png",
-    datePublished: post.publishDate,
-    dateModified: post.publishDate,
-    author: {
-      "@type": "Person",
-      name: post.author || "Tokamak Network",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Tokamak Network",
-      logo: {
-        "@type": "ImageObject",
-        url: "https://zkp.tokamak.network/assets/header/logo.svg",
+    "@graph": [
+      // BreadcrumbList for navigation - helps Google understand site structure
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${postUrl}#breadcrumb`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://zkp.tokamak.network",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Blog",
+            item: "https://zkp.tokamak.network/blog",
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: post.title,
+            item: postUrl,
+          },
+        ],
       },
-    },
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": `https://zkp.tokamak.network/blog/${slug}`,
-    },
-    keywords: post.tags.join(", "),
-    articleSection: "Technology",
-    inLanguage: "en-US",
+      // BlogPosting - more specific than Article for blog content
+      {
+        "@type": "BlogPosting",
+        "@id": `${postUrl}#blogposting`,
+        mainEntityOfPage: {
+          "@type": "WebPage",
+          "@id": postUrl,
+        },
+        headline: post.title,
+        name: post.title,
+        description: post.description || `${post.title} - Insights on zero-knowledge proofs and blockchain technology from Tokamak Network.`,
+        image: {
+          "@type": "ImageObject",
+          url: post.coverImage || "https://zkp.tokamak.network/og-image.png",
+          width: 1200,
+          height: 630,
+        },
+        datePublished: post.publishDate,
+        dateModified: post.publishDate,
+        author: {
+          "@type": "Person",
+          name: post.author || "Tokamak Network",
+          url: "https://tokamak.network",
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "Tokamak Network",
+          url: "https://tokamak.network",
+          logo: {
+            "@type": "ImageObject",
+            url: "https://zkp.tokamak.network/assets/header/logo.svg",
+            width: 200,
+            height: 60,
+          },
+          sameAs: [
+            "https://twitter.com/tokaboratory",
+            "https://t.me/tokamak_network",
+            "https://github.com/tokamak-network",
+          ],
+        },
+        // SEO-critical fields for ranking
+        keywords: allKeywords,
+        wordCount: wordCount,
+        timeRequired: `PT${readingTimeMinutes}M`, // ISO 8601 duration format
+        articleSection: "Technology",
+        articleBody: post.description,
+        inLanguage: "en-US",
+        isPartOf: {
+          "@type": "Blog",
+          "@id": "https://zkp.tokamak.network/blog#blog",
+          name: "Tokamak zk-EVM Blog",
+          url: "https://zkp.tokamak.network/blog",
+        },
+        // Speakable for voice search optimization
+        speakable: {
+          "@type": "SpeakableSpecification",
+          cssSelector: ["h1", ".notion-page-content p:first-of-type"],
+        },
+        // Potential action for engagement
+        potentialAction: {
+          "@type": "ReadAction",
+          target: postUrl,
+        },
+      },
+      // WebPage schema for the page itself
+      {
+        "@type": "WebPage",
+        "@id": postUrl,
+        url: postUrl,
+        name: post.title,
+        description: post.description,
+        isPartOf: {
+          "@type": "WebSite",
+          "@id": "https://zkp.tokamak.network#website",
+          name: "Tokamak Network ZKP",
+          url: "https://zkp.tokamak.network",
+        },
+        breadcrumb: {
+          "@id": `${postUrl}#breadcrumb`,
+        },
+        primaryImageOfPage: {
+          "@type": "ImageObject",
+          url: post.coverImage || "https://zkp.tokamak.network/og-image.png",
+        },
+      },
+    ],
   };
 }
 
@@ -131,7 +302,7 @@ export default async function BlogPostPage({
     notFound();
   }
 
-  const articleJsonLd = generateArticleJsonLd(post, slug);
+  const blogPostJsonLd = generateBlogPostJsonLd(post, slug);
 
   return (
     <BlogProvider
@@ -140,10 +311,10 @@ export default async function BlogPostPage({
       authorEmail={post.authorEmail}
       author={post.author}
     >
-      {/* JSON-LD Structured Data for Article */}
+      {/* JSON-LD Structured Data for BlogPosting with Breadcrumbs */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostJsonLd) }}
       />
       <div className="min-h-screen">
         <Navbar />

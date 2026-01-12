@@ -5,13 +5,36 @@ export default function robots(): MetadataRoute.Robots {
 
   return {
     rules: [
+      // General crawlers - allow most content
       {
         userAgent: "*",
-        allow: "/",
+        allow: ["/", "/blog", "/blog/*"],
+        disallow: ["/api/", "/_next/", "/static/"],
+      },
+      // Google - full access with specific directives
+      {
+        userAgent: "Googlebot",
+        allow: ["/", "/blog", "/blog/*"],
         disallow: ["/api/"],
       },
+      // Bing
+      {
+        userAgent: "Bingbot",
+        allow: ["/", "/blog", "/blog/*"],
+        disallow: ["/api/"],
+      },
+      // Block AI training crawlers (optional - uncomment if desired)
+      // {
+      //   userAgent: "GPTBot",
+      //   disallow: ["/"],
+      // },
+      // {
+      //   userAgent: "CCBot",
+      //   disallow: ["/"],
+      // },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
+    host: baseUrl,
   };
 }
 

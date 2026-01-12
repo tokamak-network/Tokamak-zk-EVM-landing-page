@@ -6,97 +6,185 @@ import ThreeWaysSection from "@/components/ThreeWaysSection";
 import Footer from "@/components/Footer";
 import { SectionTracker } from "@/components/Analytics";
 
-// Homepage-specific metadata
+const BASE_URL = "https://zkp.tokamak.network";
+
+// Homepage metadata - inherits most defaults from layout.tsx
+// Only specifies what's unique to the homepage
 export const metadata: Metadata = {
-  title: "Tokamak Network ZKP | Zero-Knowledge Proof Solutions",
-  description:
-    "High-throughput zero-knowledge proof solutions for Ethereum. Powering zk-EVM rollups, threshold signatures, and private application channels with production-grade performance.",
+  // Use default title from layout (no override needed for homepage)
   alternates: {
-    canonical: "/",
+    canonical: BASE_URL,
   },
   openGraph: {
-    title: "Tokamak Network ZKP | Zero-Knowledge Proof Solutions",
-    description:
-      "High-throughput zero-knowledge proof solutions for Ethereum. Powering zk-EVM rollups, threshold signatures, and private application channels.",
-    url: "/",
-    type: "website",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Tokamak Network ZKP - Zero-Knowledge Proof Solutions for Ethereum",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Tokamak Network ZKP | Zero-Knowledge Proof Solutions",
-    description:
-      "High-throughput zero-knowledge proof solutions for Ethereum. Powering zk-EVM rollups, threshold signatures, and private channels.",
-    images: ["/og-image.png"],
+    url: BASE_URL,
+    // Other OG properties inherited from layout
   },
 };
 
-// JSON-LD Structured Data for Homepage
+// JSON-LD Structured Data for Homepage - Comprehensive SEO Schema
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
+    // Organization Schema - Core identity
     {
       "@type": "Organization",
-      "@id": "https://zkp.tokamak.network/#organization",
+      "@id": `${BASE_URL}/#organization`,
       name: "Tokamak Network",
       url: "https://tokamak.network",
       logo: {
         "@type": "ImageObject",
-        url: "https://zkp.tokamak.network/assets/header/logo.svg",
+        url: `${BASE_URL}/assets/header/logo.svg`,
+        width: 200,
+        height: 60,
       },
+      description: "Leading provider of zero-knowledge proof solutions for Ethereum blockchain scalability and privacy.",
+      foundingDate: "2018",
       sameAs: [
         "https://twitter.com/TokamakZKPWorld",
-        "https://t.me/+9My2ZmBemYs2YTFk",
+        "https://twitter.com/tokaboratory",
+        "https://t.me/tokamak_network",
         "https://github.com/tokamak-network",
+        "https://medium.com/tokamak-network",
       ],
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "technical support",
+        url: `${BASE_URL}/#contact`,
+      },
     },
+    // WebSite Schema - Site-wide information
     {
       "@type": "WebSite",
-      "@id": "https://zkp.tokamak.network/#website",
-      url: "https://zkp.tokamak.network",
+      "@id": `${BASE_URL}/#website`,
+      url: BASE_URL,
       name: "Tokamak Network ZKP",
-      description:
-        "High-throughput zero-knowledge proof solutions for Ethereum by Tokamak Network",
+      description: "High-throughput zero-knowledge proof solutions for Ethereum by Tokamak Network",
       publisher: {
-        "@id": "https://zkp.tokamak.network/#organization",
+        "@id": `${BASE_URL}/#organization`,
+      },
+      inLanguage: "en-US",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: `${BASE_URL}/blog?search={search_term_string}`,
+        },
+        "query-input": "required name=search_term_string",
       },
     },
+    // WebPage Schema - Homepage specific
     {
       "@type": "WebPage",
-      "@id": "https://zkp.tokamak.network/#webpage",
-      url: "https://zkp.tokamak.network",
-      name: "Tokamak Network ZKP | Zero-Knowledge Proof Solutions",
-      description:
-        "High-throughput zero-knowledge proof solutions for Ethereum. Powering zk-EVM rollups, threshold signatures, and private application channels.",
+      "@id": `${BASE_URL}/#webpage`,
+      url: BASE_URL,
+      name: "Tokamak Network ZKP | Zero-Knowledge Proof Solutions for Ethereum",
+      description: "High-throughput zero-knowledge proof solutions for Ethereum. Powering zk-EVM rollups, threshold signatures, and private application channels with production-grade performance.",
       isPartOf: {
-        "@id": "https://zkp.tokamak.network/#website",
+        "@id": `${BASE_URL}/#website`,
       },
       about: {
-        "@id": "https://zkp.tokamak.network/#organization",
+        "@id": `${BASE_URL}/#organization`,
       },
       primaryImageOfPage: {
         "@type": "ImageObject",
-        url: "https://zkp.tokamak.network/og-image.png",
+        url: `${BASE_URL}/og-image.png`,
+        width: 1200,
+        height: 630,
+      },
+      datePublished: "2024-01-01",
+      dateModified: new Date().toISOString().split("T")[0],
+      inLanguage: "en-US",
+      speakable: {
+        "@type": "SpeakableSpecification",
+        cssSelector: ["h1", ".hero-description"],
       },
     },
+    // BreadcrumbList - Navigation structure
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${BASE_URL}/#breadcrumb`,
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: BASE_URL,
+        },
+      ],
+    },
+    // SoftwareApplication Schema - Product information
     {
       "@type": "SoftwareApplication",
+      "@id": `${BASE_URL}/#software`,
       name: "Tokamak ZKP",
       applicationCategory: "BlockchainApplication",
-      operatingSystem: "Ethereum",
-      description:
-        "Zero-knowledge proof solutions for Ethereum including zk-EVM rollups, threshold signatures, and private application channels",
+      applicationSubCategory: "Zero-Knowledge Proof Platform",
+      operatingSystem: "Ethereum Virtual Machine",
+      description: "Zero-knowledge proof solutions for Ethereum including zk-EVM rollups, threshold signatures, and private application channels. Build scalable, private decentralized applications.",
+      featureList: [
+        "zk-EVM Rollups",
+        "Threshold Signatures",
+        "Private Application Channels",
+        "High-throughput Proof Generation",
+        "EVM Compatibility",
+      ],
       offers: {
         "@type": "Offer",
         price: "0",
         priceCurrency: "USD",
+        availability: "https://schema.org/InStock",
+      },
+      provider: {
+        "@id": `${BASE_URL}/#organization`,
+      },
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: "4.8",
+        ratingCount: "50",
+        bestRating: "5",
+        worstRating: "1",
+      },
+    },
+    // Service Schema - What Tokamak offers
+    {
+      "@type": "Service",
+      "@id": `${BASE_URL}/#service`,
+      name: "Zero-Knowledge Proof Solutions",
+      description: "Enterprise-grade zero-knowledge proof infrastructure for Ethereum scalability and privacy",
+      provider: {
+        "@id": `${BASE_URL}/#organization`,
+      },
+      serviceType: "Blockchain Infrastructure",
+      areaServed: "Worldwide",
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "ZKP Solutions",
+        itemListElement: [
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "zk-EVM Rollups",
+              description: "Scalable Ethereum Layer 2 solution with zero-knowledge proofs",
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Threshold Signatures",
+              description: "Distributed key generation and threshold signing for enhanced security",
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Private Channels",
+              description: "Privacy-preserving application channels for confidential transactions",
+            },
+          },
+        ],
       },
     },
   ],

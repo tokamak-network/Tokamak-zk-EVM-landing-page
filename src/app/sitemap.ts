@@ -4,43 +4,14 @@ import { getBlogPosts } from "@/lib/blog";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://zkp.tokamak.network";
 
-  // Static pages
+  // Static pages - only include actual crawlable URLs (not hash fragments)
+  // Google doesn't treat hash URLs as separate pages
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 1.0,
-    },
-    {
-      url: `${baseUrl}/#overview`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/#who-section`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/#two-ways-section`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/#video-section`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/#why-different-section`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.8,
     },
     {
       url: `${baseUrl}/blog`,
@@ -50,15 +21,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Fetch blog posts dynamically
+  // Fetch blog posts dynamically - these are the main SEO target
   let blogPosts: MetadataRoute.Sitemap = [];
   try {
     const posts = await getBlogPosts();
-    blogPosts = posts.map((post) => ({
+    blogPosts = posts.map((post, index) => ({
       url: `${baseUrl}/blog/${post.slug}`,
       lastModified: new Date(post.publishDate),
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
+      changeFrequency: "weekly" as const, // Changed from monthly for better crawling
+      // Higher priority for recent posts (first 5 get 0.9, rest get 0.8)
+      priority: index < 5 ? 0.9 : 0.8,
     }));
   } catch (error) {
     console.error("Error fetching blog posts for sitemap:", error);
