@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
+import Link from "next/link";
 import { Zap, Layers, KeyRound, ShieldCheck } from "lucide-react";
 
 interface Solution {
@@ -20,9 +21,9 @@ const solutions: Solution[] = [
     number: "01",
     title: "Tokamak Private App Channels",
     tagline: "Your own private execution lane",
-    description: "Autonomous, private, and independent Layer 2 channels created, operated, and closed by users. Ethereum only sees state roots and ZK proofs.",
+    description: "Autonomous, private, and independent Layer 2 channels created, operated, and closed by users. Ethereum only sees state roots and zero knowledge proofs.",
     features: [
-      "User-controlled L2",
+      "User controlled L2",
       "Hidden transactions",
       "App isolation"
     ],
@@ -32,9 +33,9 @@ const solutions: Solution[] = [
   {
     id: "zk-evm",
     number: "02",
-    title: "Tokamak zk-EVM",
-    tagline: "Ethereum-compatible zk-rollup",
-    description: "Affordable on-chain verification with low proving overhead—so you can generate zero-knowledge proofs even on a gaming laptop. Full EVM compatibility with Ethereum security.",
+    title: "Tokamak zk EVM",
+    tagline: "Ethereum compatible zero knowledge execution",
+    description: "Affordable on chain verification with low proving overhead so you can generate zero knowledge proofs even on a gaming laptop. Full EVM compatibility with Ethereum security.",
     features: [
       "Low proving overhead",
       "Gaming laptop capable",
@@ -48,7 +49,7 @@ const solutions: Solution[] = [
     number: "03",
     title: "Threshold Signature App",
     tagline: "Shared control, single signature",
-    description: "Securely share control of critical keys with minimal signer interaction—no need for all participants to be online at the same time. On-chain it appears as a single signature.",
+    description: "Minimal signer interaction, eliminating the need for all participants to be online at the same time. On chain it appears as a single signature, compatible with existing wallets and protocols.",
     features: [
       "Async signing",
       "Threshold authorization",
@@ -60,12 +61,12 @@ const solutions: Solution[] = [
   {
     id: "zk-snark",
     number: "04",
-    title: "Tokamak zk-SNARK",
-    tagline: "Modular ZK circuits like FPGA",
-    description: "Build bespoke ZK-SNARK circuits like an FPGA: snap together pre-verified building blocks to skip huge RAM circuits and eliminate per-app setup—faster proofs, faster iteration.",
+    title: "Tokamak zk SNARK",
+    tagline: "Modular zero knowledge circuits like FPGA",
+    description: "Build bespoke zk SNARK circuits like an FPGA. Snap together pre verified building blocks to skip huge RAM circuits and eliminate per app setup for faster proofs and faster iteration.",
     features: [
       "Modular building blocks",
-      "No per-app setup",
+      "No per app setup",
       "Fast iteration"
     ],
     status: "available",
@@ -103,8 +104,10 @@ const SolutionCard = ({
   const isEven = index % 2 === 0;
 
   return (
-    <div
-      className={`stacking-card relative bg-gradient-to-br from-[#0d1f3c] to-[#0a1628] border border-white/10 p-8 md:p-12 lg:p-16 mb-8 transform origin-top transition-all duration-500 ${
+    <Link
+      href={`/solutions/${solution.id}`}
+      aria-label={`Open ${solution.title}`}
+      className={`stacking-card relative block bg-gradient-to-br from-[#0d1f3c] to-[#0a1628] border border-white/10 p-8 md:p-12 lg:p-16 mb-8 transform origin-top transition-all duration-500 ${
         isHovered ? 'border-[#4fc3f7]/50 shadow-2xl shadow-[#4fc3f7]/10' : ''
       } ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}
       style={{ 
@@ -117,7 +120,7 @@ const SolutionCard = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Glow effect on hover */}
-      <div className={`absolute inset-0 transition-opacity duration-500 ${
+      <div className={`pointer-events-none absolute inset-0 transition-opacity duration-500 ${
         isHovered ? 'opacity-100' : 'opacity-0'
       }`} style={{
         background: 'radial-gradient(circle at 50% 50%, rgba(79, 195, 247, 0.1) 0%, transparent 70%)'
@@ -191,11 +194,11 @@ const SolutionCard = ({
             isHovered ? 'scale-[1.02]' : ''
           }`}>
             {/* Background pattern */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#0a1930] to-[#1a2347]" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#0a1930] to-[#1a2347]" />
             
             {/* Animated grid */}
             <div 
-              className="absolute inset-0 opacity-20"
+              className="pointer-events-none absolute inset-0 opacity-20"
               style={{
                 backgroundImage: `linear-gradient(to right, #4fc3f7 1px, transparent 1px), linear-gradient(to bottom, #4fc3f7 1px, transparent 1px)`,
                 backgroundSize: '40px 40px'
@@ -206,7 +209,7 @@ const SolutionCard = ({
             <div className="absolute inset-0 flex items-center justify-center">
               <div className={`relative transition-all duration-500 ${isHovered ? 'scale-110' : ''}`}>
                 {/* Glow behind icon */}
-                <div className={`absolute inset-0 blur-3xl transition-opacity duration-500 ${
+                <div className={`pointer-events-none absolute inset-0 blur-3xl transition-opacity duration-500 ${
                   isHovered ? 'opacity-60' : 'opacity-30'
                 }`} style={{
                   background: 'radial-gradient(circle, rgba(79, 195, 247, 0.5) 0%, transparent 70%)',
@@ -229,7 +232,7 @@ const SolutionCard = ({
             </div>
 
             {/* Floating particles */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="pointer-events-none absolute inset-0 overflow-hidden">
               {[...Array(6)].map((_, i) => (
                 <div
                   key={i}
@@ -255,13 +258,13 @@ const SolutionCard = ({
               </div>
 
             {/* Corner decorations */}
-            <div className={`absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 transition-all duration-300 ${
+            <div className={`pointer-events-none absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 transition-all duration-300 ${
               isHovered ? 'border-[#4fc3f7]' : 'border-white/20'
             }`} />
-            <div className={`absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 transition-all duration-300 ${
+            <div className={`pointer-events-none absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 transition-all duration-300 ${
               isHovered ? 'border-[#4fc3f7]' : 'border-white/20'
             }`} />
-            <div className={`absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 transition-all duration-300 ${
+            <div className={`pointer-events-none absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 transition-all duration-300 ${
               isHovered ? 'border-[#4fc3f7]' : 'border-white/20'
             }`} />
           </div>
@@ -270,11 +273,11 @@ const SolutionCard = ({
 
       {/* Bottom accent line */}
       <div className="absolute bottom-0 left-0 right-0 h-0.5 overflow-hidden">
-        <div className={`h-full bg-gradient-to-r from-transparent via-[#4fc3f7] to-transparent transition-all duration-700 ${
+        <div className={`pointer-events-none h-full bg-gradient-to-r from-transparent via-[#4fc3f7] to-transparent transition-all duration-700 ${
           isHovered ? 'opacity-100' : 'opacity-0'
         }`} />
       </div>
-    </div>
+    </Link>
   );
 };
 

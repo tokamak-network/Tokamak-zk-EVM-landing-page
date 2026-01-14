@@ -47,12 +47,12 @@ const ThreeWaysSection: React.FC = () => {
       iconType: "shield",
       features: [
         {
-          title: "User-Controlled L2",
+          title: "User Controlled L2",
           description: "Autonomous, private, and independent Layer 2 channels created, operated, and closed by users."
         },
         {
-          title: "ZK-Verified State",
-          description: "Ethereum only sees state roots and proofs—never the underlying transaction data."
+          title: "Zero Knowledge Verified State",
+          description: "Ethereum only sees state roots and proofs. It never sees the underlying transaction data."
         },
         {
           title: "Application Specific",
@@ -63,13 +63,13 @@ const ThreeWaysSection: React.FC = () => {
       githubLink: "https://github.com/tokamak-network/Tokamak-zkp-channel-manager"
     },
     {
-      title: "Tokamak zk-EVM",
-      shortTitle: "zk-EVM",
+      title: "Tokamak zk EVM",
+      shortTitle: "zk EVM",
       iconType: "layers",
       features: [
         {
           title: "Low Proving Overhead",
-          description: "Affordable on-chain verification with low proving overhead—generate zero-knowledge proofs even on a gaming laptop."
+          description: "Affordable on chain verification with low proving overhead. Generate zero knowledge proofs even on a gaming laptop."
         },
         {
           title: "Full EVM Compatibility",
@@ -77,10 +77,10 @@ const ThreeWaysSection: React.FC = () => {
         },
         {
           title: "Ethereum Security",
-          description: "Every state transition is verified by zero-knowledge proofs, inheriting Ethereum's security guarantees."
+          description: "Every state transition is verified by zero knowledge proofs, inheriting Ethereum security guarantees."
         }
       ],
-      benefit: "Scale your dApps with Ethereum-grade security.",
+      benefit: "Scale your dApps with Ethereum grade security.",
       githubLink: "https://github.com/tokamak-network/Tokamak-zk-EVM"
     },
     {
@@ -90,40 +90,40 @@ const ThreeWaysSection: React.FC = () => {
       features: [
         {
           title: "Async Signing",
-          description: "Minimal signer interaction—no need for all participants to be online at the same time."
+          description: "Minimal signer interaction, eliminating the need for all participants to be online at the same time."
         },
         {
           title: "Threshold Authorization",
-          description: "Require M-of-N participants to approve before any transaction goes through."
+          description: "Require M of N participants to approve before any transaction goes through."
         },
         {
-          title: "On-chain Simplicity",
-          description: "Appears as a single standard signature on-chain—compatible with existing wallets and protocols."
+          title: "On chain Simplicity",
+          description: "Appears as a single standard signature on chain and stays compatible with existing wallets and protocols."
         }
       ],
-      benefit: "Enterprise-grade key management for DAOs and teams.",
+      benefit: "Enterprise grade key management for DAOs and teams.",
       githubLink: "https://github.com/tokamak-network/threshold-signature-Frost"
     },
     {
-      title: "Tokamak zk-SNARK",
-      shortTitle: "zk-SNARK",
+      title: "Tokamak zk SNARK",
+      shortTitle: "zk SNARK",
       iconType: "zap",
       features: [
         {
           title: "Modular Building Blocks",
-          description: "Build bespoke ZK-SNARK circuits like an FPGA—snap together pre-verified building blocks."
+          description: "Build bespoke zk SNARK circuits like an FPGA. Snap together pre verified building blocks."
         },
         {
-          title: "No Per-App Setup",
-          description: "Skip huge RAM circuits and eliminate per-app trusted setup ceremonies."
+          title: "No Per App Setup",
+          description: "Skip huge RAM circuits and eliminate per app trusted setup ceremonies."
         },
         {
           title: "Fast Iteration",
-          description: "Faster proofs, faster iteration—designed for rapid development and deployment."
+          description: "Faster proofs and faster iteration designed for rapid development and deployment."
         }
       ],
       benefit: "The foundational proving system that powers the entire Tokamak ecosystem.",
-      githubLink: "https://github.com/tokamak-network/Tokamak-zk-SNARK"
+      githubLink: "https://github.com/tokamak-network/python-snarks"
     }
   ];
 
@@ -150,7 +150,7 @@ const ThreeWaysSection: React.FC = () => {
             How to Use It
           </h2>
           <p className="text-xl text-white/80 max-w-3xl mx-auto" style={{ fontFamily: '"IBM Plex Mono"' }}>
-            Multiple paths to zero-knowledge powered applications
+            Multiple paths to zero knowledge powered applications
           </p>
         </div>
 

@@ -47,7 +47,7 @@ const VideoSection: React.FC = () => {
               <iframe
                 className="absolute top-0 left-0 w-full h-full"
                 src="https://www.youtube.com/embed/UCDVLpwayCI?autoplay=0&mute=0&controls=1&modestbranding=1&rel=0&showinfo=0&fs=1&iv_load_policy=3&loop=1&playlist=UCDVLpwayCI&playsinline=1&cc_load_policy=0&color=white&disablekb=1"
-                title="Tokamak zk-EVM Demo"
+                title="Tokamak zk EVM Demo"
                 allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
                 style={{
