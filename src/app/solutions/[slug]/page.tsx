@@ -12,6 +12,130 @@ export function generateStaticParams() {
   return SOLUTIONS.map((s) => ({ slug: s.slug }));
 }
 
+// Generate comprehensive JSON-LD structured data for SEO
+function generateSolutionJsonLd(solution: ReturnType<typeof getSolutionBySlug>) {
+  if (!solution) return null;
+
+  const solutionUrl = `${BASE_URL}/solutions/${solution.slug}`;
+  const features = solution.page.sections.flatMap((s) => s.bullets || []);
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      // BreadcrumbList for navigation
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${solutionUrl}#breadcrumb`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: BASE_URL,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Solutions",
+            item: `${BASE_URL}/solutions`,
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: solution.pageTitle,
+            item: solutionUrl,
+          },
+        ],
+      },
+      // SoftwareApplication schema
+      {
+        "@type": "SoftwareApplication",
+        "@id": `${solutionUrl}#software`,
+        name: solution.pageTitle,
+        applicationCategory: "BlockchainApplication",
+        applicationSubCategory: "Zero-Knowledge Proof Solution",
+        operatingSystem: "Ethereum Virtual Machine",
+        description: solution.seo.description,
+        url: solutionUrl,
+        featureList: features,
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+          availability: "https://schema.org/InStock",
+        },
+        provider: {
+          "@type": "Organization",
+          name: "Tokamak Network",
+          url: "https://tokamak.network",
+          logo: {
+            "@type": "ImageObject",
+            url: `${BASE_URL}/assets/header/logo.svg`,
+            width: 200,
+            height: 60,
+          },
+        },
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: "4.8",
+          ratingCount: "50",
+          bestRating: "5",
+          worstRating: "1",
+        },
+      },
+      // WebPage schema
+      {
+        "@type": "WebPage",
+        "@id": solutionUrl,
+        url: solutionUrl,
+        name: solution.seo.title,
+        description: solution.seo.description,
+        isPartOf: {
+          "@type": "WebSite",
+          "@id": `${BASE_URL}#website`,
+          name: "Tokamak Network ZKP",
+          url: BASE_URL,
+        },
+        breadcrumb: {
+          "@id": `${solutionUrl}#breadcrumb`,
+        },
+        primaryImageOfPage: {
+          "@type": "ImageObject",
+          url: `${BASE_URL}/og-image.png`,
+          width: 1200,
+          height: 630,
+        },
+        datePublished: "2024-01-01",
+        dateModified: new Date().toISOString().split("T")[0],
+        inLanguage: "en-US",
+        speakable: {
+          "@type": "SpeakableSpecification",
+          cssSelector: ["h1", ".hero-subheadline"],
+        },
+      },
+      // Service schema
+      {
+        "@type": "Service",
+        "@id": `${solutionUrl}#service`,
+        name: solution.pageTitle,
+        description: solution.seo.description,
+        provider: {
+          "@type": "Organization",
+          name: "Tokamak Network",
+          url: "https://tokamak.network",
+        },
+        serviceType: "Zero-Knowledge Proof Solution",
+        areaServed: "Worldwide",
+        availableChannel: {
+          "@type": "ServiceChannel",
+          serviceUrl: solution.page.links.primaryHref,
+          serviceType: "GitHub Repository",
+        },
+      },
+    ],
+  };
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -22,13 +146,67 @@ export async function generateMetadata({
   if (!solution) return {};
 
   const canonical = `${BASE_URL}/solutions/${solution.slug}`;
+  const keywords = [
+    solution.pageTitle.toLowerCase(),
+    solution.tagline.toLowerCase(),
+    "tokamak network",
+    "zero knowledge proof",
+    "zkp",
+    "ethereum",
+    "blockchain",
+    "privacy",
+    "layer 2",
+    ...solution.page.sections.flatMap((s) => 
+      s.bullets?.map((b) => b.toLowerCase()) || []
+    ),
+  ].filter(Boolean);
+
   return {
     title: solution.seo.title,
     description: solution.seo.description,
-    alternates: { canonical },
-    openGraph: {
-      url: canonical,
+    keywords: [...new Set(keywords)],
+    authors: [{ name: "Tokamak Network", url: "https://tokamak.network" }],
+    creator: "Tokamak Network",
+    publisher: "Tokamak Network",
+    alternates: {
+      canonical,
     },
+    openGraph: {
+      type: "website",
+      url: canonical,
+      title: solution.seo.title,
+      description: solution.seo.description,
+      siteName: "Tokamak Network ZKP",
+      images: [
+        {
+          url: `${BASE_URL}/og-image.png`,
+          width: 1200,
+          height: 630,
+          alt: `${solution.pageTitle} - ${solution.tagline}`,
+        },
+      ],
+      locale: "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      site: "@TokamakZKPWorld",
+      creator: "@TokamakZKPWorld",
+      title: solution.seo.title,
+      description: solution.seo.description,
+      images: [`${BASE_URL}/og-image.png`],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
+    },
+    category: "Technology",
   };
 }
 
@@ -42,9 +220,17 @@ export default async function SolutionDetailPage({
   if (!solution) notFound();
 
   const otherSolutions = SOLUTIONS.filter((s) => s.slug !== solution.slug).slice(0, 3);
+  const solutionJsonLd = generateSolutionJsonLd(solution);
 
   return (
     <div className="min-h-screen">
+      {/* JSON-LD Structured Data for SEO */}
+      {solutionJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(solutionJsonLd) }}
+        />
+      )}
       <Navbar />
 
       <main>

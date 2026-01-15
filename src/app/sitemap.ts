@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { getBlogPosts } from "@/lib/blog";
+import { SOLUTIONS } from "@/lib/solutions-content";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://zkp.tokamak.network";
@@ -19,7 +20,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 0.9,
     },
+    {
+      url: `${baseUrl}/solutions`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
   ];
+
+  // Solution pages - high priority for SEO
+  const solutionPages: MetadataRoute.Sitemap = SOLUTIONS.map((solution) => ({
+    url: `${baseUrl}/solutions/${solution.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.9, // High priority for solution pages
+  }));
 
   // Fetch blog posts dynamically - these are the main SEO target
   let blogPosts: MetadataRoute.Sitemap = [];
@@ -37,6 +52,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Continue with static pages if blog fetch fails
   }
 
-  return [...staticPages, ...blogPosts];
+  return [...staticPages, ...solutionPages, ...blogPosts];
 }
 

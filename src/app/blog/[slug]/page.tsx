@@ -248,6 +248,26 @@ function generateBlogPostJsonLd(post: BlogPost, slug: string) {
         articleSection: "Technology",
         articleBody: post.description,
         inLanguage: "en-US",
+        // Enhanced fields for LLM SEO
+        about: {
+          "@type": "Thing",
+          name: "Zero-Knowledge Proofs",
+          description: "Cryptographic proof systems enabling privacy and scalability on Ethereum",
+        },
+        mentions: post.tags.map((tag) => ({
+          "@type": "Thing",
+          name: tag,
+        })),
+        // Content classification for better understanding
+        genre: "Technical Article",
+        educationalLevel: "Advanced",
+        learningResourceType: "Article",
+        // Related topics
+        mainEntity: {
+          "@type": "Thing",
+          name: post.title,
+          description: post.description,
+        },
         isPartOf: {
           "@type": "Blog",
           "@id": "https://zkp.tokamak.network/blog#blog",
@@ -264,6 +284,13 @@ function generateBlogPostJsonLd(post: BlogPost, slug: string) {
           "@type": "ReadAction",
           target: postUrl,
         },
+        // Creative work properties
+        creativeWorkStatus: "Published",
+        copyrightHolder: {
+          "@type": "Organization",
+          name: "Tokamak Network",
+        },
+        copyrightYear: new Date(post.publishDate).getFullYear().toString(),
       },
       // WebPage schema for the page itself
       {

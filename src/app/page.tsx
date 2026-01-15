@@ -187,6 +187,129 @@ const jsonLd = {
         ],
       },
     },
+    // Dataset Schema - For LLM SEO and knowledge discovery
+    {
+      "@type": "Dataset",
+      "@id": `${BASE_URL}/#dataset`,
+      name: "Tokamak Network ZKP Knowledge Base",
+      description: "Comprehensive dataset about Tokamak Network zero-knowledge proof solutions, technical documentation, blog articles, and FAQs",
+      url: `${BASE_URL}/api/knowledge`,
+      keywords: [
+        "Tokamak Network",
+        "zero-knowledge proofs",
+        "zk-SNARK",
+        "zk-EVM",
+        "Ethereum",
+        "blockchain",
+        "privacy",
+        "Layer 2",
+        "rollups",
+        "threshold signatures",
+        "private channels",
+        "cryptography",
+        "Web3",
+      ],
+      publisher: {
+        "@id": `${BASE_URL}/#organization`,
+      },
+      datePublished: "2024-01-01",
+      dateModified: new Date().toISOString().split("T")[0],
+      inLanguage: "en-US",
+      distribution: {
+        "@type": "DataDownload",
+        contentUrl: `${BASE_URL}/api/knowledge`,
+        encodingFormat: "application/json",
+      },
+      includedInDataCatalog: {
+        "@type": "DataCatalog",
+        name: "Tokamak Network Documentation",
+        url: BASE_URL,
+      },
+    },
+    // Knowledge Graph - Comprehensive entity relationships
+    {
+      "@type": "ItemList",
+      "@id": `${BASE_URL}/#knowledge-graph`,
+      name: "Tokamak Network Knowledge Graph",
+      description: "Structured knowledge about Tokamak Network products, services, and content",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          item: {
+            "@type": "Product",
+            name: "Tokamak zk-EVM",
+            description: "Ethereum compatible zero knowledge rollup with low proving overhead",
+            url: `${BASE_URL}/solutions/zk-evm`,
+            category: "Blockchain Infrastructure",
+          },
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          item: {
+            "@type": "Product",
+            name: "Tokamak Private App Channels",
+            description: "Autonomous, private, and independent Layer 2 channels with zero-knowledge proofs",
+            url: `${BASE_URL}/solutions/private-channels`,
+            category: "Privacy Solutions",
+          },
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          item: {
+            "@type": "Product",
+            name: "Threshold Signature App",
+            description: "Minimal signer interaction with threshold authorization for shared key control",
+            url: `${BASE_URL}/solutions/threshold-signature`,
+            category: "Security Solutions",
+          },
+        },
+        {
+          "@type": "ListItem",
+          position: 4,
+          item: {
+            "@type": "Product",
+            name: "Tokamak zk-SNARK",
+            description: "Modular zk-SNARK circuits like FPGA with pre-verified building blocks",
+            url: `${BASE_URL}/solutions/zk-snark`,
+            category: "Cryptographic Tools",
+          },
+        },
+      ],
+    },
+    // FAQPage Schema - Link to FAQ section
+    {
+      "@type": "FAQPage",
+      "@id": `${BASE_URL}/#faq`,
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: "What is Tokamak zk-SNARK?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Tokamak zk-SNARK is our custom proving system optimized for Ethereum workloads. It features GPU-accelerated proof generation, gas-efficient on-chain verification, and is designed specifically for zk-rollup production environments.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "How does the zk-EVM work?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Our zk-EVM runs a fully EVM-compatible virtual machine and proves every state transition using Tokamak's zk-SNARK. Deploy existing Solidity contracts without modification while inheriting Ethereum's security guarantees.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "What are Private App Channels?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Private App Channels create isolated execution lanes on top of Tokamak zk-EVM. Transactions and balances remain private while Ethereum only sees state roots and zero-knowledge proofs. Perfect for sensitive applications requiring privacy.",
+          },
+        },
+      ],
+    },
   ],
 };
 

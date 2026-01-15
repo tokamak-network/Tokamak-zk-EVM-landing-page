@@ -7,20 +7,167 @@ import { SOLUTIONS } from "@/lib/solutions-content";
 const BASE_URL = "https://zkp.tokamak.network";
 
 export const metadata: Metadata = {
-  title: "Solutions",
+  title: "Solutions | Tokamak Network ZKP",
   description:
-    "Explore Tokamak Network zero knowledge solutions for Ethereum. Learn about private app channels, zk EVM tooling, threshold signatures, and zk SNARK foundations.",
+    "Explore Tokamak Network zero knowledge solutions for Ethereum. Learn about private app channels, zk EVM tooling, threshold signatures, and zk SNARK foundations. Build scalable, private decentralized applications with production grade performance.",
+  keywords: [
+    "tokamak network",
+    "zero knowledge proof",
+    "zkp",
+    "zk EVM",
+    "zk SNARK",
+    "private app channels",
+    "threshold signatures",
+    "ethereum",
+    "blockchain",
+    "privacy",
+    "layer 2",
+    "rollups",
+    "zero knowledge",
+    "cryptography",
+    "web3",
+  ],
+  authors: [{ name: "Tokamak Network", url: "https://tokamak.network" }],
+  creator: "Tokamak Network",
+  publisher: "Tokamak Network",
   alternates: {
     canonical: `${BASE_URL}/solutions`,
   },
   openGraph: {
+    type: "website",
     url: `${BASE_URL}/solutions`,
+    title: "Solutions | Tokamak Network ZKP",
+    description:
+      "Explore Tokamak Network zero knowledge solutions for Ethereum. Learn about private app channels, zk EVM tooling, threshold signatures, and zk SNARK foundations.",
+    siteName: "Tokamak Network ZKP",
+    images: [
+      {
+        url: `${BASE_URL}/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: "Tokamak Network ZKP Solutions - Zero-Knowledge Proof Solutions for Ethereum",
+      },
+    ],
+    locale: "en_US",
   },
+  twitter: {
+    card: "summary_large_image",
+    site: "@TokamakZKPWorld",
+    creator: "@TokamakZKPWorld",
+    title: "Solutions | Tokamak Network ZKP",
+    description:
+      "Explore Tokamak Network zero knowledge solutions for Ethereum. Build scalable, private decentralized applications.",
+    images: [`${BASE_URL}/og-image.png`],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  category: "Technology",
 };
 
+// Generate JSON-LD structured data for solutions index page
+function generateSolutionsIndexJsonLd() {
+  const solutionsUrl = `${BASE_URL}/solutions`;
+  
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${solutionsUrl}#breadcrumb`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: BASE_URL,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Solutions",
+            item: solutionsUrl,
+          },
+        ],
+      },
+      {
+        "@type": "CollectionPage",
+        "@id": solutionsUrl,
+        url: solutionsUrl,
+        name: "Solutions | Tokamak Network ZKP",
+        description:
+          "Explore Tokamak Network zero knowledge solutions for Ethereum. Learn about private app channels, zk EVM tooling, threshold signatures, and zk SNARK foundations.",
+        isPartOf: {
+          "@type": "WebSite",
+          "@id": `${BASE_URL}#website`,
+          name: "Tokamak Network ZKP",
+          url: BASE_URL,
+        },
+        breadcrumb: {
+          "@id": `${solutionsUrl}#breadcrumb`,
+        },
+        mainEntity: {
+          "@type": "ItemList",
+          numberOfItems: SOLUTIONS.length,
+          itemListElement: SOLUTIONS.map((solution, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            name: solution.pageTitle,
+            url: `${BASE_URL}/solutions/${solution.slug}`,
+            description: solution.description,
+          })),
+        },
+        inLanguage: "en-US",
+      },
+      {
+        "@type": "Service",
+        "@id": `${solutionsUrl}#service`,
+        name: "Tokamak Network Zero-Knowledge Proof Solutions",
+        description:
+          "Complete ecosystem of zero-knowledge proof solutions for Ethereum including zk EVM rollups, threshold signatures, private application channels, and modular zk SNARK foundations.",
+        provider: {
+          "@type": "Organization",
+          name: "Tokamak Network",
+          url: "https://tokamak.network",
+        },
+        serviceType: "Blockchain Infrastructure",
+        areaServed: "Worldwide",
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          name: "ZKP Solutions",
+          itemListElement: SOLUTIONS.map((solution) => ({
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: solution.pageTitle,
+              description: solution.description,
+              url: `${BASE_URL}/solutions/${solution.slug}`,
+            },
+          })),
+        },
+      },
+    ],
+  };
+}
+
 export default function SolutionsIndexPage() {
+  const solutionsJsonLd = generateSolutionsIndexJsonLd();
+
   return (
     <div className="min-h-screen">
+      {/* JSON-LD Structured Data for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(solutionsJsonLd) }}
+      />
       <Navbar />
 
       <main>
