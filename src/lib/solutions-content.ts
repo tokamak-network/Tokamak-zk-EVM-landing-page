@@ -165,7 +165,7 @@ export const SOLUTIONS: SolutionContent[] = [
       },
       video: {
         title: "Tokamak zk EVM demo",
-        youtubeId: "UCDVLpwayCI",
+        youtubeId: "PdbzobSY-ME",
       },
     },
   },

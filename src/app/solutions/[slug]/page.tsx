@@ -430,7 +430,7 @@ export default async function SolutionDetailPage({
                     <div className="relative w-full pb-[56.25%] bg-[#0a1930] border-2 border-[#4fc3f7] shadow-lg hover:shadow-[#4fc3f7]/20 transition-all duration-300 overflow-hidden">
                       <iframe
                         className="absolute top-0 left-0 w-full h-full"
-                        src={`https://www.youtube.com/embed/${solution.page.video.youtubeId}?autoplay=0&mute=0&controls=1&modestbranding=1&rel=0&showinfo=0&fs=1&playsinline=1&cc_load_policy=0&color=white&disablekb=1`}
+                        src={`https://www.youtube-nocookie.com/embed/${solution.page.video.youtubeId}?autoplay=0&mute=0&controls=1&modestbranding=1&rel=0&fs=1&playsinline=1&cc_load_policy=0&color=white&disablekb=1&iv_load_policy=3&origin=https://zkp.tokamak.network&enablejsapi=0&widget_referrer=https://zkp.tokamak.network&loop=1&playlist=${solution.page.video.youtubeId}`}
                         title={solution.page.video.title}
                         allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowFullScreen

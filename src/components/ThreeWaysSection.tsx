@@ -295,6 +295,33 @@ const ThreeWaysSection: React.FC = () => {
                     </div>
                   </div>
 
+                  {/* YouTube Video Embed - Only for zk EVM */}
+                  {way.title === "Tokamak zk EVM" && (
+                    <div className="px-6 sm:px-10 py-8 border-t border-[#4fc3f7]/20">
+                      <div className="mb-4">
+                        <h4 className="text-lg font-semibold text-white mb-2" style={{ fontFamily: '"IBM Plex Mono"' }}>
+                          Watch the Demo
+                        </h4>
+                        <p className="text-white/70 text-sm" style={{ fontFamily: '"IBM Plex Mono"' }}>
+                          See Tokamak zk EVM in action
+                        </p>
+                      </div>
+                      <div className="relative w-full pb-[56.25%] bg-[#0a1930] border border-[#4fc3f7]/30 shadow-lg hover:shadow-[#4fc3f7]/20 transition-all duration-300 overflow-hidden">
+                        <iframe
+                          className="absolute top-0 left-0 w-full h-full"
+                          src="https://www.youtube-nocookie.com/embed/PdbzobSY-ME?autoplay=0&mute=0&controls=1&modestbranding=1&rel=0&fs=1&playsinline=1&cc_load_policy=0&color=white&disablekb=1&iv_load_policy=3&origin=https://zkp.tokamak.network&enablejsapi=0&widget_referrer=https://zkp.tokamak.network&loop=1&playlist=PdbzobSY-ME"
+                          title="Tokamak zk EVM Demo"
+                          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                          style={{
+                            border: 'none',
+                            pointerEvents: 'auto',
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
                   {/* Footer with Benefit & CTA */}
                   <div className="px-6 sm:px-10 py-6 bg-gradient-to-r from-[#4fc3f7]/10 via-[#4fc3f7]/5 to-transparent border-t border-[#4fc3f7]/20">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
