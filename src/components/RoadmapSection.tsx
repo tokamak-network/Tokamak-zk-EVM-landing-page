@@ -43,14 +43,20 @@ const RoadmapSection: React.FC = () => {
   const roadmapData = {
     today: {
       title: "Available Today",
-      subtitle: "Ready to use right now",
+      subtitle: "Production-ready solutions",
       color: "from-blue-500 to-blue-700",
       bgColor: "bg-blue-50",
       items: [
         {
           iconType: "search",
-          title: "EVM Execution Proofs",
-          description: "Generate and verify proofs of EVM execution correctness for real Ethereum transactions via Playground/CLI.",
+          title: "Tokamak zk-SNARK",
+          description: "GPU-accelerated proving system with gas-efficient on-chain verification. Production-ready for rollup workloads.",
+          status: "Live"
+        },
+        {
+          iconType: "filecheck",
+          title: "Tokamak zk-EVM",
+          description: "EVM-compatible zk-rollup with seamless Solidity deployment and Ethereum security inheritance.",
           status: "Live"
         }
       ]
@@ -62,21 +68,15 @@ const RoadmapSection: React.FC = () => {
       bgColor: "bg-blue-50",
       items: [
         {
-          iconType: "filecheck",
-          title: "Full Transaction Proofs",
-          description: "Move from execution-only to full transaction proofs (sig, input state, post-state).",
-          status: "Q1 2025"
-        },
-        {
           iconType: "archive",
-          title: "Proof Aggregation",
-          description: "Proof aggregation for batch submissions.",
+          title: "Threshold Signature App",
+          description: "Multi-party key management with M-of-N threshold authorization. On-chain compatible single signatures.",
           status: "Q2 2025"
         },
         {
           iconType: "building",
-          title: "Private L2 Channels",
-          description: "Replace transactions with proofs for small/mid-sized private L2 groups that settle to Ethereum.",
+          title: "Private App Channels",
+          description: "Isolated private execution lanes with hidden transactions and ZK-verified state transitions.",
           status: "Q3 2025"
         }
       ]
@@ -89,10 +89,10 @@ const RoadmapSection: React.FC = () => {
         {/* Section Header */}
         <div className={`text-center mb-16 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 font-heading">
-            What You Can Do Today vs Next
+            Roadmap
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Our development roadmap and what&apos;s available now
+            Our ZKP ecosystem development timeline
           </p>
         </div>
 

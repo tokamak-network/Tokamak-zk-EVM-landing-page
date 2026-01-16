@@ -3,38 +3,46 @@ import { getBlogPosts } from "@/lib/blog";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BlogList from "@/components/BlogList";
+import type { BlogPost } from "@/types/blog";
 
 // Revalidate every 30 minutes (1800 seconds)
 export const revalidate = 1800;
 
+const BASE_URL = "https://zkp.tokamak.network";
+
 export const metadata: Metadata = {
-  title: "Blog",
+  title: "Blog | Zero Knowledge Proof & zk-EVM Articles",
   description:
-    "Latest insights, updates, and technical articles from Tokamak Network. Explore zero-knowledge proofs, zk-EVM development, privacy technology, and blockchain innovation.",
+    "Expert insights on zero-knowledge proofs, zk-EVM development, Ethereum Layer 2 solutions, and blockchain privacy technology. Technical articles from Tokamak Network engineers.",
   keywords: [
-    "Tokamak Blog",
-    "zk-EVM Articles",
-    "Zero Knowledge Proofs",
-    "Blockchain Technology",
-    "Privacy Tech",
-    "Ethereum Layer 2",
-    "Web3 Development",
+    "tokamak blog",
+    "zk-evm articles",
+    "zero knowledge proofs tutorial",
+    "blockchain technology blog",
+    "privacy technology articles",
+    "ethereum layer 2 blog",
+    "web3 development tutorials",
+    "zk-snark explained",
+    "zkp blockchain",
+    "crypto privacy solutions",
+    "ethereum scalability",
+    "rollup technology",
   ],
   alternates: {
-    canonical: "/blog",
+    canonical: `${BASE_URL}/blog`,
   },
   openGraph: {
-    title: "Blog | Tokamak zk-EVM",
+    title: "Blog | Tokamak zk-EVM - Zero Knowledge Proof Articles",
     description:
-      "Latest insights, updates, and technical articles from Tokamak Network. Explore zero-knowledge proofs and privacy technology.",
-    url: "/blog",
+      "Expert insights on zero-knowledge proofs, zk-EVM development, and blockchain privacy technology from Tokamak Network.",
+    url: `${BASE_URL}/blog`,
     type: "website",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Tokamak zk-EVM Blog",
+        alt: "Tokamak zk-EVM Blog - Zero Knowledge Proof Articles",
       },
     ],
   },
@@ -42,47 +50,151 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Blog | Tokamak zk-EVM",
     description:
-      "Latest insights, updates, and technical articles from Tokamak Network.",
+      "Expert insights on zero-knowledge proofs and blockchain privacy technology.",
     images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    "max-image-preview": "large",
+    "max-snippet": -1,
   },
 };
 
-// JSON-LD Structured Data for Blog Listing
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Blog",
-  "@id": "https://zkp.tokamak.network/blog/#blog",
-  mainEntityOfPage: "https://zkp.tokamak.network/blog",
-  name: "Tokamak zk-EVM Blog",
-  description:
-    "Latest insights, updates, and technical articles from Tokamak Network about zero-knowledge proofs and privacy technology.",
-  publisher: {
-    "@type": "Organization",
-    name: "Tokamak Network",
-    logo: {
-      "@type": "ImageObject",
-      url: "https://zkp.tokamak.network/assets/header/logo.svg",
-    },
-  },
-  url: "https://zkp.tokamak.network/blog",
-};
+// Generate comprehensive JSON-LD for blog listing with ItemList
+function generateBlogListingJsonLd(posts: BlogPost[]) {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      // BreadcrumbList for navigation
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${BASE_URL}/blog#breadcrumb`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: BASE_URL,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Blog",
+            item: `${BASE_URL}/blog`,
+          },
+        ],
+      },
+      // Blog schema
+      {
+        "@type": "Blog",
+        "@id": `${BASE_URL}/blog#blog`,
+        mainEntityOfPage: `${BASE_URL}/blog`,
+        name: "Tokamak zk-EVM Blog",
+        description:
+          "Expert insights on zero-knowledge proofs, zk-EVM development, and blockchain privacy technology from Tokamak Network.",
+        url: `${BASE_URL}/blog`,
+        inLanguage: "en-US",
+        publisher: {
+          "@type": "Organization",
+          name: "Tokamak Network",
+          url: "https://tokamak.network",
+          logo: {
+            "@type": "ImageObject",
+            url: `${BASE_URL}/assets/header/logo.svg`,
+            width: 200,
+            height: 60,
+          },
+          sameAs: [
+            "https://twitter.com/tokaboratory",
+            "https://t.me/tokamak_network",
+            "https://github.com/tokamak-network",
+          ],
+        },
+        // Link to individual blog posts
+        blogPost: posts.slice(0, 10).map((post) => ({
+          "@type": "BlogPosting",
+          "@id": `${BASE_URL}/blog/${post.slug}#blogposting`,
+          headline: post.title,
+          url: `${BASE_URL}/blog/${post.slug}`,
+          datePublished: post.publishDate,
+          author: {
+            "@type": "Person",
+            name: post.author || "Tokamak Network",
+          },
+        })),
+      },
+      // ItemList for search engines to understand the collection
+      {
+        "@type": "ItemList",
+        "@id": `${BASE_URL}/blog#itemlist`,
+        name: "Tokamak Network Blog Posts",
+        description: "Collection of articles about zero-knowledge proofs and blockchain technology",
+        numberOfItems: posts.length,
+        itemListOrder: "https://schema.org/ItemListOrderDescending",
+        itemListElement: posts.slice(0, 20).map((post, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: post.title,
+          url: `${BASE_URL}/blog/${post.slug}`,
+          item: {
+            "@type": "BlogPosting",
+            headline: post.title,
+            description: post.description,
+            url: `${BASE_URL}/blog/${post.slug}`,
+            datePublished: post.publishDate,
+            image: post.coverImage || `${BASE_URL}/og-image.png`,
+            author: {
+              "@type": "Person",
+              name: post.author || "Tokamak Network",
+            },
+            keywords: post.tags.join(", "),
+          },
+        })),
+      },
+      // CollectionPage schema
+      {
+        "@type": "CollectionPage",
+        "@id": `${BASE_URL}/blog`,
+        url: `${BASE_URL}/blog`,
+        name: "Tokamak zk-EVM Blog",
+        description: "Expert insights on zero-knowledge proofs and blockchain technology",
+        isPartOf: {
+          "@type": "WebSite",
+          "@id": `${BASE_URL}#website`,
+          name: "Tokamak Network ZKP",
+          url: BASE_URL,
+        },
+        breadcrumb: {
+          "@id": `${BASE_URL}/blog#breadcrumb`,
+        },
+        mainEntity: {
+          "@id": `${BASE_URL}/blog#itemlist`,
+        },
+      },
+    ],
+  };
+}
 
 export default async function BlogPage() {
   console.log("\n🌐 [PAGE] ========== BLOG PAGE RENDERING ==========");
   console.log("🌐 [PAGE] Fetching blog posts...");
-  
+
   const posts = await getBlogPosts();
-  
+
   console.log("🌐 [PAGE] Received", posts.length, "posts");
   console.log("🌐 [PAGE] Posts:", posts.map(p => `"${p.title}"`).join(", "));
   console.log("🌐 [PAGE] ==========================================\n");
 
+  // Generate dynamic JSON-LD with all blog posts for better indexing
+  const blogListingJsonLd = generateBlogListingJsonLd(posts);
+
   return (
     <>
-      {/* JSON-LD Structured Data */}
+      {/* JSON-LD Structured Data with ItemList for SEO */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogListingJsonLd) }}
       />
       <div className="min-h-screen flex flex-col">
         <Navbar />

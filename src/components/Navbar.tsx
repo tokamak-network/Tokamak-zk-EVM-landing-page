@@ -49,9 +49,8 @@ const Navigation = () => {
   };
 
   const navItems = [
-    { id: "who-section", label: "Who" },
-    { id: "two-ways-section", label: "How" },
-    { id: "why-different-section", label: "Why" },
+    { id: "solutions-section", label: "Solutions" },
+    { id: "two-ways-section", label: "How to Use" },
     { id: "blog", label: "Blog", isLink: true, href: "/blog" },
   ];
 
@@ -62,11 +61,11 @@ const Navigation = () => {
         <Image
           src={LogoImage}
           alt="logo"
-          width={318}
-          height={27}
+          width={260}
+          height={22}
           style={{
-            width: "318px",
-            height: "27px",
+            width: "260px",
+            height: "22px",
             flexShrink: 0,
             aspectRatio: "106/9",
             cursor: "pointer",
@@ -78,7 +77,7 @@ const Navigation = () => {
       {/* Desktop Navigation - sticky */}
       <div className="hidden desktop:flex h-[80px] items-center justify-between pl-[40px] border-t-[2px] border-b-[2px] border-[#4fc3f7] bg-gradient-to-r from-[#0a1930] to-[#1a2347] sticky top-0 z-50">
         <div className="flex items-center cursor-pointer" onClick={() => window.location.href = "/"}>
-          <Image src={LogoImage} alt="logo" width={334} height={27} />
+          <Image src={LogoImage} alt="logo" width={280} height={24} />
         </div>
 
         {/* Centered Navigation Items */}

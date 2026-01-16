@@ -1,181 +1,153 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-// Star Component for cosmic background
-const Star = ({
-  className,
-  style,
-}: {
-  className?: string;
-  style?: React.CSSProperties;
-}) => (
-  <div className={`absolute text-white ${className}`} style={style}>
-    ✦
+// Subtle grid pattern background
+const GridPattern = () => (
+  <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.03]">
+    <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+          <path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" strokeWidth="1" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#grid)" />
+    </svg>
   </div>
 );
 
-// Plus Sign Component for cosmic background ( this is for the animation of the hero section )
-const PlusSign = ({
-  className,
-  style,
-}: {
-  className?: string;
-  style?: React.CSSProperties;
-}) => (
-  <div className={`absolute text-white ${className}`} style={style}>
-    +
-  </div>
-);
-
-// Gear Component for cosmic background
-const Gear = ({
-  className,
-  style,
-}: {
-  className?: string;
-  style?: React.CSSProperties;
-}) => (
-  <div className={`absolute text-white ${className}`} style={style}>
-    ⚙
-  </div>
-);
-
-const Overview = () => {
-  return (
-    <div
-      id="overview"
-      className="w-full min-h-screen flex flex-col justify-center items-center relative overflow-hidden"
+// Subtle floating orbs - monochromatic
+const FloatingOrbs = () => (
+  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div 
+      className="absolute w-96 h-96 rounded-full blur-3xl animate-float"
       style={{
-        background: "linear-gradient(to bottom, #0a1930 0%, #1a2347 100%)",
+        background: "radial-gradient(circle, rgba(79, 195, 247, 0.08) 0%, transparent 70%)",
+        top: "5%",
+        left: "5%",
       }}
-    >
-      {/* Cosmic Background Elements */}
-      <Star
-        className="text-lg animate-pulse"
-        style={{ top: "10%", left: "10%", animationDelay: "0s" }}
-      />
-      <Star
-        className="text-sm animate-pulse"
-        style={{ top: "20%", right: "15%", animationDelay: "1s" }}
-      />
-      <Star
-        className="text-xl animate-pulse"
-        style={{ top: "30%", left: "20%", animationDelay: "2s" }}
-      />
-      <PlusSign
-        className="text-lg animate-pulse"
-        style={{ top: "15%", right: "25%", animationDelay: "0.5s" }}
-      />
-      <PlusSign
-        className="text-sm animate-pulse"
-        style={{ bottom: "40%", left: "15%", animationDelay: "1.5s" }}
-      />
-      <Gear
-        className="text-lg animate-pulse"
-        style={{ bottom: "20%", right: "10%", animationDelay: "2.5s" }}
-      />
-      <Star
-        className="text-md animate-pulse"
-        style={{ bottom: "35%", right: "30%", animationDelay: "0.8s" }}
-      />
-      <PlusSign
-        className="text-xl animate-pulse"
-        style={{ top: "60%", left: "8%", animationDelay: "1.8s" }}
-      />
-      <Star
-        className="text-sm animate-pulse"
-        style={{ top: "70%", right: "20%", animationDelay: "2.2s" }}
-      />
-      <Gear
-        className="text-sm animate-pulse"
-        style={{ top: "25%", left: "85%", animationDelay: "1.2s" }}
-      />
+    />
+    <div 
+      className="absolute w-80 h-80 rounded-full blur-3xl animate-float-delayed"
+      style={{
+        background: "radial-gradient(circle, rgba(79, 195, 247, 0.06) 0%, transparent 70%)",
+        bottom: "10%",
+        right: "10%",
+      }}
+    />
+  </div>
+);
 
-      {/* Main Content */}
-      <div className="flex flex-col items-center text-center space-y-8 z-10 px-4">
-        {/* ZK Proofs. One Click. */}
-        <div className="flex flex-col items-center">
-          <h1
-            className="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-wider"
-            style={{
-              fontFamily: '"Jersey 10", "Press Start 2P", monospace',
-              textShadow: "0 0 20px rgba(255, 255, 255, 0.3)",
-            }}
-          >
-            Own Your Privacy
-          </h1>
+const Hero: React.FC = () => {
+  const [mounted, setMounted] = useState(false);
 
-          {/* Tokamak zk-EVM */}
-          <h2
-            className="text-6xl md:text-8xl lg:text-[12rem] font-bold mt-4 bg-gradient-to-r from-[#4fc3f7] to-[#29b6f6] bg-clip-text text-transparent"
-            style={{
-              fontFamily: '"Jersey 10", "Press Start 2P", monospace',
-              letterSpacing: '0.5rem',
-            }}
-          >
-            Tokamak zk-EVM
-          </h2>
-        </div>
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-        {/* Description */}
-        <div className="mt-12 text-center">
-          <div
-            className="text-white text-lg max-w-2xl"
-            style={{
-              fontFamily: '"IBM Plex Mono"',
-              lineHeight: "1.6",
-            }}
-          >
-            Experience true privacy with Tokamak Network&apos;s zero-knowledge Ethereum Virtual Machine. Your data, your control.
+  return (
+    <section className="relative">
+      {/* Fixed Background Layer */}
+      <div 
+        className="fixed inset-0 w-full h-screen z-0"
+        style={{
+          background: "linear-gradient(180deg, #0a1930 0%, #0d1f3c 50%, #0a1930 100%)",
+        }}
+      >
+        <GridPattern />
+        <FloatingOrbs />
+        
+        {/* Ambient center glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#4fc3f7]/5 rounded-full blur-3xl pointer-events-none" />
+      </div>
+
+      {/* Content Layer - scrolls over the fixed background */}
+      <div 
+        id="overview"
+        className="relative z-10 min-h-screen flex flex-col justify-center items-center"
+      >
+        {/* Main Content */}
+        <div className={`flex flex-col items-center text-center space-y-6 md:space-y-8 px-4 sm:px-6 w-full transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#4fc3f7]/10 border border-[#4fc3f7]/20 backdrop-blur-sm">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4fc3f7] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4fc3f7]"></span>
+            </span>
+            <span className="text-[#4fc3f7] text-sm font-medium" style={{ fontFamily: '"IBM Plex Mono"' }}>
+              Zero-Knowledge Proof Solutions
+            </span>
+          </div>
+
+          {/* Main Title */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-8">
+            <h1
+              className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-white text-center"
+              style={{
+                fontFamily: '"Jersey 10", "Press Start 2P", monospace',
+              }}
+            >
+              Tokamak Network
+            </h1>
+            <span
+              className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-[#4fc3f7]"
+              style={{
+                fontFamily: '"Jersey 10", "Press Start 2P", monospace',
+                letterSpacing: '0.3rem',
+              }}
+            >
+              ZKP
+            </span>
+          </div>
+
+          {/* Description */}
+          <div className="max-w-3xl px-2">
+            <p
+              className="text-white/70 text-base sm:text-lg md:text-xl leading-relaxed"
+              style={{
+                fontFamily: '"IBM Plex Mono"',
+              }}
+            >
+              Making privacy the default for Ethereum. 
+              Scalable, verifiable, and accessible to everyone.
+            </p>
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mt-2 sm:mt-4 w-full sm:w-auto px-4 sm:px-0">
+            {/* Primary CTA */}
+            <a
+              href="#solutions-section"
+              className="group inline-flex items-center justify-center w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white bg-[#028bee] hover:bg-[#0277d4] transition-all duration-300 shadow-lg hover:shadow-xl"
+              style={{
+                fontFamily: '"IBM Plex Mono"',
+              }}
+            >
+              <span>Explore Solutions</span>
+              <svg className="ml-2 w-5 h-5 transform group-hover:translate-y-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
+            </a>
+            
+            {/* Secondary CTA */}
+            <a
+              href="https://github.com/tokamak-network"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center justify-center w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-[#4fc3f7] border-2 border-[#4fc3f7]/50 hover:border-[#4fc3f7] hover:bg-[#4fc3f7]/10 transition-all duration-300 backdrop-blur-sm"
+              style={{
+                fontFamily: '"IBM Plex Mono"',
+              }}
+            >
+              <span>View on GitHub</span>
+              <svg className="ml-2 w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </a>
           </div>
         </div>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
-          {/* Primary CTA - Playground */}
-          <a
-            href="https://github.com/tokamak-network/Tokamak-zk-EVM-playgrounds/releases"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group relative inline-flex items-center px-8 py-4 text-lg font-semibold text-white bg-[#028bee] hover:bg-[#0277d4] transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl relative z-50"
-            style={{
-              fontFamily: '"IBM Plex Mono"',
-            }}
-          >
-            <span>Try Playground</span>
-            <svg className="ml-2 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </a>
-          
-          {/* Secondary CTA - CLI */}
-          <a
-            href="https://github.com/tokamak-network/Tokamak-zk-EVM"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group relative inline-flex items-center px-8 py-4 text-lg font-semibold text-[#4fc3f7] bg-transparent border-2 border-[#4fc3f7] hover:bg-[#4fc3f7] hover:text-white transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl relative z-50"
-            style={{
-              fontFamily: '"IBM Plex Mono"',
-            }}
-          >
-            <span>Install CLI</span>
-            <svg className="ml-2 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </a>
-        </div>
       </div>
-
-      {/* Rainbow Stripe at bottom */}
-      <div className="absolute bottom-0 left-0 w-full h-4 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 via-indigo-500 to-purple-500"></div>
-    </div>
-  );
-};
-
-const Hero: React.FC = () => {
-  return (
-    <section className="flex flex-col justify-center items-center">
-      <Overview />
     </section>
   );
 };

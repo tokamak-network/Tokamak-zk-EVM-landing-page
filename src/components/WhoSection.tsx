@@ -41,34 +41,48 @@ const WhoSection: React.FC = () => {
 
   const personas = [
     {
-      title: "Builders & Devs",
-      description: "Ship private-by-design flows. Generate/verify proofs locally, automate with the CLI, and plug into CI.",
+      title: "Rollup Operators",
+      description: "Deploy production-ready zk-rollups with EVM compatibility. Scale your L2 with Ethereum-grade security and minimal operational overhead.",
       iconType: "code",
       color: "from-[#4fc3f7] to-[#29b6f6]"
     },
     {
-      title: "Privacy-minded Users",
-      description: "Verify what happened on Ethereum without exposing what happened. Run proofs on your own computer, end-to-end.",
+      title: "dApp Developers",
+      description: "Build privacy-first applications using our complete ZKP stack. From DeFi protocols to private voting systems—full developer tooling included.",
       iconType: "shield",
       color: "from-[#4fc3f7] to-[#29b6f6]"
     },
     {
-      title: "Teams, DAOs & Enterprises",
-      description: "Spin up short-lived, private L2 channels where batches of actions can be replaced by a single proof posted to L1 (on the roadmap).",
+      title: "DAOs & Enterprises",
+      description: "Secure multi-sig treasuries with threshold signatures. Create private execution channels for sensitive operations with cryptographic guarantees.",
       iconType: "users",
       color: "from-[#4fc3f7] to-[#29b6f6]"
     },
     {
       title: "Researchers & Auditors",
-      description: "Inspect circuits, reproduce proofs, and stress-test our lightweight SNARK and consensus approach.",
+      description: "Explore cutting-edge ZK cryptography. Inspect our circuits, verify proofs, and contribute to open-source development.",
       iconType: "research",
       color: "from-[#4fc3f7] to-[#29b6f6]"
     }
   ];
 
   return (
-    <section id="who-section" className="py-24 bg-gradient-to-b from-[#0a1930] to-[#1a2347]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section 
+      id="who-section" 
+      className="relative z-10 py-24 overflow-hidden"
+      style={{
+        background: "linear-gradient(180deg, #0d1f3c 0%, #1a2347 50%, #0d1f3c 100%)",
+        boxShadow: "0 -20px 60px rgba(0, 0, 0, 0.8)"
+      }}
+    >
+      {/* Top accent line */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#4fc3f7]/40 to-transparent" />
+      
+      {/* Background elements */}
+      <div className="absolute top-20 right-20 w-80 h-80 bg-[#4fc3f7]/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-20 left-20 w-96 h-96 bg-[#029cdc]/5 rounded-full blur-3xl pointer-events-none" />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className={`text-center mb-20 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6" style={{ fontFamily: '"Jersey 10", "Press Start 2P", monospace' }}>

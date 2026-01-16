@@ -9,22 +9,24 @@ import { GlobalBlogProvider } from "@/components/BlogContext";
 export const metadata: Metadata = {
   metadataBase: new URL("https://zkp.tokamak.network"),
   title: {
-    default: "Tokamak zk-EVM | Privacy-First Zero-Knowledge Ethereum",
-    template: "%s | Tokamak zk-EVM",
+    default: "Tokamak Network ZKP | Zero-Knowledge Proof Solutions for Ethereum",
+    template: "%s | Tokamak Network ZKP",
   },
-  description: "Experience true privacy with Tokamak Network's zero-knowledge Ethereum Virtual Machine. Your data, your control. Build private, scalable dApps on Ethereum.",
+  description: "High-throughput zero-knowledge proof solutions for Ethereum. Powering zk-EVM rollups, threshold signatures, and private application channels with production-grade performance.",
   keywords: [
     "Tokamak",
+    "zk-SNARK",
     "zk-EVM",
-    "Zero Knowledge",
+    "Zero Knowledge Proof",
+    "ZKP",
     "Privacy",
     "Blockchain",
     "Ethereum",
     "Layer 2",
-    "ZKP",
-    "Private Transactions",
+    "Threshold Signatures",
+    "Private Channels",
+    "Rollups",
     "Web3",
-    "Smart Contracts",
     "Tokamak Network",
   ],
   authors: [{ name: "Tokamak Network", url: "https://tokamak.network" }],
@@ -50,21 +52,21 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "Tokamak zk-EVM",
+    siteName: "Tokamak Network ZKP",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Tokamak zk-EVM - Privacy-First Zero-Knowledge Ethereum",
+        alt: "Tokamak Network ZKP - Zero-Knowledge Proof Solutions for Ethereum",
       },
     ],
   },
   // Twitter Card defaults
   twitter: {
     card: "summary_large_image",
-    site: "@tokaborator",
-    creator: "@tokaborator",
+    site: "@TokamakZKPWorld",
+    creator: "@TokamakZKPWorld",
   },
   // Google Search Console verification (from env)
   verification: {
