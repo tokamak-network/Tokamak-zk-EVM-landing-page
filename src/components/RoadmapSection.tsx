@@ -56,7 +56,7 @@ const RoadmapSection: React.FC = () => {
         {
           iconType: "filecheck",
           title: "Tokamak zk-EVM",
-          description: "Full EVM-compatible zk-rollup with seamless Solidity deployment and Ethereum security inheritance.",
+          description: "EVM-compatible zk-rollup with seamless Solidity deployment and Ethereum security inheritance.",
           status: "Live"
         }
       ]

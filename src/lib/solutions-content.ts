@@ -110,30 +110,30 @@ export const SOLUTIONS: SolutionContent[] = [
     pageTitle: "Tokamak zk EVM",
     tagline: "Ethereum compatible zero knowledge rollup",
     description:
-      "Affordable on chain verification with low proving overhead so you can generate zero knowledge proofs even on a gaming laptop. Full EVM compatibility with Ethereum security.",
+      "Affordable on chain verification with low proving overhead so you can generate zero knowledge proofs even on a gaming laptop. EVM compatibility with Ethereum security.",
     status: "available",
     iconType: "layers",
     seo: {
       title: "Tokamak zk EVM",
       description:
-        "Affordable on chain verification with low proving overhead. Generate zero knowledge proofs even on a gaming laptop with full EVM compatibility and Ethereum security.",
+        "Affordable on chain verification with low proving overhead. Generate zero knowledge proofs even on a gaming laptop with EVM compatibility and Ethereum security.",
     },
     page: {
       hero: {
         eyebrow: "Solution 02",
         headline: "Ethereum compatible zk EVM",
         subheadline:
-          "Affordable on chain verification with low proving overhead so you can generate zero knowledge proofs even on a gaming laptop. Full EVM compatibility with Ethereum security.",
+          "Affordable on chain verification with low proving overhead so you can generate zero knowledge proofs even on a gaming laptop. EVM compatibility with Ethereum security.",
       },
       sections: [
         {
           title: "What it is",
           body:
-            "Tokamak zk EVM is a proving toolchain that turns transaction execution into zero knowledge proofs with low proving overhead. Generate proofs on approachable hardware while maintaining full EVM compatibility and Ethereum security guarantees.",
+            "Tokamak zk EVM is a proving toolchain that turns transaction execution into zero knowledge proofs with low proving overhead. Generate proofs on approachable hardware while maintaining EVM compatibility and Ethereum security guarantees.",
           bullets: [
             "Low proving overhead for practical hardware",
             "Gaming laptop capable proof generation",
-            "Full EVM compatibility",
+            "EVM compatibility",
           ],
         },
         {

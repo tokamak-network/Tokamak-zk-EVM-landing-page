@@ -72,8 +72,8 @@ const ThreeWaysSection: React.FC = () => {
           description: "Affordable on chain verification with low proving overhead. Generate zero knowledge proofs even on a gaming laptop."
         },
         {
-          title: "Full EVM Compatibility",
-          description: "Deploy existing Solidity contracts without modification. Full compatibility with Ethereum tooling and infrastructure."
+          title: "EVM Compatibility",
+          description: "Deploy existing Solidity contracts without modification. Compatibility with Ethereum tooling and infrastructure."
         },
         {
           title: "Ethereum Security",

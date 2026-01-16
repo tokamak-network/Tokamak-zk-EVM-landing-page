@@ -35,11 +35,11 @@ const solutions: Solution[] = [
     number: "02",
     title: "Tokamak zk EVM",
     tagline: "Ethereum compatible zero knowledge execution",
-    description: "Affordable on chain verification with low proving overhead so you can generate zero knowledge proofs even on a gaming laptop. Full EVM compatibility with Ethereum security.",
+    description: "Affordable on chain verification with low proving overhead so you can generate zero knowledge proofs even on a gaming laptop. EVM compatibility with Ethereum security.",
     features: [
       "Low proving overhead",
       "Gaming laptop capable",
-      "Full EVM compatibility"
+      "EVM compatibility"
     ],
     status: "available",
     iconType: "layers"

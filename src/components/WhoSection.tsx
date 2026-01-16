@@ -42,7 +42,7 @@ const WhoSection: React.FC = () => {
   const personas = [
     {
       title: "Rollup Operators",
-      description: "Deploy production-ready zk-rollups with full EVM compatibility. Scale your L2 with Ethereum-grade security and minimal operational overhead.",
+      description: "Deploy production-ready zk-rollups with EVM compatibility. Scale your L2 with Ethereum-grade security and minimal operational overhead.",
       iconType: "code",
       color: "from-[#4fc3f7] to-[#29b6f6]"
     },
