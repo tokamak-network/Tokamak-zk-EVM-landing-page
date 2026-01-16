@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { SOLUTIONS } from "@/lib/solutions-content";
 
 const Footer: React.FC = () => {
   const LogoImage = "/assets/header/logo.svg";
@@ -53,10 +54,35 @@ const Footer: React.FC = () => {
             </div>
           </div>
 
+          {/* Solutions - Important for Google sitelinks */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4 text-blue-400">Solutions</h3>
+            <ul className="space-y-3">
+              {SOLUTIONS.map((solution) => (
+                <li key={solution.slug}>
+                  <Link 
+                    href={`/solutions/${solution.slug}`}
+                    className="text-gray-300 hover:text-white transition-colors duration-300 hover:translate-x-1 transform inline-block"
+                  >
+                    {solution.pageTitle}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           {/* Quick Links */}
           <div>
             <h3 className="text-lg font-semibold mb-4 text-blue-400">Quick Links</h3>
             <ul className="space-y-3">
+              <li>
+                <Link 
+                  href="/solutions"
+                  className="text-gray-300 hover:text-white transition-colors duration-300 hover:translate-x-1 transform inline-block"
+                >
+                  All Solutions
+                </Link>
+              </li>
               <li>
                 <a 
                   href="https://www.tokamak.network/" 
@@ -78,29 +104,6 @@ const Footer: React.FC = () => {
                 </a>
               </li>
               <li>
-                <Link 
-                  href="/#who-section" 
-                  className="text-gray-300 hover:text-white transition-colors duration-300 hover:translate-x-1 transform inline-block"
-                >
-                  Who This Is For
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  href="/#two-ways-section" 
-                  className="text-gray-300 hover:text-white transition-colors duration-300 hover:translate-x-1 transform inline-block"
-                >
-                  How to Use
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-blue-400">Resources</h3>
-            <ul className="space-y-3">
-              <li>
                 <a 
                   href="https://github.com/tokamak-network" 
                   target="_blank" 
@@ -108,16 +111,6 @@ const Footer: React.FC = () => {
                   className="text-gray-300 hover:text-white transition-colors duration-300 hover:translate-x-1 transform inline-block"
                 >
                   GitHub
-                </a>
-              </li>
-              <li>
-                <a 
-                  href="https://github.com/tokamak-network/Tokamak-zk-EVM-playgrounds/releases"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-white transition-colors duration-300 hover:translate-x-1 transform inline-block"
-                >
-                  Get Started
                 </a>
               </li>
             </ul>
