@@ -5,6 +5,7 @@ import SolutionsSection from "@/components/SolutionsSection";
 import ThreeWaysSection from "@/components/ThreeWaysSection";
 import Footer from "@/components/Footer";
 import { SectionTracker } from "@/components/Analytics";
+import { SOLUTIONS } from "@/lib/solutions-content";
 
 const BASE_URL = "https://zkp.tokamak.network";
 
@@ -63,14 +64,41 @@ const jsonLd = {
         "@id": `${BASE_URL}/#organization`,
       },
       inLanguage: "en-US",
-      potentialAction: {
-        "@type": "SearchAction",
-        target: {
-          "@type": "EntryPoint",
-          urlTemplate: `${BASE_URL}/blog?search={search_term_string}`,
+      potentialAction: [
+        {
+          "@type": "SearchAction",
+          target: {
+            "@type": "EntryPoint",
+            urlTemplate: `${BASE_URL}/blog?search={search_term_string}`,
+          },
+          "query-input": "required name=search_term_string",
         },
-        "query-input": "required name=search_term_string",
-      },
+        {
+          "@type": "SiteNavigationElement",
+          "@id": `${BASE_URL}/#sitenav`,
+          name: "Main Navigation",
+          url: BASE_URL,
+        },
+      ],
+    },
+    // SiteNavigationElement - Helps Google generate sitelinks
+    // This schema helps Google understand the site structure for sitelink generation
+    {
+      "@type": "ItemList",
+      "@id": `${BASE_URL}/#sitenav`,
+      name: "Tokamak Network Solutions",
+      description: "Zero-knowledge proof solutions for Ethereum",
+      itemListElement: SOLUTIONS.map((solution, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        item: {
+          "@type": "WebPage",
+          "@id": `${BASE_URL}/solutions/${solution.slug}`,
+          url: `${BASE_URL}/solutions/${solution.slug}`,
+          name: solution.pageTitle,
+          description: solution.description,
+        },
+      })),
     },
     // WebPage Schema - Homepage specific
     {
