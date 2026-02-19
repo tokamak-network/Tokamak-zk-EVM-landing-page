@@ -339,6 +339,15 @@ function normalizeDoc(doc, idCounts, blockedIds) {
     }
   }
 
+  // Some exported docs already have frontmatter but still keep metadata lines
+  // in the body (often right below the first heading). Pull those into frontmatter.
+  const inlineInBody = parseInlineMetadataFromTop(body);
+  if (inlineInBody) {
+    frontmatter = { ...frontmatter, ...inlineInBody.metadata };
+    body = inlineInBody.body;
+    convertedInline = true;
+  }
+
   delete frontmatter["notion-id"];
   frontmatter.base = BASE_LINK;
   frontmatter.Title = preferredTitle(doc.title, frontmatter.Title);
