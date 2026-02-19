@@ -1,50 +1,42 @@
-# Task: Blog Index All-in-One Script
+# Task: Strengthen CSV -> Articles Sync
 
 ## Goal
-Implement one script that:
-- creates `database/blog/blog-index.csv` from `database/blog/blog-index.base` (`--init`)
-- syncs `database/blog/articles/*.md` from CSV as source of truth (`--update-articles`)
+Improve `--update-articles` so that:
+- document filename is always synced to CSV `Title`
+- CSV rows with empty `Title` fail fast with friendly error
+- title changes keep existing article body when possible
 
 ## Spec
-- `--init`
-  - Read columns/order from `database/blog/blog-index.base`
-  - Scan `database/blog/articles/*.md`
-  - Include only documents with frontmatter `base: "[[blog-index.base]]"`
-  - Generate `database/blog/blog-index.csv`
-- `--update-articles`
-  - Read `database/blog/blog-index.csv`
-  - For each CSV row:
-    - Find/create article file by `Title` -> `<Title>.md`
-    - Update frontmatter fields from CSV
-    - Ensure `base: "[[blog-index.base]]"`
-    - Preserve body content for existing docs
-    - New docs should include frontmatter + placeholder body
-  - Delete managed article docs (`base: "[[blog-index.base]]"`) not present in CSV titles
-- CLI behavior
-  - Exactly one mode required: `--init` or `--update-articles`
-  - Friendly summary output with counts
+- Validation
+  - If any data row has empty `Title`, stop and show row number(s)
+  - If duplicate `Title` exists, stop with clear error
+  - If `Title` contains path separators (`/`, `\`), stop with clear error
+- Sync behavior
+  - Match existing managed docs by `Title` first
+  - If `Title` changed, match by `Slug` and rename file to new title
+  - Preserve article body and unmanaged frontmatter keys on update
+  - Keep create/update/delete behavior based on CSV as source of truth
 
 ## Checklist
 - [x] Write plan/spec
-- [x] Implement script
-- [x] Wire npm scripts
-- [x] Verify `--init`
-- [x] Verify `--update-articles`
-- [x] Add review notes
-- [x] Commit
+- [x] Implement script changes
+- [x] Verify normal update flow
+- [x] Verify rename sync flow
+- [x] Verify blank title error flow
+- [x] Update lessons and review notes
+- [ ] Commit
 
 ## Review
-- Implemented all-in-one CLI in `scripts/generate-blog-index-csv.mjs`:
-  - `--init`: reads columns/order from `database/blog/blog-index.base` and generates `database/blog/blog-index.csv`
-  - `--update-articles`: applies CSV as source of truth to `database/blog/articles/*.md` (create/update/delete)
-- Added npm commands:
-  - `blog-index:init`
-  - `blog-index:update-articles`
-  - kept `generate-blog-index-csv` as compatibility alias to `--init`
+- Implemented stricter CSV validation in `--update-articles`:
+  - Empty `Title` now fails fast with row numbers and clear message
+  - Duplicate `Title` now fails fast
+  - `Title` containing path separators (`/`, `\`) now fails fast
+- Improved filename synchronization:
+  - Existing managed docs are matched by `Title` first, then by `Slug`
+  - If matched by `Slug` with changed `Title`, file is renamed to `<Title>.md` and body is preserved
+  - Output now includes `renamed` count
+- Added friendly top-level error handling to avoid stack traces for user-facing CLI errors
 - Verification:
-  - In-repo check:
-    - `npm run blog-index:init` -> generated 14 rows
-    - `npm run blog-index:update-articles` -> `created=0, updated=0, unchanged=14, deleted=0`
-  - Integration check in `/tmp`:
-    - CSV with one existing row changed + one new row + one row removed
-    - Result -> `created=1, updated=1, deleted=1` and preserved body for updated file
+  - `npm run blog-index:update-articles` in repo -> `created=0, updated=0, unchanged=14, renamed=0, deleted=0`
+  - `/tmp` rename scenario -> `created=0, updated=1, renamed=1` and body preserved
+  - `/tmp` empty title scenario -> exits with `Error: CSV has empty Title value on line(s): ...`

@@ -270,6 +270,9 @@ function parseCsv(content) {
   }
 
   const [headers, ...dataRows] = rows;
+  if (headers.length > 0) {
+    headers[0] = headers[0].replace(/^\uFEFF/, "");
+  }
   const data = dataRows.map((cells) => {
     const obj = {};
     for (let i = 0; i < headers.length; i += 1) {
@@ -422,6 +425,92 @@ function equivalentValue(existing, target, key) {
   return normalizeScalar(existing) === normalizeScalar(target);
 }
 
+function pushMapList(map, key, value) {
+  if (!key) {
+    return;
+  }
+
+  if (!map.has(key)) {
+    map.set(key, []);
+  }
+  map.get(key).push(value);
+}
+
+function takeFirstUnmatched(map, key) {
+  if (!map.has(key)) {
+    return null;
+  }
+
+  const list = map.get(key);
+  for (const item of list) {
+    if (!item.matched) {
+      return item;
+    }
+  }
+
+  return null;
+}
+
+function validateCsvRows(data) {
+  const normalizedRows = [];
+  const emptyTitleRows = [];
+  const duplicateMessages = [];
+  const invalidPathRows = [];
+  const seenTitleLine = new Map();
+
+  for (let i = 0; i < data.length; i += 1) {
+    const row = data[i];
+    const lineNumber = i + 2;
+    const title = normalizeScalar(row.Title);
+
+    if (title === "") {
+      emptyTitleRows.push(lineNumber);
+      continue;
+    }
+
+    if (/[\\/]/.test(title)) {
+      invalidPathRows.push({ lineNumber, title });
+      continue;
+    }
+
+    if (seenTitleLine.has(title)) {
+      duplicateMessages.push(
+        `line ${lineNumber} duplicates Title "${title}" from line ${seenTitleLine.get(title)}`
+      );
+      continue;
+    }
+
+    seenTitleLine.set(title, lineNumber);
+    normalizedRows.push({
+      ...row,
+      __title: title,
+      __lineNumber: lineNumber,
+    });
+  }
+
+  const errors = [];
+  if (emptyTitleRows.length > 0) {
+    errors.push(
+      `CSV has empty Title value on line(s): ${emptyTitleRows.join(", ")}. Fill Title for every row.`
+    );
+  }
+  if (duplicateMessages.length > 0) {
+    errors.push(`CSV has duplicate Title values:\n- ${duplicateMessages.join("\n- ")}`);
+  }
+  if (invalidPathRows.length > 0) {
+    const message = invalidPathRows
+      .map(({ lineNumber, title }) => `line ${lineNumber}: "${title}"`)
+      .join(", ");
+    errors.push(`Title cannot include "/" or "\\": ${message}`);
+  }
+
+  if (errors.length > 0) {
+    throw new Error(errors.join("\n"));
+  }
+
+  return normalizedRows;
+}
+
 function initCsv(columns) {
   const files = fs
     .readdirSync(ARTICLES_DIR)
@@ -469,6 +558,7 @@ function updateArticles(columns) {
   if (!headers.includes("Title")) {
     throw new Error('CSV must include a "Title" column.');
   }
+  const normalizedRows = validateCsvRows(data);
 
   const headerToProperty = {};
   for (const column of columns) {
@@ -483,14 +573,27 @@ function updateArticles(columns) {
     .readdirSync(ARTICLES_DIR)
     .filter((name) => name.toLowerCase().endsWith(".md"));
 
-  const managedExistingByTitle = new Map();
+  const managedDocs = [];
+  const managedByTitle = new Map();
+  const managedBySlug = new Map();
+
   for (const file of files) {
     const filePath = path.join(ARTICLES_DIR, file);
     const content = fs.readFileSync(filePath, "utf8");
-    const { frontmatter } = splitFrontmatterAndBody(content);
+    const { frontmatter, body } = splitFrontmatterAndBody(content);
     if (frontmatter.base === BASE_LINK) {
       const title = file.replace(/\.md$/i, "");
-      managedExistingByTitle.set(title, filePath);
+      const doc = {
+        filePath,
+        title,
+        slug: normalizeScalar(frontmatter.Slug),
+        frontmatter,
+        body,
+        matched: false,
+      };
+      managedDocs.push(doc);
+      pushMapList(managedByTitle, title, doc);
+      pushMapList(managedBySlug, doc.slug, doc);
     }
   }
 
@@ -498,23 +601,49 @@ function updateArticles(columns) {
   let created = 0;
   let updated = 0;
   let unchanged = 0;
+  let renamed = 0;
 
-  for (const row of data) {
-    const title = normalizeScalar(row.Title);
-    if (title === "") {
-      continue;
-    }
+  for (const row of normalizedRows) {
+    const title = row.__title;
+    const lineNumber = row.__lineNumber;
 
     targetTitles.add(title);
-    const filePath = path.join(ARTICLES_DIR, `${title}.md`);
+    const targetFilePath = path.join(ARTICLES_DIR, `${title}.md`);
+
+    let matchedManagedDoc = takeFirstUnmatched(managedByTitle, title);
+    if (!matchedManagedDoc) {
+      const rowSlug = normalizeScalar(row.Slug);
+      if (rowSlug !== "") {
+        matchedManagedDoc = takeFirstUnmatched(managedBySlug, rowSlug);
+      }
+    }
 
     let existingFrontmatter = {};
     let body = "";
     let existed = false;
+    let fileWasRenamed = false;
 
-    if (fileExists(filePath)) {
+    if (matchedManagedDoc) {
+      matchedManagedDoc.matched = true;
       existed = true;
-      const content = fs.readFileSync(filePath, "utf8");
+      existingFrontmatter = matchedManagedDoc.frontmatter;
+      body = matchedManagedDoc.body;
+
+      if (matchedManagedDoc.filePath !== targetFilePath) {
+        if (fileExists(targetFilePath)) {
+          throw new Error(
+            `Cannot sync CSV line ${lineNumber}: target file already exists: ${targetFilePath}`
+          );
+        }
+
+        fs.renameSync(matchedManagedDoc.filePath, targetFilePath);
+        matchedManagedDoc.filePath = targetFilePath;
+        fileWasRenamed = true;
+        renamed += 1;
+      }
+    } else if (fileExists(targetFilePath)) {
+      existed = true;
+      const content = fs.readFileSync(targetFilePath, "utf8");
       const parsed = splitFrontmatterAndBody(content);
       existingFrontmatter = parsed.frontmatter;
       body = parsed.body;
@@ -522,7 +651,7 @@ function updateArticles(columns) {
 
     const targetManaged = managedFrontmatterFromRow(row, headerToProperty);
 
-    let metadataChanged = !existed;
+    let metadataChanged = !existed || fileWasRenamed;
 
     if (existed) {
       if (normalizeScalar(existingFrontmatter.base) !== BASE_LINK) {
@@ -565,7 +694,7 @@ function updateArticles(columns) {
     const nextBody = body === "" ? "\nWrite your article here.\n" : body;
     const nextContent = `---\n${fmText}\n---\n\n${nextBody.replace(/^\n+/, "")}`;
 
-    fs.writeFileSync(filePath, nextContent, "utf8");
+    fs.writeFileSync(targetFilePath, nextContent, "utf8");
 
     if (existed) {
       updated += 1;
@@ -575,15 +704,15 @@ function updateArticles(columns) {
   }
 
   let deleted = 0;
-  for (const [title, filePath] of managedExistingByTitle.entries()) {
-    if (!targetTitles.has(title)) {
-      fs.unlinkSync(filePath);
+  for (const doc of managedDocs) {
+    if (!doc.matched && !targetTitles.has(doc.title)) {
+      fs.unlinkSync(doc.filePath);
       deleted += 1;
     }
   }
 
   console.log(
-    `Updated articles from CSV: created=${created}, updated=${updated}, unchanged=${unchanged}, deleted=${deleted}`
+    `Updated articles from CSV: created=${created}, updated=${updated}, unchanged=${unchanged}, renamed=${renamed}, deleted=${deleted}`
   );
 }
 
@@ -599,4 +728,10 @@ function main() {
   updateArticles(columns);
 }
 
-main();
+try {
+  main();
+} catch (error) {
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(`Error: ${message}`);
+  process.exit(1);
+}
