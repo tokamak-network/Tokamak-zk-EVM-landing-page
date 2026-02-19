@@ -19,7 +19,7 @@ Ensure `--update-articles` uses CSV as source of truth for the entire `database/
 - [x] Verify in repo (legacy missing-base file resolved)
 - [x] Verify in tmp integration scenario
 - [x] Update lessons and review notes
-- [ ] Commit
+- [x] Commit
 
 ## Review
 - Fixed `--update-articles` matching scope to include all `database/blog/articles/*.md` files, not just files that already had `base: [[blog-index.base]]`.
