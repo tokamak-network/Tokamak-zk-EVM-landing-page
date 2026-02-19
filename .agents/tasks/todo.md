@@ -19,7 +19,7 @@ Remove `notion-id` from all article frontmatter and prevent the sync script from
 - [x] Patch script to drop notion-id during sync
 - [x] Verify end-to-end
 - [x] Update lessons and review notes
-- [ ] Commit
+- [x] Commit
 
 ## Review
 - Removed `notion-id` frontmatter key from all markdown files in `database/blog/articles`.
