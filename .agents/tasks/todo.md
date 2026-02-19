@@ -17,7 +17,7 @@ Avoid name collisions by extracting each ZIP archive into its own arbitrary fold
 - [x] Implement isolated recursive extraction
 - [x] Verify each zip produced its own random folder
 - [x] Update lessons and review notes
-- [ ] Commit
+- [x] Commit
 
 ## Review
 - Isolated extraction completed for each root ZIP under `database/blog/articles` into unique folders:
