@@ -15,7 +15,7 @@ ReadTimeMinutes: 6
 Description: "Discover how batched verification reduces on-chain costs for Tokamak zk-SNARKs by replacing expensive sequential pairing operations with efficient aggregated checks, enabling high-throughput scalability."
 CoverImageAlt: ""
 Published: Prod
-ArticleId: 7
+ArticleId: wncjpvqe
 ---
 
 **Zero-Knowledge Succinct Non-Interactive Arguments of Knowledge (zk-SNARKs)** have revolutionized blockchain scalability and privacy. They allow a prover to convince a verifier that a computation is correct without revealing the underlying data. However, as transaction volumes on the Tokamak Network increase, we face a fundamental challenge: can we increase the transaction throughput?

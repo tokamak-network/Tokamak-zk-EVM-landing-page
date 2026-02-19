@@ -10,7 +10,7 @@ Tags:
 Description: "A friendly, plain-language intro to zero-knowledge proofs with everyday examples and why they matter."
 CoverImageAlt: ""
 Published: Prod
-ArticleId: 14
+ArticleId: hypsz2d5
 ---
 
 > Prove something is true without revealing the details. That’s the magic of zero-knowledge proofs.

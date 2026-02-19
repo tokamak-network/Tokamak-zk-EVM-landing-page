@@ -13,7 +13,7 @@ Tags:
 Description: "How Tokamak’s universal-setup zkSNARK and modular zkEVM deliver smaller proofs, cheaper verification, and flexible deployment."
 CoverImageAlt: ""
 Published: Prod
-ArticleId: 3
+ArticleId: 7incqdcr
 ---
 
 > [!note] 📌

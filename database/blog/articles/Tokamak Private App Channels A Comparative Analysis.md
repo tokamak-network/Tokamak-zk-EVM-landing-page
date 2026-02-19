@@ -13,7 +13,7 @@ Tags:
 Description: "A technical  comparison of Tokamak Private App Channels against Aztec, Aleo, Penumbra, and COTI V2."
 CoverImageAlt: ""
 Published: Prod
-ArticleId: 10
+ArticleId: tcoat43w
 ---
 
 # Introduction

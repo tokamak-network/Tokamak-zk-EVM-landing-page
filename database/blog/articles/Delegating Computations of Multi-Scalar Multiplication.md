@@ -17,7 +17,7 @@ ReadTimeMinutes: 15
 Description: "The aim of this technical blog post is to review various attempts and solutions to remove a very challenging cryptographic bottleneck, crucial to most web3 applications, namely, the possibility to delegate computation (of MSMs) to an untrusted party. The scenario considered is that of an on-chain verifier trying to delegate the computation of an MSM."
 CoverImageAlt: ""
 Published: Prod
-ArticleId: 2
+ArticleId: ulzu0gm6
 ---
 
 ---

@@ -13,7 +13,7 @@ ReadTimeMinutes: 7
 Description: "How threshold signatures make signer rotation seamless without changing addresses, reducing risk and cost."
 CoverImageAlt: ""
 Published: Staging
-ArticleId: 13
+ArticleId: tqhi4l52
 ---
 
 *The headache of changing signers, and how threshold cryptography solves it*

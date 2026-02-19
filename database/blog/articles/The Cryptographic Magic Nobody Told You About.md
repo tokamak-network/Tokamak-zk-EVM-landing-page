@@ -14,7 +14,7 @@ ReadTimeMinutes: 8
 Description: "A plain-language intro to FROST threshold signatures, DKG, and why an invisible single address can be controlled by many."
 CoverImageAlt: ""
 Published: Staging
-ArticleId: 8
+ArticleId: tsi39rp6
 ---
 
 *Imagine: My friends and I have gathered our precious secrets and decided to store them in a treasure chest. To open this chest, we need a master key. What if a master key could exist... but nobody knows it?*
