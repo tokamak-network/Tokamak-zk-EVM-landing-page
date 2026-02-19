@@ -1,5 +1,4 @@
 ---
-notion-id: 30b30540-582c-8155-ace6-c4b9d3b2e9a8
 base: "[[blog-index.base]]"
 AuthorEmail: luca@tokamak.network
 Slug: delegating-computations-of-msms

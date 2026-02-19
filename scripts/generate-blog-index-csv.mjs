@@ -652,6 +652,9 @@ function updateArticles(columns) {
       if (normalizeScalar(existingFrontmatter.base) !== BASE_LINK) {
         metadataChanged = true;
       }
+      if (Object.prototype.hasOwnProperty.call(existingFrontmatter, "notion-id")) {
+        metadataChanged = true;
+      }
 
       for (const key of managedPropertyKeys) {
         if (!equivalentValue(existingFrontmatter[key], targetManaged[key], key)) {
@@ -667,7 +670,7 @@ function updateArticles(columns) {
     }
 
     const preservedExtraKeys = Object.keys(existingFrontmatter).filter(
-      (key) => key !== "base" && !managedPropertyKeys.includes(key)
+      (key) => key !== "base" && key !== "notion-id" && !managedPropertyKeys.includes(key)
     );
 
     const orderedKeys = [

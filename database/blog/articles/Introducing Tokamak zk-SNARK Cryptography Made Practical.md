@@ -1,5 +1,4 @@
 ---
-notion-id: 30b30540-582c-81fc-bd96-f8872c08a29a
 base: "[[blog-index.base]]"
 AuthorEmail: ""
 Slug: tokamak-zksnark-advantages

@@ -1,5 +1,4 @@
 ---
-notion-id: 30b30540-582c-814e-a1be-dc22210ce337
 base: "[[blog-index.base]]"
 AuthorEmail: ""
 Slug: the-cryptographic-magic-nobody-told-you-about

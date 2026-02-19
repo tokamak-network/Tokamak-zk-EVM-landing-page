@@ -1,5 +1,4 @@
 ---
-notion-id: 30b30540-582c-81bf-ac5b-c7cac60403ee
 base: "[[blog-index.base]]"
 AuthorEmail: luca@tokamak.network
 Slug: scaling-tokamak-batched-verification

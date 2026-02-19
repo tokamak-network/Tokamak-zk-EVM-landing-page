@@ -1,5 +1,4 @@
 ---
-notion-id: 30b30540-582c-814c-b386-d770ff1e3c03
 base: "[[blog-index.base]]"
 AuthorEmail: ""
 Slug: why-i-stopped-worrying-about-key-rotation

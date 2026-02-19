@@ -1,5 +1,4 @@
 ---
-notion-id: 30b30540-582c-8190-ab5c-fdb56abded47
 base: "[[blog-index.base]]"
 AuthorEmail: ""
 Slug: ""

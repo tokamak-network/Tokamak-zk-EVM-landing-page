@@ -1,5 +1,4 @@
 ---
-notion-id: 30b30540-582c-8103-ad20-e6e3eb621a95
 base: "[[blog-index.base]]"
 AuthorEmail: ""
 Slug: On-chain-privacy-trilemma-Why-True-Privacy-Is-Still-Hard-on-Ethereum

@@ -1,5 +1,4 @@
 ---
-notion-id: 30b30540-582c-8104-a941-e6dbbcbe7c92
 base: "[[blog-index.base]]"
 AuthorEmail: ""
 Slug: tokamak-network-zkp-stupidly-simple-one-click

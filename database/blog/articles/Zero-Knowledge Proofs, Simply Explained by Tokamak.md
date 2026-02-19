@@ -1,5 +1,4 @@
 ---
-notion-id: 30b30540-582c-81aa-83a3-f3b39eedfc2f
 base: "[[blog-index.base]]"
 AuthorEmail: ""
 Slug: zero-knowledge-explained-simple

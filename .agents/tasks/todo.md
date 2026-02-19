@@ -1,33 +1,31 @@
-# Task: Fix Full-Folder Sync Boundary
+# Task: Remove notion-id Metadata Completely
 
 ## Goal
-Ensure `--update-articles` uses CSV as source of truth for the entire `database/blog/articles` folder, so legacy files without `base` do not get skipped or left behind.
+Remove `notion-id` from all article frontmatter and prevent the sync script from ever preserving/adding it.
 
 ## Spec
-- Matching scope
-  - Include all `articles/*.md` files for match/update/delete decisions
-  - Not limited by existing `base` value
-- Sync behavior
-  - Keep filename = CSV `Title` sync guarantees
-  - Keep strict `Title` validations
-  - Keep rename-by-`Slug` behavior and preserve body
-  - Delete files not represented by CSV title rows
+- Data migration
+  - Remove `notion-id:` line from all `database/blog/articles/*.md`
+- Script behavior
+  - `--update-articles` must not preserve `notion-id` from existing files
+  - New files created by script must not include `notion-id`
+- Verification
+  - Zero matches for `^notion-id:` across article files
+  - Run update command and confirm zero matches remain
 
 ## Checklist
 - [x] Write plan/spec
-- [x] Implement sync-boundary fix
-- [x] Verify in repo (legacy missing-base file resolved)
-- [x] Verify in tmp integration scenario
+- [x] Remove notion-id from all article files
+- [x] Patch script to drop notion-id during sync
+- [x] Verify end-to-end
 - [x] Update lessons and review notes
-- [x] Commit
+- [ ] Commit
 
 ## Review
-- Fixed `--update-articles` matching scope to include all `database/blog/articles/*.md` files, not just files that already had `base: [[blog-index.base]]`.
-- Outcome:
-  - Legacy files missing `base` are now corrected when represented in CSV.
-  - Files not represented by CSV are deleted, regardless of prior `base` state.
+- Removed `notion-id` frontmatter key from all markdown files in `database/blog/articles`.
+- Updated sync logic in `scripts/generate-blog-index-csv.mjs`:
+  - `notion-id` is excluded from preserved frontmatter keys.
+  - If an existing doc still has `notion-id`, it is treated as a metadata change and rewritten without it.
 - Verification:
-  - In-repo run: orphan file `database/blog/articles/zk-EVM (Ooo) Blogs New item.md` was removed during sync; subsequent run stable with `deleted=0`.
-  - Tmp integration:
-    - Legacy file without `base` + CSV row matching its title/slug -> updated with `base` and metadata, body preserved.
-    - Extra file not in CSV -> deleted (`deleted=1`).
+  - `rg -n '^notion-id:' database/blog/articles/*.md` returned no results.
+  - `npm run blog-index:update-articles` completed with stable output (`updated=0, unchanged=14`) and `notion-id` remained absent.

@@ -1,5 +1,4 @@
 ---
-notion-id: 30b30540-582c-81b4-bbd7-e688a9f49a92
 base: "[[blog-index.base]]"
 AuthorEmail: ""
 Slug: multi-sig-vs-threshold-signatures-which-one-to-chose

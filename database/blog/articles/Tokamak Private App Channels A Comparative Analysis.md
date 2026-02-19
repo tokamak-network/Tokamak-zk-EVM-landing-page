@@ -1,5 +1,4 @@
 ---
-notion-id: 30b30540-582c-8191-99c3-ef4508fafe8e
 base: "[[blog-index.base]]"
 AuthorEmail: ""
 Slug: tokamak-private-app-channels-a-comparative-analysis
