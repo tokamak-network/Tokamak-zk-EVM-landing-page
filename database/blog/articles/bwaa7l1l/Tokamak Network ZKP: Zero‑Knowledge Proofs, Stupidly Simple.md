@@ -1,10 +1,18 @@
+---
+base: "[[blog-index.base]]"
+ArticleId: bwaa7l1l
+Title: "Tokamak Network ZKP: Zero‑Knowledge Proofs, Stupidly Simple"
+Slug: tokamak-network-zkp-stupidly-simple-one-click
+Description: "Announcing Tokamak Network’s one‑click ZKP generation — turn complex cryptography into a developer‑first workflow."
+Published: Staging
+Tags:
+  - Education
+  - Technology
+Status: Draft
+---
+
 # Tokamak Network ZKP: Zero‑Knowledge Proofs, Stupidly Simple
 
-Slug: tokamak-network-zkp-stupidly-simple-one-click
-Description: Announcing Tokamak Network’s one‑click ZKP generation — turn complex cryptography into a developer‑first workflow.
-Published: Staging
-Tags: Education, Technology
-Status: Draft
 
 > Zero‑knowledge proofs used to require specialized math, custom hardware, and hours of tuning. We made it a click.
 > 

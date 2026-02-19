@@ -1,32 +1,35 @@
-# Task: Re-extract ZIPs Into Isolated Random Folders
+# Task: Normalize Recursive Article Metadata
 
 ## Goal
-Avoid name collisions by extracting each ZIP archive into its own arbitrary folder and recursively extracting nested ZIPs inside that isolated folder.
+For all markdown files under `database/blog/articles/**`, move visible metadata into YAML frontmatter and assign random unique `ArticleId` values using the agreed format.
 
 ## Spec
-- Target: `database/blog/articles/*.zip` (root-level zip files)
-- For each zip:
-  - create unique random output folder (`pkg_<random>`)
-  - extract archive into that folder
-  - recursively extract nested zip files inside the same folder
-  - remove nested zip files after extraction
-- Keep original root zip files in place unless explicitly asked to delete
+- Scope: all `.md` files recursively under `database/blog/articles`
+- Metadata normalization:
+  - if file has no YAML frontmatter, detect top inline metadata block (`Key: Value`) and convert to frontmatter
+  - remove converted inline metadata lines from rendered body
+  - ensure frontmatter contains `base: "[[blog-index.base]]"` and `ArticleId`
+- ArticleId:
+  - use short random string (`[a-z0-9]{8}`)
+  - keep existing valid random IDs
+  - assign new IDs for missing/invalid/duplicate IDs
 
 ## Checklist
 - [x] Write plan/spec
-- [x] Implement isolated recursive extraction
-- [x] Verify each zip produced its own random folder
+- [x] Implement normalization
+- [x] Verify all markdown files satisfy frontmatter + ArticleId rules
 - [x] Update lessons and review notes
-- [x] Commit
+- [ ] Commit
 
 ## Review
-- Isolated extraction completed for each root ZIP under `database/blog/articles` into unique folders:
-  - `pkg_705d35b7b2`
-  - `pkg_9c18dc46c1`
-  - `pkg_b81e83e02c`
-  - `pkg_4c0319dee7`
-  - `pkg_ee5fbcecd2`
-  - `pkg_f47c1cc85f`
-- Nested ZIP files were recursively extracted inside each isolated folder and then removed.
-- Verified no ZIP remains inside `pkg_*` folders (`count=0`).
-- Mapping file generated: `database/blog/articles/_extract_map.txt`.
+- Added `scripts/normalize-article-metadata.mjs` to normalize recursive markdown metadata under `database/blog/articles/**`.
+- Applied normalization to 11 markdown files:
+  - Converted inline visible `Key: Value` metadata blocks to YAML frontmatter at top.
+  - Removed `notion-id` if present.
+  - Enforced `base: "[[blog-index.base]]"`.
+  - Assigned random unique `ArticleId` values (`[a-z0-9]{8}`), preserving valid unique IDs when already present.
+- Verification:
+  - `md_total=11`
+  - `starts_with_frontmatter=11`
+  - `valid_id_lines=11`
+  - `unique_ids=11`

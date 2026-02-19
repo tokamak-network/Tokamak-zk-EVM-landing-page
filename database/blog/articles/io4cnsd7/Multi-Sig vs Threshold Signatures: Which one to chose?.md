@@ -1,13 +1,23 @@
-# Multi-Sig vs Threshold Signatures: Which one to chose?
-
+---
+base: "[[blog-index.base]]"
+ArticleId: io4cnsd7
+Title: "Multi-Sig vs Threshold Signatures: Which one to chose?"
 Slug: multi-sig-vs-threshold-signatures-which-one-to-chose
-Description: A practical framework for choosing between multi-sig and threshold signatures across transparency, privacy, and cost.
+Description: "A practical framework for choosing between multi-sig and threshold signatures across transparency, privacy, and cost."
 Published: Staging
-PublishDate: 2025년 12월 9일
-Tags: Education, Technical, Technology, zkEVM
+PublishDate: "December 9, 2025"
+Tags:
+  - Education
+  - Technical
+  - Technology
+  - zkEVM
 Author: Aamir
 ReadTimeMinutes: 9
 Status: Draft
+---
+
+# Multi-Sig vs Threshold Signatures: Which one to chose?
+
 
 *When signing a contract to reach an agreement among members of an organization, which should be chosen: public transparency and private efficiency*
 

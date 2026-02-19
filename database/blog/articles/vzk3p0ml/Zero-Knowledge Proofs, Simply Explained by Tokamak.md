@@ -1,11 +1,19 @@
+---
+base: "[[blog-index.base]]"
+ArticleId: vzk3p0ml
+Title: "Zero-Knowledge Proofs, Simply Explained by Tokamak"
+Slug: zero-knowledge-explained-simple
+Description: "A friendly, plain-language intro to zero-knowledge proofs with everyday examples and why they matter."
+Published: Prod
+Tags:
+  - Education
+  - Technology
+Author: "Aamir Muhammad"
+Status: Published
+---
+
 # Zero-Knowledge Proofs, Simply Explained by Tokamak
 
-Slug: zero-knowledge-explained-simple
-Description: A friendly, plain-language intro to zero-knowledge proofs with everyday examples and why they matter.
-Published: Prod
-Tags: Education, Technology
-Author: Aamir Muhammad
-Status: Published
 
 > Prove something is true without revealing the details. That’s the magic of zero-knowledge proofs.
 > 

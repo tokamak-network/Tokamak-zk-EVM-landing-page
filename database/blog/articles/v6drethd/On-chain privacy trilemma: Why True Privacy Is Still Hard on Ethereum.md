@@ -1,13 +1,20 @@
-# On-chain privacy trilemma: 
-Why True Privacy Is Still Hard on Ethereum
-
+---
+base: "[[blog-index.base]]"
+ArticleId: v6drethd
+Title: "On-chain privacy trilemma: Why True Privacy Is Still Hard on Ethereum"
 Slug: On-chain-privacy-trilemma-Why-True-Privacy-Is-Still-Hard-on-Ethereum
-Description: How the pursuit of privacy collides with usability and security — and how new protocols like Tokamak Channels might resolve it.
+Description: "How the pursuit of privacy collides with usability and security — and how new protocols like Tokamak Channels might resolve it."
 Published: Prod
-PublishDate: 2025년 11월 16일
-Tags: Education, Technology
+PublishDate: "November 16, 2025"
+Tags:
+  - Education
+  - Technology
 Author: Mehdi
 Status: Published
+---
+
+# On-chain privacy trilemma: Why True Privacy Is Still Hard on Ethereum
+
 
 This article extends the presentation "*The Privacy Trilemma"* by Wei Dai at *DC Privacy Summit 2025* — [YouTube](https://www.youtube.com/watch?v=b1RjuJrOt3A).
 

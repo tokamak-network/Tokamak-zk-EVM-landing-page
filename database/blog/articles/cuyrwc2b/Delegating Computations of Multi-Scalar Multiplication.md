@@ -1,16 +1,26 @@
-# Delegating Computations of Multi-Scalar Multiplication
-
+---
+base: "[[blog-index.base]]"
+ArticleId: cuyrwc2b
+Title: "Delegating Computations of Multi-Scalar Multiplication"
 Slug: delegating-computations-of-msms
-Description: The aim of this technical blog post is to review various attempts and solutions to remove a very challenging cryptographic bottleneck, crucial to most web3 applications, namely, the possibility to delegate computation (of MSMs) to an untrusted party. The scenario considered is that of an on-chain verifier trying to delegate the computation of an MSM.
+Description: "The aim of this technical blog post is to review various attempts and solutions to remove a very challenging cryptographic bottleneck, crucial to most web3 applications, namely, the possibility to delegate computation (of MSMs) to an untrusted party. The scenario considered is that of an on-chain verifier trying to delegate the computation of an MSM."
 Published: Prod
-PublishDate: 2026년 1월 5일
-Tags: Cryptography, Research, Technical, Technology
-Author: Luca Dall’Ava
+PublishDate: "January 5, 2026"
+Tags:
+  - Cryptography
+  - Research
+  - Technical
+  - Technology
+Author: "Luca Dall’Ava"
 AuthorEmail: luca@tokamak.network
-CanonicalURL: https://zkp.tokamak.network/blog/delegating-computations-of-msms
-CoverImage: Delegating%20Computations%20of%20Multi-Scalar%20Multiplica/Gemini_Generated_Image_m79icum79icum79i_(1)%201.png
+CanonicalURL: "https://zkp.tokamak.network/blog/delegating-computations-of-msms"
+CoverImage: "Delegating%20Computations%20of%20Multi-Scalar%20Multiplica/Gemini_Generated_Image_m79icum79icum79i_(1)%201.png"
 ReadTimeMinutes: 15
 Status: Published
+---
+
+# Delegating Computations of Multi-Scalar Multiplication
+
 
 ---
 

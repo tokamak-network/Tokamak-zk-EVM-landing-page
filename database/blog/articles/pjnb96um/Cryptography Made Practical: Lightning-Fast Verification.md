@@ -1,3 +1,9 @@
+---
+base: "[[blog-index.base]]"
+ArticleId: pjnb96um
+Title: "Cryptography Made Practical: Lightning-Fast Verification"
+---
+
 # Cryptography Made Practical: Lightning-Fast Verification
 
 Tokamak zkSNARK keeps proofs short and exceptionally easy to verify. It achieves competitive proof sizes compared to other universal SNARKs, with communication and computation efficiency that’s on par with state-of-the-art protocols.

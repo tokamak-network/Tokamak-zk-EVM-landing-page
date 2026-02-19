@@ -1,12 +1,21 @@
+---
+base: "[[blog-index.base]]"
+ArticleId: 89v5v9ri
+Title: "Introducing Tokamak zk-SNARK: Cryptography Made Practical"
+Slug: tokamak-zksnark-advantages
+Description: "How Tokamak’s universal-setup zkSNARK and modular zkEVM deliver smaller proofs, cheaper verification, and flexible deployment."
+Published: Prod
+PublishDate: "December 30, 2025"
+Tags:
+  - Research
+  - Technology
+  - zkEVM
+Author: "Nil Soroush"
+CoverImage: "Introducing%20Tokamak%20zk-SNARK%20Cryptography%20Made%20Pra/Intro_post-cover.png"
+---
+
 # Introducing Tokamak zk-SNARK: Cryptography Made Practical
 
-Slug: tokamak-zksnark-advantages
-Description: How Tokamak’s universal-setup zkSNARK and modular zkEVM deliver smaller proofs, cheaper verification, and flexible deployment.
-Published: Prod
-PublishDate: 2025년 12월 30일
-Tags: Research, Technology, zkEVM
-Author: Nil Soroush
-CoverImage: Introducing%20Tokamak%20zk-SNARK%20Cryptography%20Made%20Pra/Intro_post-cover.png
 
 <aside>
 

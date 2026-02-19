@@ -1,12 +1,21 @@
+---
+base: "[[blog-index.base]]"
+ArticleId: tv3i44co
+Title: "Pick, Wire & Prove; The Anatomy of Tokamak zk-SNARK"
+Slug: pick-wire-and-prove-the-anatomy-of-tokamak-zksnark
+Description: "We present a high-level overview of Tokamak zk-SNARK."
+Published: Prod
+PublishDate: "December 30, 2025"
+Tags:
+  - Cryptography
+  - Technical
+  - Technology
+Author: "Nil Soroush"
+CoverImage: "Pick,%20Wire%20&%20Prove;%20The%20Anatomy%20of%20Tokamak%20zk-SNAR/anatomy_of_TM-ZK-SNARK.png"
+---
+
 # Pick, Wire & Prove; The Anatomy of Tokamak zk-SNARK
 
-Slug: pick-wire-and-prove-the-anatomy-of-tokamak-zksnark
-Description: We present a high-level overview of Tokamak zk-SNARK.
-Published: Prod
-PublishDate: 2025년 12월 30일
-Tags: Cryptography, Technical, Technology
-Author: Nil Soroush
-CoverImage: Pick,%20Wire%20&%20Prove;%20The%20Anatomy%20of%20Tokamak%20zk-SNAR/anatomy_of_TM-ZK-SNARK.png
 
 ![anatomy of TM-ZK-SNARK.png](Pick,%20Wire%20&%20Prove;%20The%20Anatomy%20of%20Tokamak%20zk-SNAR/59e165c5-8cb1-4c77-bbf0-4b91c26ad607.png)
 

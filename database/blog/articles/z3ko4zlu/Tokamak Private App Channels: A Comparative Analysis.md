@@ -1,12 +1,27 @@
+---
+base: "[[blog-index.base]]"
+ArticleId: z3ko4zlu
+AuthorEmail: ""
+Slug: tokamak-private-app-channels-a-comparative-analysis
+CoverImage: []
+PublishDate: "December 30, 2025"
+CanonicalURL: ""
+Status: "Ready to Publish"
+Author: "Nil Soroush,  Jake Jang"
+Tags:
+  - Research
+  - Technical
+  - Technology
+  - zkEVM
+ReadTimeMinutes: ""
+Description: "A technical  comparison of Tokamak Private App Channels against Aztec, Aleo, Penumbra, and COTI V2."
+CoverImageAlt: ""
+Published: Prod
+Title: "Tokamak Private App Channels: A Comparative Analysis"
+---
+
 # Tokamak Private App Channels: A Comparative Analysis
 
-Slug: tokamak-private-app-channels-a-comparative-analysis
-Description: A technical  comparison of Tokamak Private App Channels against Aztec, Aleo, Penumbra, and COTI V2.
-Published: Prod
-PublishDate: 2025년 12월 30일
-Tags: Research, Technical, Technology, zkEVM
-Author:  Nil Soroush,  Jake Jang
-Status: Ready to Publish
 
 # Introduction
 

@@ -1,13 +1,23 @@
-# The Cryptographic Magic Nobody Told You About
-
+---
+base: "[[blog-index.base]]"
+ArticleId: ik9iphcf
+Title: "The Cryptographic Magic Nobody Told You About"
 Slug: the-cryptographic-magic-nobody-told-you-about
-Description: A plain-language intro to FROST threshold signatures, DKG, and why an invisible single address can be controlled by many.
+Description: "A plain-language intro to FROST threshold signatures, DKG, and why an invisible single address can be controlled by many."
 Published: Staging
-PublishDate: 2025년 12월 9일
-Tags: Education, Technical, Technology, zkEVM
+PublishDate: "December 9, 2025"
+Tags:
+  - Education
+  - Technical
+  - Technology
+  - zkEVM
 Author: Aamir
 ReadTimeMinutes: 8
 Status: Draft
+---
+
+# The Cryptographic Magic Nobody Told You About
+
 
 *Imagine: My friends and I have gathered our precious secrets and decided to store them in a treasure chest. To open this chest, we need a master key. What if a master key could exist... but nobody knows it?*
 

@@ -7,3 +7,7 @@
 - If creation has a dedicated command, update/sync commands must not silently create new files; they should hard-fail with actionable guidance.
 - When a user specifies an explicit reconciliation algorithm, implement that exact directionality (CSV->docs, docs->CSV, deletions/appends) instead of preserving previous source-of-truth assumptions.
 - For archive extraction requests, never extract multiple archives into a shared destination when internal top-level folder names can collide; always isolate per-archive output first.
+- To keep metadata hidden in rendered markdown, normalize files to YAML frontmatter at the very top (`--- ... ---`) instead of leaving `Key: Value` lines in body content.
+- For article sync, when markdown filename and frontmatter `Title` conflict, treat frontmatter `Title` as canonical and rename the file to match it instead of overwriting metadata from filename.
+- In `--update-articles`, do not keep CSV rows with empty `ArticleId`; remove them so CSV remains a strict mirror of existing article documents.
+- For `--create-article`, interpret the user-provided index as the actual CSV line number (header included), so first data row starts at index 2.
