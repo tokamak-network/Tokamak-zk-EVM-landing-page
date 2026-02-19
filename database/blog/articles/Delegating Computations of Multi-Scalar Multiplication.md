@@ -5,19 +5,21 @@ Slug: delegating-computations-of-msms
 CoverImage:
   - "[[Gemini_Generated_Image_m79icum79icum79i (1).png]]"
 PublishDate: 2026-01-05
-CanonicalURL: https://zkp.tokamak.network/blog/delegating-computations-of-msms
+CanonicalURL: "https://zkp.tokamak.network/blog/delegating-computations-of-msms"
 Status: Published
-Author: Luca Dall’Ava
+Author: "Luca Dall’Ava"
 Tags:
   - Cryptography
   - Research
   - Technical
   - Technology
 ReadTimeMinutes: 15
-Description: The aim of this technical blog post is to review various attempts and solutions to remove a very challenging cryptographic bottleneck, crucial to most web3 applications, namely, the possibility to delegate computation (of MSMs) to an untrusted party. The scenario considered is that of an on-chain verifier trying to delegate the computation of an MSM.
+Description: "The aim of this technical blog post is to review various attempts and solutions to remove a very challenging cryptographic bottleneck, crucial to most web3 applications, namely, the possibility to delegate computation (of MSMs) to an untrusted party. The scenario considered is that of an on-chain verifier trying to delegate the computation of an MSM."
 CoverImageAlt: ""
 Published: Prod
+ArticleId: 2
 ---
+
 ---
 
 The aim of this technical blog post is to review various attempts and solutions to remove a very challenging cryptographic bottleneck, crucial to most web3 applications, namely, the possibility to delegate computation (of MSM) to an untrusted party. The scenario considered is that of an on-chain verifier trying to delegate MSM.

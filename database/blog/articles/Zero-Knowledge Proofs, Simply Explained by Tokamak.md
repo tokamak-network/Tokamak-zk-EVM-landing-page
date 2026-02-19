@@ -3,14 +3,16 @@ base: "[[blog-index.base]]"
 AuthorEmail: ""
 Slug: zero-knowledge-explained-simple
 Status: Published
-Author: Aamir Muhammad
+Author: "Aamir Muhammad"
 Tags:
   - Technology
   - Education
-Description: A friendly, plain-language intro to zero-knowledge proofs with everyday examples and why they matter.
+Description: "A friendly, plain-language intro to zero-knowledge proofs with everyday examples and why they matter."
 CoverImageAlt: ""
 Published: Prod
+ArticleId: 14
 ---
+
 > Prove something is true without revealing the details. That’s the magic of zero-knowledge proofs.
 
 ### What is a zero-knowledge proof?

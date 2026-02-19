@@ -3,17 +3,19 @@ base: "[[blog-index.base]]"
 AuthorEmail: ""
 Slug: why-i-stopped-worrying-about-key-rotation
 PublishDate: 2025-12-09
-Status: Needs Update
+Status: "Needs Update"
 Author: Aamir
 Tags:
   - Technology
   - zkEVM
   - Technical
 ReadTimeMinutes: 7
-Description: How threshold signatures make signer rotation seamless without changing addresses, reducing risk and cost.
+Description: "How threshold signatures make signer rotation seamless without changing addresses, reducing risk and cost."
 CoverImageAlt: ""
 Published: Staging
+ArticleId: 13
 ---
+
 *The headache of changing signers, and how threshold cryptography solves it*
 
 ---

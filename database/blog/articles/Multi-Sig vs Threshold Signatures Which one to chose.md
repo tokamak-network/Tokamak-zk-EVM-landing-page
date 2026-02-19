@@ -11,10 +11,12 @@ Tags:
   - Technical
   - Education
 ReadTimeMinutes: 9
-Description: A practical framework for choosing between multi-sig and threshold signatures across transparency, privacy, and cost.
+Description: "A practical framework for choosing between multi-sig and threshold signatures across transparency, privacy, and cost."
 CoverImageAlt: ""
 Published: Staging
+ArticleId: 4
 ---
+
 *When signing a contract to reach an agreement among members of an organization, which should be chosen: public transparency and private efficiency*
 
 ---

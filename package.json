@@ -10,6 +10,7 @@
     "generate-blog-index-csv": "node scripts/generate-blog-index-csv.mjs --init",
     "blog-index:init": "node scripts/generate-blog-index-csv.mjs --init",
     "blog-index:update-articles": "node scripts/generate-blog-index-csv.mjs --update-articles",
+    "blog-index:create-article": "node scripts/generate-blog-index-csv.mjs --create-article",
     "reset-visualizations": "npx tsx scripts/reset-visualizations.ts",
     "generate-all-visualizations": "npx tsx scripts/generate-all-visualizations.ts"
   },

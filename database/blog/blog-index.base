@@ -6,6 +6,8 @@ filters:
 properties:
   file.name:
     displayName: Title
+  ArticleId:
+    displayName: ArticleId
   AuthorEmail:
     displayName: AuthorEmail
   Slug:
@@ -35,6 +37,7 @@ views:
     name: Table View
     order:
       - file.name
+      - ArticleId
       - AuthorEmail
       - Slug
       - CoverImage

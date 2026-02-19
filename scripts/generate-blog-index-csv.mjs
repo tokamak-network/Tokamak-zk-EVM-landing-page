@@ -7,9 +7,11 @@ const ARTICLES_DIR = path.join(BLOG_DIR, "articles");
 const BASE_FILE = path.join(BLOG_DIR, "blog-index.base");
 const CSV_FILE = path.join(BLOG_DIR, "blog-index.csv");
 const BASE_LINK = "[[blog-index.base]]";
+const UNIQUE_ID_KEY = "ArticleId";
 
 const DEFAULT_COLUMNS = [
   { propertyKey: "file.name", header: "Title" },
+  { propertyKey: UNIQUE_ID_KEY, header: UNIQUE_ID_KEY },
   { propertyKey: "AuthorEmail", header: "AuthorEmail" },
   { propertyKey: "Slug", header: "Slug" },
   { propertyKey: "CoverImage", header: "CoverImage" },
@@ -25,16 +27,41 @@ const DEFAULT_COLUMNS = [
 ];
 
 function printUsageAndExit() {
-  console.error("Usage: node scripts/generate-blog-index-csv.mjs --init | --update-articles");
+  console.error(
+    "Usage:\n" +
+      "  node scripts/generate-blog-index-csv.mjs --init\n" +
+      "  node scripts/generate-blog-index-csv.mjs --update-articles\n" +
+      "  node scripts/generate-blog-index-csv.mjs --create-article <row-number>"
+  );
   process.exit(1);
 }
 
 function parseArgs(argv) {
   const hasInit = argv.includes("--init");
   const hasUpdate = argv.includes("--update-articles");
+  const createIndex = argv.indexOf("--create-article");
+  const hasCreate = createIndex !== -1;
 
-  if ((hasInit && hasUpdate) || (!hasInit && !hasUpdate)) {
+  const modeCount = Number(hasInit) + Number(hasUpdate) + Number(hasCreate);
+  if (modeCount !== 1) {
     printUsageAndExit();
+  }
+
+  if (hasCreate) {
+    const rowArg = argv[createIndex + 1];
+    if (!rowArg) {
+      throw new Error("Missing <row-number>. Example: --create-article 3");
+    }
+
+    const rowNumber = parsePositiveInteger(rowArg);
+    if (rowNumber == null) {
+      throw new Error(`Invalid row number: "${rowArg}". Use a positive integer (data row starts at 1).`);
+    }
+
+    return {
+      mode: "create-article",
+      rowNumber,
+    };
   }
 
   return {
@@ -128,7 +155,7 @@ function loadColumnsFromBase(basePath) {
     header: displayNameByProperty[propertyKey] || propertyKey,
   }));
 
-  const hasTitle = columns.some((column) => column.propertyKey === "file.name" || column.header === "Title");
+  const hasTitle = columns.some((column) => column.propertyKey === "file.name");
   if (!hasTitle) {
     return DEFAULT_COLUMNS;
   }
@@ -273,6 +300,7 @@ function parseCsv(content) {
   if (headers.length > 0) {
     headers[0] = headers[0].replace(/^\uFEFF/, "");
   }
+
   const data = dataRows.map((cells) => {
     const obj = {};
     for (let i = 0; i < headers.length; i += 1) {
@@ -336,6 +364,18 @@ function normalizeScalar(value) {
   return value == null ? "" : String(value).trim();
 }
 
+function parsePositiveInteger(value) {
+  const text = normalizeScalar(value);
+  if (!/^\d+$/.test(text)) {
+    return null;
+  }
+  const parsed = Number(text);
+  if (!Number.isSafeInteger(parsed) || parsed <= 0) {
+    return null;
+  }
+  return parsed;
+}
+
 function asArray(value) {
   if (Array.isArray(value)) {
     return value.map((v) => String(v).trim()).filter(Boolean);
@@ -386,6 +426,43 @@ function serializeFrontmatter(frontmatter, orderedKeys) {
   return lines.join("\n");
 }
 
+function writeArticleFile(filePath, frontmatter, orderedKeys, body) {
+  const fmText = serializeFrontmatter(frontmatter, orderedKeys);
+  const nextBody = body === "" ? "\nWrite your article here.\n" : body;
+  const content = `---\n${fmText}\n---\n\n${nextBody.replace(/^\n+/, "")}`;
+  fs.writeFileSync(filePath, content, "utf8");
+}
+
+function getColumnMaps(columns) {
+  const headerToProperty = {};
+  const propertyToHeader = {};
+
+  for (const column of columns) {
+    headerToProperty[column.header] = column.propertyKey;
+    propertyToHeader[column.propertyKey] = column.header;
+  }
+
+  const titleHeader = propertyToHeader["file.name"] || "Title";
+  const articleIdHeader = propertyToHeader[UNIQUE_ID_KEY] || UNIQUE_ID_KEY;
+  const managedPropertyKeys = columns
+    .filter((column) => column.propertyKey !== "file.name")
+    .map((column) => column.propertyKey);
+
+  if (!managedPropertyKeys.includes(UNIQUE_ID_KEY)) {
+    throw new Error(
+      `blog-index.base must define property \"${UNIQUE_ID_KEY}\". Add it to properties and view order.`
+    );
+  }
+
+  return {
+    headerToProperty,
+    propertyToHeader,
+    titleHeader,
+    articleIdHeader,
+    managedPropertyKeys,
+  };
+}
+
 function managedFrontmatterFromRow(row, headerToProperty) {
   const managed = {
     base: BASE_LINK,
@@ -398,6 +475,7 @@ function managedFrontmatterFromRow(row, headerToProperty) {
     }
 
     const raw = value ?? "";
+
     if (propertyKey === "Tags") {
       managed.Tags = parseTagCell(raw);
       continue;
@@ -406,6 +484,12 @@ function managedFrontmatterFromRow(row, headerToProperty) {
     if (propertyKey === "CoverImage") {
       const imageValue = normalizeScalar(raw);
       managed.CoverImage = imageValue === "" ? [] : [imageValue];
+      continue;
+    }
+
+    if (propertyKey === UNIQUE_ID_KEY) {
+      const idValue = parsePositiveInteger(raw);
+      managed[UNIQUE_ID_KEY] = idValue == null ? "" : String(idValue);
       continue;
     }
 
@@ -425,126 +509,302 @@ function equivalentValue(existing, target, key) {
   return normalizeScalar(existing) === normalizeScalar(target);
 }
 
-function pushMapList(map, key, value) {
-  if (!key) {
-    return;
-  }
-
-  if (!map.has(key)) {
-    map.set(key, []);
-  }
-  map.get(key).push(value);
-}
-
-function takeFirstUnmatched(map, key) {
-  if (!map.has(key)) {
-    return null;
-  }
-
-  const list = map.get(key);
-  for (const item of list) {
-    if (!item.matched) {
-      return item;
-    }
-  }
-
-  return null;
-}
-
-function validateCsvRows(data) {
-  const normalizedRows = [];
-  const emptyTitleRows = [];
-  const duplicateMessages = [];
-  const invalidPathRows = [];
-  const seenTitleLine = new Map();
-
-  for (let i = 0; i < data.length; i += 1) {
-    const row = data[i];
-    const lineNumber = i + 2;
-    const title = normalizeScalar(row.Title);
-
-    if (title === "") {
-      emptyTitleRows.push(lineNumber);
-      continue;
-    }
-
-    if (/[\\/]/.test(title)) {
-      invalidPathRows.push({ lineNumber, title });
-      continue;
-    }
-
-    if (seenTitleLine.has(title)) {
-      duplicateMessages.push(
-        `line ${lineNumber} duplicates Title "${title}" from line ${seenTitleLine.get(title)}`
-      );
-      continue;
-    }
-
-    seenTitleLine.set(title, lineNumber);
-    normalizedRows.push({
-      ...row,
-      __title: title,
-      __lineNumber: lineNumber,
-    });
-  }
-
-  const errors = [];
-  if (emptyTitleRows.length > 0) {
-    errors.push(
-      `CSV has empty Title value on line(s): ${emptyTitleRows.join(", ")}. Fill Title for every row.`
-    );
-  }
-  if (duplicateMessages.length > 0) {
-    errors.push(`CSV has duplicate Title values:\n- ${duplicateMessages.join("\n- ")}`);
-  }
-  if (invalidPathRows.length > 0) {
-    const message = invalidPathRows
-      .map(({ lineNumber, title }) => `line ${lineNumber}: "${title}"`)
-      .join(", ");
-    errors.push(`Title cannot include "/" or "\\": ${message}`);
-  }
-
-  if (errors.length > 0) {
-    throw new Error(errors.join("\n"));
-  }
-
-  return normalizedRows;
-}
-
-function initCsv(columns) {
+function readArticleDocs() {
   const files = fs
     .readdirSync(ARTICLES_DIR)
     .filter((name) => name.toLowerCase().endsWith(".md"))
     .sort((a, b) => a.localeCompare(b));
 
-  const rows = [];
-
-  for (const file of files) {
+  return files.map((file) => {
     const filePath = path.join(ARTICLES_DIR, file);
     const content = fs.readFileSync(filePath, "utf8");
-    const { frontmatter } = splitFrontmatterAndBody(content);
+    const { frontmatter, body } = splitFrontmatterAndBody(content);
 
-    if (frontmatter.base !== BASE_LINK) {
+    return {
+      file,
+      filePath,
+      title: file.replace(/\.md$/i, ""),
+      frontmatter,
+      body,
+      matched: false,
+    };
+  });
+}
+
+function collectUsedArticleIdsFromDocs(docs) {
+  const used = new Set();
+  let maxId = 0;
+
+  for (const doc of docs) {
+    const raw = normalizeScalar(doc.frontmatter[UNIQUE_ID_KEY]);
+    if (raw === "") {
       continue;
     }
 
-    const title = file.replace(/\.md$/i, "");
-    const row = {};
-
-    for (const column of columns) {
-      if (column.propertyKey === "file.name") {
-        row[column.header] = title;
-        continue;
-      }
-
-      row[column.header] = toCellValueForCsv(column.propertyKey, frontmatter[column.propertyKey]);
+    const parsed = parsePositiveInteger(raw);
+    if (parsed == null) {
+      throw new Error(`${doc.filePath} has invalid ${UNIQUE_ID_KEY}: \"${raw}\". Use a positive integer.`);
     }
 
+    if (used.has(parsed)) {
+      throw new Error(`Duplicate ${UNIQUE_ID_KEY} in articles: ${parsed}.`);
+    }
+
+    used.add(parsed);
+    if (parsed > maxId) {
+      maxId = parsed;
+    }
+  }
+
+  return { used, maxId };
+}
+
+function ensureArticleIdsInDocs(docs) {
+  const { used, maxId } = collectUsedArticleIdsFromDocs(docs);
+  let nextId = maxId + 1;
+  let assigned = 0;
+
+  for (const doc of docs) {
+    const raw = normalizeScalar(doc.frontmatter[UNIQUE_ID_KEY]);
+    if (raw !== "") {
+      continue;
+    }
+
+    while (used.has(nextId)) {
+      nextId += 1;
+    }
+
+    const assignedId = String(nextId);
+    used.add(nextId);
+    nextId += 1;
+
+    doc.frontmatter[UNIQUE_ID_KEY] = assignedId;
+
+    const orderedKeys = Object.keys(doc.frontmatter).filter((key) => key !== "notion-id");
+    if (!orderedKeys.includes(UNIQUE_ID_KEY)) {
+      orderedKeys.push(UNIQUE_ID_KEY);
+    }
+
+    writeArticleFile(doc.filePath, doc.frontmatter, orderedKeys, doc.body);
+    assigned += 1;
+  }
+
+  return assigned;
+}
+
+function collectUsedArticleIdsFromCsv(data, articleIdHeader) {
+  const used = new Set();
+  let maxId = 0;
+
+  for (let i = 0; i < data.length; i += 1) {
+    const row = data[i];
+    const lineNumber = i + 2;
+    const raw = normalizeScalar(row[articleIdHeader]);
+
+    if (raw === "") {
+      continue;
+    }
+
+    const parsed = parsePositiveInteger(raw);
+    if (parsed == null) {
+      throw new Error(`CSV line ${lineNumber} has invalid ${UNIQUE_ID_KEY}: \"${raw}\". Use a positive integer.`);
+    }
+
+    if (used.has(parsed)) {
+      throw new Error(`CSV has duplicate ${UNIQUE_ID_KEY}: ${parsed}.`);
+    }
+
+    used.add(parsed);
+    if (parsed > maxId) {
+      maxId = parsed;
+    }
+  }
+
+  return { used, maxId };
+}
+
+function validateCsvRowsForUpdate(data, titleHeader, articleIdHeader) {
+  const normalizedRows = [];
+  const errors = [];
+  const seenTitles = new Map();
+  const seenIds = new Map();
+
+  for (let i = 0; i < data.length; i += 1) {
+    const row = data[i];
+    const lineNumber = i + 2;
+    const title = normalizeScalar(row[titleHeader]);
+    const idRaw = normalizeScalar(row[articleIdHeader]);
+
+    if (title === "") {
+      errors.push(`line ${lineNumber}: Title is empty`);
+      continue;
+    }
+
+    if (/[\\/]/.test(title)) {
+      errors.push(`line ${lineNumber}: Title contains invalid path separator: \"${title}\"`);
+      continue;
+    }
+
+    if (seenTitles.has(title)) {
+      errors.push(
+        `line ${lineNumber}: duplicate Title \"${title}\" (already used on line ${seenTitles.get(title)})`
+      );
+      continue;
+    }
+    seenTitles.set(title, lineNumber);
+
+    if (idRaw === "") {
+      errors.push(
+        `line ${lineNumber}: ${UNIQUE_ID_KEY} is empty. Create the document first with --create-article ${i + 1}.`
+      );
+      continue;
+    }
+
+    const idNum = parsePositiveInteger(idRaw);
+    if (idNum == null) {
+      errors.push(`line ${lineNumber}: invalid ${UNIQUE_ID_KEY} \"${idRaw}\"`);
+      continue;
+    }
+
+    if (seenIds.has(idNum)) {
+      errors.push(
+        `line ${lineNumber}: duplicate ${UNIQUE_ID_KEY} ${idNum} (already used on line ${seenIds.get(idNum)})`
+      );
+      continue;
+    }
+    seenIds.set(idNum, lineNumber);
+
+    normalizedRows.push({
+      ...row,
+      __title: title,
+      __lineNumber: lineNumber,
+      __articleId: String(idNum),
+    });
+  }
+
+  if (errors.length > 0) {
+    throw new Error(`CSV validation failed:\n- ${errors.join("\n- ")}`);
+  }
+
+  return normalizedRows;
+}
+
+function nextArticleId(docs, data, articleIdHeader) {
+  const docStats = collectUsedArticleIdsFromDocs(docs);
+  const csvStats = collectUsedArticleIdsFromCsv(data, articleIdHeader);
+  return Math.max(docStats.maxId, csvStats.maxId) + 1;
+}
+
+function initCsv(columns) {
+  const { titleHeader } = getColumnMaps(columns);
+  const docs = readArticleDocs();
+  const assignedCount = ensureArticleIdsInDocs(docs);
+
+  const rows = [];
+  for (const doc of docs) {
+    if (doc.frontmatter.base !== BASE_LINK) {
+      continue;
+    }
+
+    const row = {};
+    for (const column of columns) {
+      if (column.propertyKey === "file.name") {
+        row[column.header] = doc.title;
+      } else {
+        row[column.header] = toCellValueForCsv(column.propertyKey, doc.frontmatter[column.propertyKey]);
+      }
+    }
     rows.push(row);
   }
 
   writeCsvFile(CSV_FILE, columns.map((c) => c.header), rows);
-  console.log(`Initialized ${CSV_FILE} from ${BASE_FILE} (${rows.length} rows)`);
+
+  const assignedSuffix = assignedCount > 0 ? `, assigned ${UNIQUE_ID_KEY} to ${assignedCount} article(s)` : "";
+  console.log(`Initialized ${CSV_FILE} from ${BASE_FILE} (${rows.length} rows${assignedSuffix})`);
+
+  if (!columns.some((c) => c.header === titleHeader)) {
+    throw new Error("Title column mapping failed.");
+  }
+}
+
+function createArticle(columns, rowNumber) {
+  if (!fileExists(CSV_FILE)) {
+    throw new Error(`CSV not found: ${CSV_FILE}. Run --init first.`);
+  }
+
+  const maps = getColumnMaps(columns);
+  const csvContent = fs.readFileSync(CSV_FILE, "utf8");
+  const { headers, data } = parseCsv(csvContent);
+
+  if (!headers.includes(maps.titleHeader)) {
+    throw new Error(`CSV must include a \"${maps.titleHeader}\" column.`);
+  }
+  if (!headers.includes(maps.articleIdHeader)) {
+    throw new Error(`CSV must include a \"${maps.articleIdHeader}\" column.`);
+  }
+
+  if (rowNumber < 1 || rowNumber > data.length) {
+    throw new Error(
+      `Row ${rowNumber} is out of range. CSV has ${data.length} data row(s). Row number starts at 1.`
+    );
+  }
+
+  const row = data[rowNumber - 1];
+  const csvLine = rowNumber + 1;
+  const title = normalizeScalar(row[maps.titleHeader]);
+  const idRaw = normalizeScalar(row[maps.articleIdHeader]);
+
+  if (title === "") {
+    throw new Error(`CSV line ${csvLine} has empty Title. Fill Title before creating an article.`);
+  }
+  if (/[\\/]/.test(title)) {
+    throw new Error(`CSV line ${csvLine} has invalid Title \"${title}\". Do not use / or \\.`);
+  }
+  if (idRaw !== "") {
+    throw new Error(
+      `CSV line ${csvLine} already has ${UNIQUE_ID_KEY}=${idRaw}. Use --update-articles for existing documents.`
+    );
+  }
+
+  for (let i = 0; i < data.length; i += 1) {
+    if (i === rowNumber - 1) {
+      continue;
+    }
+    const peerTitle = normalizeScalar(data[i][maps.titleHeader]);
+    if (peerTitle !== "" && peerTitle === title) {
+      throw new Error(
+        `CSV line ${csvLine} Title \"${title}\" duplicates line ${i + 2}. Titles must be unique.`
+      );
+    }
+  }
+
+  const docs = readArticleDocs();
+  ensureArticleIdsInDocs(docs);
+
+  const newId = nextArticleId(docs, data, maps.articleIdHeader);
+  const targetFilePath = path.join(ARTICLES_DIR, `${title}.md`);
+  if (fileExists(targetFilePath)) {
+    throw new Error(`Cannot create article. File already exists: ${targetFilePath}`);
+  }
+
+  row[maps.articleIdHeader] = String(newId);
+
+  const targetManaged = managedFrontmatterFromRow(row, maps.headerToProperty);
+  targetManaged[UNIQUE_ID_KEY] = String(newId);
+
+  const nextFrontmatter = {
+    base: BASE_LINK,
+  };
+  for (const key of maps.managedPropertyKeys) {
+    nextFrontmatter[key] = targetManaged[key] ?? "";
+  }
+
+  writeArticleFile(targetFilePath, nextFrontmatter, ["base", ...maps.managedPropertyKeys], "\nWrite your article here.\n");
+  writeCsvFile(CSV_FILE, headers, data);
+
+  initCsv(columns);
+
+  console.log(`Created article from CSV row ${rowNumber}: ${title}.md (${UNIQUE_ID_KEY}=${newId})`);
 }
 
 function updateArticles(columns) {
@@ -552,115 +812,90 @@ function updateArticles(columns) {
     throw new Error(`CSV not found: ${CSV_FILE}. Run --init first.`);
   }
 
+  const maps = getColumnMaps(columns);
   const csvContent = fs.readFileSync(CSV_FILE, "utf8");
   const { headers, data } = parseCsv(csvContent);
 
-  if (!headers.includes("Title")) {
-    throw new Error('CSV must include a "Title" column.');
+  if (!headers.includes(maps.titleHeader)) {
+    throw new Error(`CSV must include a \"${maps.titleHeader}\" column.`);
   }
-  const normalizedRows = validateCsvRows(data);
-
-  const headerToProperty = {};
-  for (const column of columns) {
-    headerToProperty[column.header] = column.propertyKey;
+  if (!headers.includes(maps.articleIdHeader)) {
+    throw new Error(`CSV must include a \"${maps.articleIdHeader}\" column.`);
   }
 
-  const managedPropertyKeys = columns
-    .filter((column) => column.propertyKey !== "file.name")
-    .map((column) => column.propertyKey);
+  const rows = validateCsvRowsForUpdate(data, maps.titleHeader, maps.articleIdHeader);
 
-  const files = fs
-    .readdirSync(ARTICLES_DIR)
-    .filter((name) => name.toLowerCase().endsWith(".md"));
+  const docs = readArticleDocs();
+  const assignedCount = ensureArticleIdsInDocs(docs);
 
-  const existingDocs = [];
-  const existingByTitle = new Map();
-  const existingBySlug = new Map();
+  const docsByArticleId = new Map();
+  for (const doc of docs) {
+    const raw = normalizeScalar(doc.frontmatter[UNIQUE_ID_KEY]);
+    const parsed = parsePositiveInteger(raw);
+    if (parsed == null) {
+      throw new Error(`${doc.filePath} has invalid ${UNIQUE_ID_KEY}: \"${raw}\".`);
+    }
 
-  for (const file of files) {
-    const filePath = path.join(ARTICLES_DIR, file);
-    const content = fs.readFileSync(filePath, "utf8");
-    const { frontmatter, body } = splitFrontmatterAndBody(content);
-    const title = file.replace(/\.md$/i, "");
-    const doc = {
-      filePath,
-      title,
-      slug: normalizeScalar(frontmatter.Slug),
-      frontmatter,
-      body,
-      matched: false,
-    };
-    existingDocs.push(doc);
-    pushMapList(existingByTitle, title, doc);
-    pushMapList(existingBySlug, doc.slug, doc);
+    const id = String(parsed);
+    if (docsByArticleId.has(id)) {
+      throw new Error(`Duplicate ${UNIQUE_ID_KEY} in article files: ${id}`);
+    }
+
+    docsByArticleId.set(id, doc);
   }
 
-  let created = 0;
   let updated = 0;
   let unchanged = 0;
   let renamed = 0;
 
-  for (const row of normalizedRows) {
+  for (const row of rows) {
     const title = row.__title;
     const lineNumber = row.__lineNumber;
+    const articleId = row.__articleId;
     const targetFilePath = path.join(ARTICLES_DIR, `${title}.md`);
 
-    let matchedDoc = takeFirstUnmatched(existingByTitle, title);
-    if (!matchedDoc) {
-      const rowSlug = normalizeScalar(row.Slug);
-      if (rowSlug !== "") {
-        matchedDoc = takeFirstUnmatched(existingBySlug, rowSlug);
-      }
+    const doc = docsByArticleId.get(articleId);
+    if (!doc) {
+      throw new Error(
+        `CSV line ${lineNumber} has ${UNIQUE_ID_KEY}=${articleId}, but no matching article file exists. ` +
+          `New article creation via --update-articles is disabled. Use --create-article ${lineNumber - 1}.`
+      );
     }
 
-    let existingFrontmatter = {};
-    let body = "";
-    let existed = false;
+    doc.matched = true;
+
+    let existingFrontmatter = doc.frontmatter;
+    const body = doc.body;
     let fileWasRenamed = false;
 
-    if (matchedDoc) {
-      matchedDoc.matched = true;
-      existed = true;
-      existingFrontmatter = matchedDoc.frontmatter;
-      body = matchedDoc.body;
-
-      if (matchedDoc.filePath !== targetFilePath) {
-        if (fileExists(targetFilePath)) {
-          throw new Error(
-            `Cannot sync CSV line ${lineNumber}: target file already exists: ${targetFilePath}`
-          );
-        }
-
-        fs.renameSync(matchedDoc.filePath, targetFilePath);
-        matchedDoc.filePath = targetFilePath;
-        fileWasRenamed = true;
-        renamed += 1;
+    if (doc.filePath !== targetFilePath) {
+      if (fileExists(targetFilePath)) {
+        throw new Error(`Cannot sync CSV line ${lineNumber}: target file already exists: ${targetFilePath}`);
       }
-    } else if (fileExists(targetFilePath)) {
-      existed = true;
-      const content = fs.readFileSync(targetFilePath, "utf8");
-      const parsed = splitFrontmatterAndBody(content);
-      existingFrontmatter = parsed.frontmatter;
-      body = parsed.body;
+
+      fs.renameSync(doc.filePath, targetFilePath);
+      doc.filePath = targetFilePath;
+      doc.title = title;
+      fileWasRenamed = true;
+      renamed += 1;
     }
 
-    const targetManaged = managedFrontmatterFromRow(row, headerToProperty);
+    const targetManaged = managedFrontmatterFromRow(row, maps.headerToProperty);
+    targetManaged[UNIQUE_ID_KEY] = articleId;
 
-    let metadataChanged = !existed || fileWasRenamed;
+    let metadataChanged = fileWasRenamed;
 
-    if (existed) {
-      if (normalizeScalar(existingFrontmatter.base) !== BASE_LINK) {
+    if (normalizeScalar(existingFrontmatter.base) !== BASE_LINK) {
+      metadataChanged = true;
+    }
+    if (Object.prototype.hasOwnProperty.call(existingFrontmatter, "notion-id")) {
+      metadataChanged = true;
+    }
+
+    for (const key of maps.managedPropertyKeys) {
+      if (!equivalentValue(existingFrontmatter[key], targetManaged[key], key)) {
         metadataChanged = true;
-      }
-      if (Object.prototype.hasOwnProperty.call(existingFrontmatter, "notion-id")) {
-        metadataChanged = true;
-      }
-
-      for (const key of managedPropertyKeys) {
-        if (!equivalentValue(existingFrontmatter[key], targetManaged[key], key)) {
-          metadataChanged = true;
-          break;
-        }
+        break;
       }
     }
 
@@ -670,56 +905,49 @@ function updateArticles(columns) {
     }
 
     const preservedExtraKeys = Object.keys(existingFrontmatter).filter(
-      (key) => key !== "base" && key !== "notion-id" && !managedPropertyKeys.includes(key)
+      (key) => key !== "base" && key !== "notion-id" && !maps.managedPropertyKeys.includes(key)
     );
 
-    const orderedKeys = [
-      ...preservedExtraKeys,
-      "base",
-      ...managedPropertyKeys,
-    ];
-
+    const orderedKeys = [...preservedExtraKeys, "base", ...maps.managedPropertyKeys];
     const nextFrontmatter = {};
+
     for (const key of preservedExtraKeys) {
       nextFrontmatter[key] = existingFrontmatter[key];
     }
     nextFrontmatter.base = BASE_LINK;
-    for (const key of managedPropertyKeys) {
-      nextFrontmatter[key] = targetManaged[key];
+    for (const key of maps.managedPropertyKeys) {
+      nextFrontmatter[key] = targetManaged[key] ?? "";
     }
 
-    const fmText = serializeFrontmatter(nextFrontmatter, orderedKeys);
-    const nextBody = body === "" ? "\nWrite your article here.\n" : body;
-    const nextContent = `---\n${fmText}\n---\n\n${nextBody.replace(/^\n+/, "")}`;
-
-    fs.writeFileSync(targetFilePath, nextContent, "utf8");
-
-    if (existed) {
-      updated += 1;
-    } else {
-      created += 1;
-    }
+    writeArticleFile(doc.filePath, nextFrontmatter, orderedKeys, body);
+    updated += 1;
   }
 
   let deleted = 0;
-  for (const doc of existingDocs) {
+  for (const doc of docs) {
     if (!doc.matched) {
       fs.unlinkSync(doc.filePath);
       deleted += 1;
     }
   }
 
+  const assignedSuffix = assignedCount > 0 ? `, assigned ${UNIQUE_ID_KEY}=${assignedCount}` : "";
   console.log(
-    `Updated articles from CSV: created=${created}, updated=${updated}, unchanged=${unchanged}, renamed=${renamed}, deleted=${deleted}`
+    `Updated articles from CSV: created=0, updated=${updated}, unchanged=${unchanged}, renamed=${renamed}, deleted=${deleted}${assignedSuffix}`
   );
 }
 
 function main() {
-  const { mode } = parseArgs(process.argv.slice(2));
+  const args = parseArgs(process.argv.slice(2));
   const columns = loadColumnsFromBase(BASE_FILE);
 
-  if (mode === "init") {
+  if (args.mode === "init") {
     initCsv(columns);
+    return;
+  }
+
+  if (args.mode === "create-article") {
+    createArticle(columns, args.rowNumber);
     return;
   }
 

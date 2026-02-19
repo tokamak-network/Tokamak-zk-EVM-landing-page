@@ -7,10 +7,12 @@ Author: ""
 Tags:
   - Technology
   - Education
-Description: Announcing Tokamak Network’s one‑click ZKP generation — turn complex cryptography into a developer‑first workflow.
+Description: "Announcing Tokamak Network’s one‑click ZKP generation — turn complex cryptography into a developer‑first workflow."
 CoverImageAlt: ""
 Published: Staging
+ArticleId: 9
 ---
+
 > Zero‑knowledge proofs used to require specialized math, custom hardware, and hours of tuning. We made it a click.
 
 ### TL;DR

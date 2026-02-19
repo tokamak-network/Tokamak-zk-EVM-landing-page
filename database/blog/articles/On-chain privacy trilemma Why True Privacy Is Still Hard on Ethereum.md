@@ -8,10 +8,12 @@ Author: Mehdi
 Tags:
   - Technology
   - Education
-Description: How the pursuit of privacy collides with usability and security — and how new protocols like Tokamak Channels might resolve it.
+Description: "How the pursuit of privacy collides with usability and security — and how new protocols like Tokamak Channels might resolve it."
 CoverImageAlt: ""
 Published: Prod
+ArticleId: 5
 ---
+
 This article extends the presentation "*The Privacy Trilemma" *by Wei Dai at* DC Privacy Summit 2025* — [YouTube](https://www.youtube.com/watch?v=b1RjuJrOt3A).
 
 # Introduction

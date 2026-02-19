@@ -6,7 +6,9 @@ Author: ""
 Tags: []
 Description: ""
 CoverImageAlt: ""
+ArticleId: 1
 ---
+
 Tokamak zkSNARK keeps proofs short and exceptionally easy to verify. It achieves competitive proof sizes compared to other universal SNARKs, with communication and computation efficiency that’s on par with state-of-the-art protocols.
 
 

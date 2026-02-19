@@ -5,17 +5,19 @@ Slug: scaling-tokamak-batched-verification
 CoverImage:
   - "[[Gemini_Generated_Image_4iab7i4iab7i4iab.png]]"
 PublishDate: 2025-12-16
-CanonicalURL: https://zkp.tokamak.network/blog/scaling-tokamak-batched-verification
+CanonicalURL: "https://zkp.tokamak.network/blog/scaling-tokamak-batched-verification"
 Status: Published
-Author: Luca Dall’Ava
+Author: "Luca Dall’Ava"
 Tags:
   - Technical
   - Cryptography
 ReadTimeMinutes: 6
-Description: Discover how batched verification reduces on-chain costs for Tokamak zk-SNARKs by replacing expensive sequential pairing operations with efficient aggregated checks, enabling high-throughput scalability.
+Description: "Discover how batched verification reduces on-chain costs for Tokamak zk-SNARKs by replacing expensive sequential pairing operations with efficient aggregated checks, enabling high-throughput scalability."
 CoverImageAlt: ""
 Published: Prod
+ArticleId: 7
 ---
+
 **Zero-Knowledge Succinct Non-Interactive Arguments of Knowledge (zk-SNARKs)** have revolutionized blockchain scalability and privacy. They allow a prover to convince a verifier that a computation is correct without revealing the underlying data. However, as transaction volumes on the Tokamak Network increase, we face a fundamental challenge: can we increase the transaction throughput?
 
 Even though SNARKs are succinct, i.e. small proofs and fast verification, **fast is relative:** 
