@@ -6,3 +6,4 @@
 - When users require a metadata key to be removed permanently, handle both migration (bulk remove existing files) and enforcement (script must strip the key even when no other metadata changed).
 - If creation has a dedicated command, update/sync commands must not silently create new files; they should hard-fail with actionable guidance.
 - When a user specifies an explicit reconciliation algorithm, implement that exact directionality (CSV->docs, docs->CSV, deletions/appends) instead of preserving previous source-of-truth assumptions.
+- For archive extraction requests, never extract multiple archives into a shared destination when internal top-level folder names can collide; always isolate per-archive output first.
