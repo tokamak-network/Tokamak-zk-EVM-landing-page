@@ -573,31 +573,28 @@ function updateArticles(columns) {
     .readdirSync(ARTICLES_DIR)
     .filter((name) => name.toLowerCase().endsWith(".md"));
 
-  const managedDocs = [];
-  const managedByTitle = new Map();
-  const managedBySlug = new Map();
+  const existingDocs = [];
+  const existingByTitle = new Map();
+  const existingBySlug = new Map();
 
   for (const file of files) {
     const filePath = path.join(ARTICLES_DIR, file);
     const content = fs.readFileSync(filePath, "utf8");
     const { frontmatter, body } = splitFrontmatterAndBody(content);
-    if (frontmatter.base === BASE_LINK) {
-      const title = file.replace(/\.md$/i, "");
-      const doc = {
-        filePath,
-        title,
-        slug: normalizeScalar(frontmatter.Slug),
-        frontmatter,
-        body,
-        matched: false,
-      };
-      managedDocs.push(doc);
-      pushMapList(managedByTitle, title, doc);
-      pushMapList(managedBySlug, doc.slug, doc);
-    }
+    const title = file.replace(/\.md$/i, "");
+    const doc = {
+      filePath,
+      title,
+      slug: normalizeScalar(frontmatter.Slug),
+      frontmatter,
+      body,
+      matched: false,
+    };
+    existingDocs.push(doc);
+    pushMapList(existingByTitle, title, doc);
+    pushMapList(existingBySlug, doc.slug, doc);
   }
 
-  const targetTitles = new Set();
   let created = 0;
   let updated = 0;
   let unchanged = 0;
@@ -606,15 +603,13 @@ function updateArticles(columns) {
   for (const row of normalizedRows) {
     const title = row.__title;
     const lineNumber = row.__lineNumber;
-
-    targetTitles.add(title);
     const targetFilePath = path.join(ARTICLES_DIR, `${title}.md`);
 
-    let matchedManagedDoc = takeFirstUnmatched(managedByTitle, title);
-    if (!matchedManagedDoc) {
+    let matchedDoc = takeFirstUnmatched(existingByTitle, title);
+    if (!matchedDoc) {
       const rowSlug = normalizeScalar(row.Slug);
       if (rowSlug !== "") {
-        matchedManagedDoc = takeFirstUnmatched(managedBySlug, rowSlug);
+        matchedDoc = takeFirstUnmatched(existingBySlug, rowSlug);
       }
     }
 
@@ -623,21 +618,21 @@ function updateArticles(columns) {
     let existed = false;
     let fileWasRenamed = false;
 
-    if (matchedManagedDoc) {
-      matchedManagedDoc.matched = true;
+    if (matchedDoc) {
+      matchedDoc.matched = true;
       existed = true;
-      existingFrontmatter = matchedManagedDoc.frontmatter;
-      body = matchedManagedDoc.body;
+      existingFrontmatter = matchedDoc.frontmatter;
+      body = matchedDoc.body;
 
-      if (matchedManagedDoc.filePath !== targetFilePath) {
+      if (matchedDoc.filePath !== targetFilePath) {
         if (fileExists(targetFilePath)) {
           throw new Error(
             `Cannot sync CSV line ${lineNumber}: target file already exists: ${targetFilePath}`
           );
         }
 
-        fs.renameSync(matchedManagedDoc.filePath, targetFilePath);
-        matchedManagedDoc.filePath = targetFilePath;
+        fs.renameSync(matchedDoc.filePath, targetFilePath);
+        matchedDoc.filePath = targetFilePath;
         fileWasRenamed = true;
         renamed += 1;
       }
@@ -704,8 +699,8 @@ function updateArticles(columns) {
   }
 
   let deleted = 0;
-  for (const doc of managedDocs) {
-    if (!doc.matched && !targetTitles.has(doc.title)) {
+  for (const doc of existingDocs) {
+    if (!doc.matched) {
       fs.unlinkSync(doc.filePath);
       deleted += 1;
     }
