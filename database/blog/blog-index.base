@@ -1,0 +1,49 @@
+# zk-EVM (Ooo) Blogs
+
+filters:
+  and:
+    - note["base"] == link("blog-index.base")
+properties:
+  file.name:
+    displayName: Title
+  AuthorEmail:
+    displayName: AuthorEmail
+  Slug:
+    displayName: Slug
+  CoverImage:
+    displayName: CoverImage
+  PublishDate:
+    displayName: PublishDate
+  CanonicalURL:
+    displayName: CanonicalURL
+  Status:
+    displayName: Status
+  Author:
+    displayName: Author
+  Tags:
+    displayName: Tags
+  ReadTimeMinutes:
+    displayName: ReadTimeMinutes
+  Description:
+    displayName: Description
+  CoverImageAlt:
+    displayName: CoverImageAlt
+  Published:
+    displayName: Published
+views:
+  - type: table
+    name: Table View
+    order:
+      - file.name
+      - AuthorEmail
+      - Slug
+      - CoverImage
+      - PublishDate
+      - CanonicalURL
+      - Status
+      - Author
+      - Tags
+      - ReadTimeMinutes
+      - Description
+      - CoverImageAlt
+      - Published
