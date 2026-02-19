@@ -28,7 +28,7 @@ Add immutable unique IDs to all articles and split document creation from update
 - [x] Migrate existing docs to include `ArticleId`
 - [x] Verify end-to-end (repo + tmp scenarios)
 - [x] Update lessons and review notes
-- [ ] Commit
+- [x] Commit
 
 ## Review
 - `scripts/generate-blog-index-csv.mjs` rewritten to support three modes:
