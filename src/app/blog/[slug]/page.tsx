@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import NotionContent from "@/components/NotionContent";
+import MarkdownContent from "@/components/MarkdownContent";
 import { BlogTracker } from "@/components/Analytics";
 import VisualizationsSection from "@/components/VisualizationsSection";
 import { BlogProvider } from "@/components/BlogContext";
@@ -33,35 +33,12 @@ function extractKeywordsFromTitle(title: string): string[] {
     .slice(0, 10); // Limit to 10 keywords
 }
 
-// SEO Helper: Estimate word count from Notion recordMap
-function estimateWordCount(recordMap: BlogPost["recordMap"]): number {
-  if (!recordMap?.block) return 0;
-
-  let wordCount = 0;
-  const blocks = Object.values(recordMap.block);
-
-  for (const block of blocks) {
-    const value = block?.value;
-    if (!value) continue;
-
-    // Extract text from various block types
-    const textArrays = [
-      value.properties?.title,
-      value.properties?.caption,
-    ].filter(Boolean);
-
-    for (const textArray of textArrays) {
-      if (Array.isArray(textArray)) {
-        for (const segment of textArray) {
-          if (Array.isArray(segment) && typeof segment[0] === "string") {
-            wordCount += segment[0].split(/\s+/).filter(Boolean).length;
-          }
-        }
-      }
-    }
-  }
-
-  return wordCount || 500; // Default estimate if extraction fails
+function estimateWordCount(post: BlogPost): number {
+  const text = post.markdownContent || post.description || "";
+  if (!text) return 500;
+  const cleaned = text.replace(/[#*_\[\]()!`>|]/g, " ");
+  const count = cleaned.split(/\s+/).filter(Boolean).length;
+  return count || 500;
 }
 
 // SEO Helper: Calculate reading time in minutes
@@ -166,7 +143,7 @@ export async function generateMetadata({
 // Generate comprehensive JSON-LD structured data for SEO
 function generateBlogPostJsonLd(post: BlogPost, slug: string) {
   const postUrl = `https://zkp.tokamak.network/blog/${slug}`;
-  const wordCount = estimateWordCount(post.recordMap);
+  const wordCount = estimateWordCount(post);
   const readingTimeMinutes = calculateReadingTime(wordCount);
   const titleKeywords = extractKeywordsFromTitle(post.title);
 
@@ -277,7 +254,7 @@ function generateBlogPostJsonLd(post: BlogPost, slug: string) {
         // Speakable for voice search optimization
         speakable: {
           "@type": "SpeakableSpecification",
-          cssSelector: ["h1", ".notion-page-content p:first-of-type"],
+          cssSelector: ["h1", ".blog-page-content p:first-of-type"],
         },
         // Potential action for engagement
         potentialAction: {
@@ -326,7 +303,7 @@ export default async function BlogPostPage({
   const post = await getBlogPostBySlug(slug);
 
   if (!post) {
-    notFound();
+    return notFound();
   }
 
   const blogPostJsonLd = generateBlogPostJsonLd(post, slug);
@@ -430,10 +407,10 @@ export default async function BlogPostPage({
               )}
             </div>
 
-            {/* Article Content - Rendered with react-notion-x */}
-            {post.recordMap ? (
-              <div className="notion-page-content">
-                <NotionContent recordMap={post.recordMap} rootPageId={post.id} />
+            {/* Article Content - Rendered from Markdown */}
+            {post.markdownContent ? (
+              <div className="blog-page-content">
+                <MarkdownContent content={post.markdownContent} />
               </div>
             ) : (
               <div className="text-white text-center py-12">

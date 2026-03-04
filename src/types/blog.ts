@@ -11,7 +11,8 @@ export interface BlogPost {
   coverImage?: string;
   author?: string;
   authorEmail?: string; // Comma-separated emails for multiple authors
-  recordMap?: ExtendedRecordMap; // Full page content for react-notion-x
+  markdownContent?: string; // Full article markdown body (from database/blog)
+  recordMap?: ExtendedRecordMap; // Legacy: Full page content for react-notion-x
 }
 
 export interface NotionPage {

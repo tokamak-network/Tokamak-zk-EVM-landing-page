@@ -218,58 +218,40 @@ export default function BlogList({ posts }: BlogListProps) {
               href={`/blog/${post.slug}`}
               className="group relative bg-gradient-to-b from-[#0a1930] to-[#1a2347] border-2 border-[#4fc3f7]/40 hover:border-[#4fc3f7]/70 transition-all duration-300 hover:shadow-lg hover:shadow-[#4fc3f7]/20 overflow-hidden flex flex-col"
             >
-              {/* Cover Image or Placeholder */}
-              {post.coverImage ? (
-                <div className="w-full h-48 overflow-hidden border-b-2 border-[#4fc3f7]/40">
-                  <img
-                    src={post.coverImage}
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
+              {/* Title with Background */}
+              <div className="w-full h-48 bg-gradient-to-br from-[#0a1930] via-[#1a2347] to-[#0a1930] border-b-2 border-[#4fc3f7]/40 flex flex-col items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0" style={{
+                  backgroundImage: `
+                    linear-gradient(to right, #4fc3f7 1px, transparent 1px),
+                    linear-gradient(to bottom, #4fc3f7 1px, transparent 1px)
+                  `,
+                  backgroundSize: '20px 20px',
+                  opacity: 0.15
+                }}></div>
+                <div className="absolute inset-0 opacity-20">
+                  <div className="absolute top-4 left-4 text-3xl text-[#4fc3f7]">✦</div>
+                  <div className="absolute bottom-4 right-4 text-3xl text-[#4fc3f7]">✦</div>
                 </div>
-              ) : (
-                <div className="w-full h-48 bg-gradient-to-br from-[#0a1930] via-[#1a2347] to-[#0a1930] border-b-2 border-[#4fc3f7]/40 flex flex-col items-center justify-center relative overflow-hidden">
-                  {/* Grid Background Pattern */}
-                  <div className="absolute inset-0" style={{
-                    backgroundImage: `
-                      linear-gradient(to right, #4fc3f7 1px, transparent 1px),
-                      linear-gradient(to bottom, #4fc3f7 1px, transparent 1px)
-                    `,
-                    backgroundSize: '20px 20px',
-                    opacity: 0.15
-                  }}></div>
-                  
-                  {/* Corner Decorations */}
-                  <div className="absolute inset-0 opacity-20">
-                    <div className="absolute top-4 left-4 text-3xl text-[#4fc3f7]">✦</div>
-                    <div className="absolute bottom-4 right-4 text-3xl text-[#4fc3f7]">✦</div>
+                <div className="relative z-10 flex flex-col items-center justify-center gap-3 px-6">
+                  <div
+                    className="text-sm font-bold text-[#4fc3f7]/60 tracking-wider"
+                    style={{
+                      fontFamily: '"Jersey 10", "Press Start 2P", monospace',
+                    }}
+                  >
+                    TOKAMAK zk-EVM
                   </div>
-                  
-                  {/* Main Content - Post Title */}
-                  <div className="relative z-10 flex flex-col items-center justify-center gap-3 px-6">
-                    {/* Brand Logo/Text */}
-                    <div
-                      className="text-sm font-bold text-[#4fc3f7]/60 tracking-wider"
-                      style={{
-                        fontFamily: '"Jersey 10", "Press Start 2P", monospace',
-                      }}
-                    >
-                      TOKAMAK zk-EVM
-                    </div>
-                    
-                    {/* Post Title */}
-                    <h3
-                      className="text-lg font-bold text-white text-center line-clamp-3"
-                      style={{
-                        fontFamily: '"IBM Plex Mono"',
-                        letterSpacing: '0.02rem',
-                      }}
-                    >
-                      {post.title}
-                    </h3>
-                  </div>
+                  <h3
+                    className="text-lg font-bold text-white text-center line-clamp-3"
+                    style={{
+                      fontFamily: '"IBM Plex Mono"',
+                      letterSpacing: '0.02rem',
+                    }}
+                  >
+                    {post.title}
+                  </h3>
                 </div>
-              )}
+              </div>
 
               {/* Content - Flex Grow */}
               <div className="p-6 flex flex-col flex-grow">
