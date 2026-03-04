@@ -5,7 +5,6 @@ import {
   generateCartoon,
   generateSummaryCard,
   generateDiagram,
-  extractTextFromNotionContent,
   GeneratedImage,
 } from "./gemini-service";
 import { uploadBase64Image } from "./blob-storage";
@@ -48,17 +47,22 @@ export async function processBlogPost(
       visualizations: {},
     });
     
-    // Step 2: Extract text content from Notion
+    // Step 2: Extract text content from markdown
     console.log("📝 [PROCESS] Step 2: Extracting text content...");
     
     let blogContent = "";
-    if (post.recordMap) {
-      blogContent = extractTextFromNotionContent(post.recordMap);
+    if (post.markdownContent) {
+      blogContent = post.markdownContent
+        .replace(/^---[\s\S]*?---\s*/m, "")
+        .replace(/!\[.*?\]\(.*?\)/g, "")
+        .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+        .replace(/[#*_`>|]/g, "")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
     }
     
-    // Fallback to description if no content
     if (!blogContent || blogContent.length < 100) {
-      console.log("⚠️  [PROCESS] Not enough content from recordMap, using title and description");
+      console.log("⚠️  [PROCESS] Not enough content from markdown, using title and description");
       blogContent = `${post.title}\n\n${post.description}`;
     }
     
