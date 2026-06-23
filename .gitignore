@@ -31,9 +31,11 @@ pnpm-debug.log*
 # Vercel
 .vercel/
 
+# Local workspace
+tmp/
+
 # Editor and OS files
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
-
