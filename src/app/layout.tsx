@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Tonigma",
   description:
-    "Proof-backed application channels with explicit public boundaries and channel-local private state.",
+    "Validity-proven app channels with public proof boundaries, observable policy, and Ethereum-settled verification.",
   icons: {
     icon: "/brand/tonigma-square-logo.svg",
   },

@@ -21,18 +21,18 @@ import Image from "next/image";
 import { ParallaxBackground } from "./parallax-background";
 
 const publicRows = [
-  ["Bridge edge", "ETH-visible"],
-  ["Channel join", "policy 0x04"],
-  ["Accepted state", "0x8e41...d19a"],
-  ["Nullifier set", "public index"],
-  ["Withdrawal", "settled"],
+  ["Bridge custody", "Ethereum-settled"],
+  ["Channel registration", "public registry"],
+  ["Proof acceptance", "verifier visible"],
+  ["Policy snapshot", "observable"],
+  ["Withdrawal edge", "settled boundary"],
 ];
 
 const privateRows = [
-  ["Note ownership", "User-held secrets"],
-  ["Transfer meaning", "Channel-local"],
-  ["Note provenance", "Not public by default"],
-  ["Disclosure", "User-controlled"],
+  ["Execution state", "DApp-scoped"],
+  ["Disclosure model", "DApp-defined"],
+  ["User material", "app-specific"],
+  ["Internal meaning", "not universal"],
 ];
 
 const dappFlow = [
@@ -59,17 +59,17 @@ const dappFlow = [
 ];
 
 const policySignals = [
-  ["Policy snapshot", "immutable"],
-  ["Verifier version", "v2.1 pinned"],
+  ["Immutable policy", "sealed"],
+  ["Verifier snapshot", "v2.1 pinned"],
   ["DApp metadata", "registered"],
   ["Accepted root", "0x44b7...a02c"],
 ];
 
 const observerRows = [
-  ["channel_id", "tonigma:private-state", "registry"],
+  ["channel_id", "dapp:registered-channel", "registry"],
   ["policy_snapshot", "sealed at 0x04", "observer"],
   ["transition_accepted", "0x8e41...d19a", "proof"],
-  ["nullifier_count", "128 indexed", "public"],
+  ["verifier_snapshot", "v2.1 pinned", "public"],
   ["mirror_sync", "current", "mirror"],
 ];
 
@@ -140,52 +140,33 @@ function BoundaryColumn({
   );
 }
 
-function TransformationMap() {
+function BrandBoundaryVisual() {
   return (
-    <div className="proof-map" aria-hidden="true">
-      <div className="proof-texture proof-texture--hero" />
-      <svg viewBox="0 0 860 360" role="img">
-        <defs>
-          <linearGradient id="edge" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0%" stopColor="#f7f7f2" stopOpacity="0.15" />
-            <stop offset="52%" stopColor="#1f8fff" stopOpacity="0.62" />
-            <stop offset="100%" stopColor="#ffffff" stopOpacity="0.92" />
-          </linearGradient>
-        </defs>
-        <path className="map-edge" d="M126 128 L306 82 L492 128 L704 180" />
-        <path className="map-edge" d="M126 232 L306 180 L492 232 L704 180" />
-        <path className="map-edge soft" d="M126 128 L306 180 L492 232" />
-        <path className="map-edge soft" d="M126 232 L306 278 L492 128" />
-        <path className="map-edge fine" d="M306 82 L492 232" />
-        <path className="map-edge fine" d="M306 278 L492 128" />
-        {[126, 126].map((x, index) => (
-          <circle
-            className="map-node input"
-            cx={x}
-            cy={index === 0 ? 128 : 232}
-            key={`input-${index}`}
-            r="18"
-          />
-        ))}
-        {[82, 180, 278].map((y) => (
-          <circle className="map-node expanded" cx="306" cy={y} key={y} r="14" />
-        ))}
-        {[128, 232].map((y) => (
-          <circle className="map-node committed" cx="492" cy={y} key={y} r="16" />
-        ))}
-        <path className="map-diamond" d="M704 140 L744 180 L704 220 L664 180 Z" />
-      </svg>
-      <div className="telemetry-strip">
+    <div className="hero-identity-surface" aria-hidden="true">
+      <div className="symbol-stage">
+        <Image
+          alt=""
+          className="hero-symbol"
+          height={720}
+          priority
+          src="/brand/tonigma-symbol-transparent.svg"
+          width={720}
+        />
+        <div className="symbol-shadow" />
+        <div className="proof-texture proof-texture--hero" />
+        <div className="boundary-beam" />
+      </div>
+      <div className="boundary-ledger">
         <div>
-          <span>accepted state</span>
+          <span>accepted root</span>
           <strong>0x8e41...d19a</strong>
         </div>
         <div>
-          <span>verifier</span>
+          <span>verifier snapshot</span>
           <strong>v2.1 pinned</strong>
         </div>
         <div>
-          <span>bridge edge</span>
+          <span>policy surface</span>
           <strong>observable</strong>
         </div>
       </div>
@@ -227,11 +208,11 @@ export default function Home() {
 
         <div className="hero-grid" id="top">
           <div className="hero-copy">
-            <span className="section-kicker">Transparent boundary, private state</span>
+            <span className="section-kicker">Validity-proven app channels</span>
             <h1>Tonigma</h1>
             <p>
-              Proof-backed application channels for DApps that need explicit
-              public boundaries and channel-local private state.
+              A product surface for DApps that need public proof boundaries,
+              observable policy, and Ethereum-settled verification.
             </p>
             <div className="hero-actions">
               <DisabledAction>Open Observer</DisabledAction>
@@ -239,14 +220,14 @@ export default function Home() {
             </div>
           </div>
 
-          <TransformationMap />
+          <BrandBoundaryVisual />
         </div>
 
         <div className="hero-status" aria-label="Observer-style status preview">
           <div>
             <Activity size={16} aria-hidden="true" />
             <span>channel id</span>
-            <strong>private-state</strong>
+            <strong>registered DApp</strong>
           </div>
           <div>
             <ShieldCheck size={16} aria-hidden="true" />
@@ -264,7 +245,7 @@ export default function Home() {
       <section className="section-shell intro-section">
         <div className="section-heading">
           <span className="section-kicker">What Tonigma is</span>
-          <h2>A product surface for DApp-specific private app channels.</h2>
+          <h2>A product surface for DApp-specific proof channels.</h2>
         </div>
         <div className="statement-grid">
           <article>
@@ -285,10 +266,10 @@ export default function Home() {
           </article>
           <article>
             <LockKeyhole aria-hidden="true" size={24} />
-            <h3>DApp-defined privacy</h3>
+            <h3>DApp-defined policy</h3>
             <p>
-              Privacy behavior is scoped by each DApp rather than promised as
-              one universal property of the Tonigma brand.
+              Disclosure behavior and channel rules belong to each DApp rather
+              than one universal promise from the Tonigma brand.
             </p>
           </article>
         </div>
@@ -296,8 +277,8 @@ export default function Home() {
 
       <section className="section-shell boundary-section">
         <div className="section-heading">
-          <span className="section-kicker">Public edge / private state</span>
-          <h2>Public accountability where it matters, private state where the DApp defines it.</h2>
+          <span className="section-kicker">Public edge / channel state</span>
+          <h2>Public accountability where it matters, DApp-scoped state where policy defines it.</h2>
         </div>
         <div className="boundary-grid">
           <BoundaryColumn
@@ -309,7 +290,7 @@ export default function Home() {
             label="Channel state"
             privateSide
             rows={privateRows}
-            title="What stays scoped inside the app"
+            title="What belongs to the DApp model"
           />
         </div>
       </section>
@@ -465,7 +446,7 @@ export default function Home() {
           src="/brand/tonigma-square-logo.svg"
           width={64}
         />
-        <h2>Private app channels, made visible at the boundary.</h2>
+        <h2>App-specific proof channels, made visible at the boundary.</h2>
         <div className="hero-actions">
           <DisabledAction>Open Observer</DisabledAction>
           <DisabledAction variant="secondary">Read Docs</DisabledAction>

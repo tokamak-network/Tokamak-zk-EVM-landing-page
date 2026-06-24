@@ -62,18 +62,20 @@ main {
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
-  background: #050607;
+  background:
+    radial-gradient(circle at 78% 16%, rgba(255, 255, 255, 0.045), transparent 28%),
+    linear-gradient(180deg, #070809 0%, #030405 100%);
 }
 
 .site-background::after {
   position: absolute;
   inset: 0;
   content: "";
-  opacity: 0.18;
+  opacity: 0.12;
   background-image:
-    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.12) 0 0.5px, transparent 0.7px),
-    radial-gradient(circle at 80% 68%, rgba(255, 255, 255, 0.1) 0 0.45px, transparent 0.7px);
-  background-size: 7px 7px, 11px 11px;
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.12) 0 0.45px, transparent 0.65px),
+    radial-gradient(circle at 80% 68%, rgba(255, 255, 255, 0.08) 0 0.4px, transparent 0.65px);
+  background-size: 9px 9px, 13px 13px;
 }
 
 .background-layer {
@@ -84,93 +86,81 @@ main {
 }
 
 .background-layer--base {
-  opacity: 0.32;
+  opacity: 0.38;
   background-image:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(255, 255, 255, 0.026) 1px, transparent 1px),
-    linear-gradient(115deg, transparent 0 38%, rgba(31, 143, 255, 0.045) 38% 38.18%, transparent 38.18% 100%);
-  background-size: 96px 96px, 96px 96px, 520px 320px;
+    linear-gradient(116deg, transparent 0 42%, rgba(255, 255, 255, 0.035) 42% 42.1%, transparent 42.1% 100%),
+    linear-gradient(63deg, transparent 0 58%, rgba(31, 143, 255, 0.05) 58% 58.16%, transparent 58.16% 100%);
+  background-size: 640px 420px, 760px 460px;
   transform: translate3d(0, calc(var(--scroll-depth) * -18px), 0);
 }
 
-.background-layer--proof {
+.background-layer--proof-field {
   inset: 0;
-  opacity: 0.18;
-  color: rgba(255, 255, 255, 0.22);
-  font-family:
-    "Geist Mono",
-    "SFMono-Regular",
-    Consolas,
-    monospace;
-  font-size: 0.82rem;
-  letter-spacing: 0;
-  transform: translate3d(calc(var(--scroll-depth) * -10px), calc(var(--scroll-depth) * -28px), 0);
+  color: rgba(255, 255, 255, 0.032);
+  font-size: clamp(8rem, 18vw, 18rem);
+  font-weight: 820;
+  line-height: 0.8;
+  opacity: 0.45;
+  overflow: hidden;
+  transform: translate3d(calc(var(--scroll-depth) * -10px), calc(var(--scroll-depth) * -24px), 0);
 }
 
-.background-layer--proof span {
+.background-layer--proof-field span {
   position: absolute;
-  padding: 6px 8px;
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
-  opacity: 0.62;
-}
-
-.background-layer--proof span:nth-child(1) {
-  top: 18%;
-  left: 9%;
-}
-
-.background-layer--proof span:nth-child(2) {
-  top: 52%;
-  right: 12%;
-}
-
-.background-layer--proof span:nth-child(3) {
-  bottom: 14%;
-  left: 44%;
-}
-
-.background-layer--graph-mid,
-.background-layer--graph-near {
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.background-layer--graph-mid {
+  display: block;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.32) 0 1px, transparent 1px 8px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.18) 0 1px, transparent 1px 13px);
+  background-clip: text;
+  color: transparent;
   opacity: 0.28;
-  stroke: rgba(31, 143, 255, 0.34);
-  transform: translate3d(calc(var(--scroll-depth) * -32px), calc(var(--scroll-depth) * -78px), 0);
 }
 
-.background-layer--graph-mid path,
-.background-layer--graph-near path {
-  stroke-width: 1;
+.background-layer--proof-field span:nth-child(1) {
+  top: 10%;
+  left: 18%;
+  transform: rotate(-4deg);
 }
 
-.background-layer--graph-mid circle,
-.background-layer--graph-near circle {
-  fill: #050607;
-  stroke-width: 1.5;
+.background-layer--proof-field span:nth-child(2) {
+  right: -4%;
+  bottom: 14%;
+  transform: rotate(3deg);
 }
 
-.background-layer--graph-near {
-  opacity: 0.42;
-  stroke: rgba(255, 255, 255, 0.32);
-  transform: translate3d(calc(var(--scroll-depth) * 42px), calc(var(--scroll-depth) * -124px), 0);
+.background-layer--symbol-far,
+.background-layer--symbol-near {
+  background-image: url("/brand/tonigma-symbol-transparent.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.055;
+}
+
+.background-layer--symbol-far {
+  inset: auto auto 0% -16%;
+  width: min(520px, 42vw);
+  aspect-ratio: 1;
+  filter: blur(1px);
+  transform: translate3d(calc(var(--scroll-depth) * -28px), calc(var(--scroll-depth) * -58px), 0) rotate(-3deg);
+}
+
+.background-layer--symbol-near {
+  inset: 5% -17% auto auto;
+  width: min(620px, 46vw);
+  aspect-ratio: 1;
+  opacity: 0.055;
+  transform: translate3d(calc(var(--scroll-depth) * 38px), calc(var(--scroll-depth) * -118px), 0) rotate(3deg);
 }
 
 .background-layer--surface {
   inset: auto;
-  top: 18%;
+  top: 17%;
   left: auto;
   right: 4%;
   width: min(360px, 32vw);
   height: auto;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  opacity: 0.28;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  opacity: 0.2;
   background: rgba(5, 6, 7, 0.66);
   backdrop-filter: blur(10px);
   transform: translate3d(calc(var(--scroll-depth) * -70px), calc(var(--scroll-depth) * -154px), 0);
@@ -295,9 +285,9 @@ main {
 
 .hero-grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.82fr) minmax(560px, 1.18fr);
+  grid-template-columns: minmax(0, 0.9fr) minmax(520px, 1.1fr);
   align-items: center;
-  gap: 28px;
+  gap: 36px;
 }
 
 .hero-copy {
@@ -365,102 +355,89 @@ p {
   margin-top: 30px;
 }
 
-.proof-map {
+.hero-identity-surface {
   position: relative;
-  min-height: 500px;
-  margin-right: -64px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035), transparent 1px);
-  background-size: 100% 70px, 86px 100%;
+  min-height: 520px;
+  margin-right: -24px;
   overflow: visible;
 }
 
-.proof-map::before,
-.proof-map::after {
+.symbol-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 88%, transparent);
+}
+
+.symbol-stage::before,
+.symbol-stage::after {
   position: absolute;
   content: "";
   pointer-events: none;
 }
 
-.proof-map::before {
-  inset: 20px 28px 84px 8px;
+.symbol-stage::before {
+  inset: 11% 5% 18% 14%;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   background:
-    linear-gradient(90deg, rgba(31, 143, 255, 0.12), transparent 1px),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 1px);
-  background-size: 130px 100%, 100% 72px;
-  mask-image: linear-gradient(90deg, transparent, #000 18%, #000 84%, transparent);
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 30%, transparent 70%, rgba(255, 255, 255, 0.035));
+  opacity: 0.42;
 }
 
-.proof-map::after {
-  right: 64px;
-  bottom: 94px;
-  width: 120px;
-  height: 120px;
-  border: 1px solid rgba(255, 255, 255, 0.24);
+.symbol-stage::after {
+  right: 16%;
+  top: 36%;
+  width: 108px;
+  height: 108px;
+  border: 1px solid rgba(255, 255, 255, 0.36);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.16), transparent 54%),
+    rgba(255, 255, 255, 0.025);
   transform: rotate(45deg);
-  opacity: 0.22;
+  animation: endpoint-settle 5200ms ease-in-out 1200ms infinite;
+  filter: drop-shadow(0 0 28px rgba(255, 255, 255, 0.14));
 }
 
-.proof-map svg {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  height: 410px;
-  display: block;
-  margin-top: 18px;
+.hero-symbol {
+  position: absolute;
+  top: 52%;
+  right: 4%;
+  width: min(450px, 42vw);
+  height: auto;
+  opacity: 0.94;
+  transform: translateY(-50%) scale(1);
+  animation: symbol-resolve 1200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  filter: drop-shadow(0 28px 80px rgba(0, 0, 0, 0.46));
 }
 
-.map-edge {
-  fill: none;
-  stroke: url("#edge");
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-dasharray: 680;
-  animation:
-    draw-edge 1400ms cubic-bezier(0.22, 1, 0.36, 1) both,
-    line-breathe 5200ms ease-in-out 1600ms infinite;
+.symbol-shadow {
+  position: absolute;
+  inset: 15% 12% 16% 26%;
+  background:
+    radial-gradient(circle at 72% 48%, rgba(255, 255, 255, 0.1), transparent 28%),
+    linear-gradient(90deg, transparent, rgba(31, 143, 255, 0.075), transparent);
+  filter: blur(34px);
 }
 
-.map-edge.soft {
-  opacity: 0.58;
-  stroke-width: 1.2;
+.boundary-beam {
+  position: absolute;
+  left: 10%;
+  right: 13%;
+  bottom: 24%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(31, 143, 255, 0.55), rgba(255, 255, 255, 0.62), transparent);
+  transform-origin: left center;
+  animation: beam-resolve 1200ms cubic-bezier(0.22, 1, 0.36, 1) 220ms both;
 }
 
-.map-edge.fine {
-  opacity: 0.35;
-  stroke-width: 0.8;
-}
-
-.map-node {
-  fill: #050607;
-  stroke: rgba(255, 255, 255, 0.82);
-  stroke-width: 2;
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.08));
-}
-
-.map-node.expanded {
-  stroke: rgba(31, 143, 255, 0.8);
-}
-
-.map-node.committed {
-  stroke: rgba(127, 231, 178, 0.84);
-}
-
-.map-diamond {
-  fill: rgba(255, 255, 255, 0.06);
-  stroke: rgba(255, 255, 255, 0.92);
-  stroke-width: 2;
-  animation: endpoint-settle 4200ms ease-in-out 1200ms infinite;
-  filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.18));
-}
-
-.telemetry-strip {
+.boundary-ledger {
   position: absolute;
   z-index: 2;
-  left: 42px;
-  right: 82px;
-  bottom: 36px;
+  left: 12%;
+  right: 14%;
+  bottom: 20px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   border: 1px solid rgba(255, 255, 255, 0.13);
@@ -469,17 +446,17 @@ p {
   animation: surface-reveal 900ms ease-out 900ms both;
 }
 
-.telemetry-strip div {
+.boundary-ledger div {
   min-width: 0;
   padding: 14px 16px;
   border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.telemetry-strip div:last-child {
+.boundary-ledger div:last-child {
   border-right: 0;
 }
 
-.telemetry-strip span,
+.boundary-ledger span,
 .hero-status span,
 .boundary-row span,
 .observer-row span,
@@ -492,7 +469,7 @@ p {
   letter-spacing: 0.08em;
 }
 
-.telemetry-strip strong,
+.boundary-ledger strong,
 .hero-status strong,
 .boundary-row strong,
 .observer-row strong {
@@ -514,15 +491,15 @@ p {
   position: absolute;
   pointer-events: none;
   background-image:
-    linear-gradient(90deg, transparent 0 8%, rgba(255, 255, 255, 0.18) 8% 8.2%, transparent 8.2% 100%),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px 9px);
-  background-size: 280px 120px, 100% 100%;
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.2) 0 1px, transparent 1px 9px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 17px);
+  background-size: 100% 100%;
   mask-image: linear-gradient(90deg, transparent, #000 24%, #000 72%, transparent);
-  opacity: 0.11;
+  opacity: 0.12;
 }
 
 .proof-texture--hero {
-  inset: 44px 60px 96px 40px;
+  inset: 13% 12% 22% 28%;
   transform: skewX(-8deg);
 }
 
@@ -935,27 +912,6 @@ p {
   max-width: 780px;
 }
 
-@keyframes draw-edge {
-  from {
-    stroke-dashoffset: 680;
-  }
-
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes line-breathe {
-  0%,
-  100% {
-    opacity: 0.82;
-  }
-
-  50% {
-    opacity: 1;
-  }
-}
-
 @keyframes endpoint-settle {
   0%,
   100% {
@@ -966,6 +922,30 @@ p {
   50% {
     stroke-opacity: 1;
     filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.28));
+  }
+}
+
+@keyframes symbol-resolve {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.98);
+  }
+
+  to {
+    opacity: 0.94;
+    transform: translateY(-50%) scale(1.02);
+  }
+}
+
+@keyframes beam-resolve {
+  from {
+    opacity: 0;
+    transform: scaleX(0.2);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleX(1);
   }
 }
 
@@ -991,13 +971,21 @@ p {
     gap: 34px;
   }
 
-  .proof-map {
+  .hero-identity-surface {
     min-height: 320px;
     margin-right: 0;
   }
 
-  .proof-map svg {
-    height: 300px;
+  .hero-symbol {
+    right: 0;
+    width: min(520px, 92vw);
+  }
+
+  .symbol-stage::after {
+    right: 12%;
+    top: 32%;
+    width: 96px;
+    height: 96px;
   }
 
   .brand-lockup {
@@ -1039,6 +1027,7 @@ p {
   .hero {
     min-height: auto;
     padding-bottom: 28px;
+    gap: 20px;
   }
 
   .topbar {
@@ -1064,27 +1053,27 @@ p {
     font-size: 1.05rem;
   }
 
-  .proof-map {
-    min-height: 260px;
+  .hero-identity-surface {
+    min-height: 220px;
     margin-right: 0;
-    background-size: 100% 58px, 74px 100%;
   }
 
-  .proof-map svg {
-    height: 230px;
-    transform: scale(1.08);
-    transform-origin: center center;
+  .hero-symbol {
+    width: min(360px, 104vw);
+    transform: translateY(-50%) translateX(8%) scale(1);
   }
 
-  .proof-map::before {
-    inset: 14px 12px 72px;
+  .symbol-stage {
+    mask-image: linear-gradient(90deg, transparent, #000 4%, #000 94%, transparent);
   }
 
-  .proof-map::after {
-    right: 34px;
-    bottom: 88px;
-    width: 72px;
-    height: 72px;
+  .symbol-stage::before {
+    inset: 12% 0 18% 0;
+  }
+
+  .symbol-stage::after {
+    width: 56px;
+    height: 56px;
   }
 
   .statement-grid,
@@ -1096,25 +1085,25 @@ p {
     grid-template-columns: 1fr;
   }
 
-  .telemetry-strip {
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
+  .boundary-ledger {
+    left: 10px;
+    right: 10px;
+    bottom: 8px;
   }
 
-  .telemetry-strip div,
+  .boundary-ledger div,
   .hero-status div {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  .telemetry-strip div {
+  .boundary-ledger div {
     min-width: 0;
-    padding: 10px 8px;
+    padding: 9px 8px;
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     border-bottom: 0;
   }
 
-  .telemetry-strip div:last-child {
+  .boundary-ledger div:last-child {
     border-right: 0;
   }
 
@@ -1145,7 +1134,7 @@ p {
   }
 
   .intro-section {
-    padding-top: 36px;
+    padding-top: 20px;
   }
 
   .boundary-column {
@@ -1187,7 +1176,7 @@ p {
   }
 
   h1 {
-    font-size: 3.35rem;
+    font-size: 3.18rem;
   }
 
   h2 {
@@ -1199,6 +1188,14 @@ p {
   .control-grid article,
   .resource-card {
     min-height: auto;
+  }
+
+  .hero-identity-surface {
+    min-height: 190px;
+  }
+
+  .hero-actions {
+    margin-top: 24px;
   }
 }
 
@@ -1215,9 +1212,10 @@ p {
     transform: none !important;
   }
 
-  .map-edge,
-  .map-diamond,
-  .telemetry-strip {
+  .symbol-stage::after,
+  .hero-symbol,
+  .boundary-beam,
+  .boundary-ledger {
     animation: none !important;
   }
 }
