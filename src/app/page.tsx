@@ -73,6 +73,7 @@ export default function Home() {
           </p>
           <div className="hero-actions">
             <DisabledAction>Explore DApps</DisabledAction>
+            <DisabledAction>See How It Works</DisabledAction>
           </div>
         </div>
       </section>
