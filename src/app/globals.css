@@ -179,6 +179,7 @@ main {
 
 .hero-copy {
   align-self: center;
+  width: 100%;
   max-width: 640px;
 }
 
@@ -195,7 +196,7 @@ main {
 }
 
 .hero-wordmark {
-  width: min(620px, 100%);
+  width: min(620px, calc(100vw - 48px));
   margin-top: 22px;
   line-height: 1;
 }
@@ -223,10 +224,15 @@ p {
 
 .hero-copy p {
   margin-top: 22px;
-  max-width: 560px;
+  max-width: 620px;
   color: #d6d9dd;
   font-size: 1.18rem;
   line-height: 1.58;
+}
+
+.hero-lines span {
+  display: block;
+  white-space: nowrap;
 }
 
 .hero-actions {
@@ -334,6 +340,14 @@ code {
     font-size: 1.05rem;
   }
 
+  .hero-wordmark {
+    width: calc(100vw - 32px);
+  }
+
+  .hero-actions {
+    width: 100%;
+  }
+
   .hero-actions .action {
     width: 100%;
   }
@@ -358,12 +372,18 @@ code {
 }
 
 @media (max-width: 460px) {
-  .hero-wordmark {
-    width: min(100%, 358px);
+  .hero-copy .hero-lines {
+    font-size: 0.98rem;
   }
 
   h2 {
     font-size: 1.86rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .hero-copy .hero-lines {
+    font-size: 0.86rem;
   }
 }
 

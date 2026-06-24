@@ -66,9 +66,10 @@ export default function Home() {
               width={2558}
             />
           </h1>
-          <p>
-            A product surface for DApps that need public proof boundaries,
-            observable policy, and Ethereum-settled verification.
+          <p className="hero-lines">
+            <span>Run decentralized apps on your own device.</span>
+            <span>Generate your own proofs.</span>
+            <span>Verify on Ethereum.</span>
           </p>
           <div className="hero-actions">
             <DisabledAction>Explore DApps</DisabledAction>
