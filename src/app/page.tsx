@@ -21,10 +21,11 @@ import Image from "next/image";
 import { ParallaxBackground } from "./parallax-background";
 
 const publicRows = [
-  ["Bridge deposit", "Observable"],
-  ["Channel join", "Policy-bound"],
-  ["Accepted transition", "Proof-backed"],
-  ["Withdrawal", "Ethereum-settled"],
+  ["Bridge edge", "ETH-visible"],
+  ["Channel join", "policy 0x04"],
+  ["Accepted state", "0x8e41...d19a"],
+  ["Nullifier set", "public index"],
+  ["Withdrawal", "settled"],
 ];
 
 const privateRows = [
@@ -40,8 +41,8 @@ const dappFlow = [
     text: "A user joins a DApp-specific channel and funds the public bridge edge.",
   },
   {
-    title: "Hold private-state notes",
-    text: "Inside the DApp, balances become channel-local notes instead of public account rows.",
+    title: "Mint private-state notes",
+    text: "Inside the DApp, deposits can become channel-local notes instead of public account rows.",
   },
   {
     title: "Transfer inside the app",
@@ -52,16 +53,24 @@ const dappFlow = [
     text: "Viewing keys and backups support recovery and selective disclosure without a master viewing key.",
   },
   {
-    title: "Exit through Ethereum",
-    text: "Redemption and withdrawal return to the public settlement boundary.",
+    title: "Redeem and exit",
+    text: "Notes can be redeemed through the DApp flow before withdrawal returns to the public boundary.",
   },
 ];
 
 const policySignals = [
-  ["Channel policy", "Immutable snapshot"],
-  ["Verifier", "Pinned version"],
-  ["Transition", "Accepted after proof"],
-  ["Mirror", "Public boundary surface"],
+  ["Policy snapshot", "immutable"],
+  ["Verifier version", "v2.1 pinned"],
+  ["DApp metadata", "registered"],
+  ["Accepted root", "0x44b7...a02c"],
+];
+
+const observerRows = [
+  ["channel_id", "tonigma:private-state", "registry"],
+  ["policy_snapshot", "sealed at 0x04", "observer"],
+  ["transition_accepted", "0x8e41...d19a", "proof"],
+  ["nullifier_count", "128 indexed", "public"],
+  ["mirror_sync", "current", "mirror"],
 ];
 
 const resources = [
@@ -134,6 +143,7 @@ function BoundaryColumn({
 function TransformationMap() {
   return (
     <div className="proof-map" aria-hidden="true">
+      <div className="proof-texture proof-texture--hero" />
       <svg viewBox="0 0 860 360" role="img">
         <defs>
           <linearGradient id="edge" x1="0" x2="1" y1="0" y2="0">
@@ -167,16 +177,16 @@ function TransformationMap() {
       </svg>
       <div className="telemetry-strip">
         <div>
-          <span>transition</span>
+          <span>accepted state</span>
           <strong>0x8e41...d19a</strong>
         </div>
         <div>
-          <span>policy</span>
-          <strong>sealed</strong>
+          <span>verifier</span>
+          <strong>v2.1 pinned</strong>
         </div>
         <div>
-          <span>verifier</span>
-          <strong>active</strong>
+          <span>bridge edge</span>
+          <strong>observable</strong>
         </div>
       </div>
     </div>
@@ -198,6 +208,14 @@ export default function Home() {
               priority
               sizes="(max-width: 760px) 176px, 202px"
               src="/brand/tonigma-logo.png"
+            />
+            <Image
+              alt="Tonigma"
+              className="brand-symbol"
+              height={42}
+              priority
+              src="/brand/tonigma-square-logo.svg"
+              width={42}
             />
           </a>
           <div className="nav-actions" aria-label="Inactive page actions">
@@ -227,18 +245,18 @@ export default function Home() {
         <div className="hero-status" aria-label="Observer-style status preview">
           <div>
             <Activity size={16} aria-hidden="true" />
-            <span>channel health</span>
-            <strong>stable</strong>
+            <span>channel id</span>
+            <strong>private-state</strong>
           </div>
           <div>
             <ShieldCheck size={16} aria-hidden="true" />
             <span>latest proof</span>
-            <strong>accepted</strong>
+            <strong>accepted 0x8e41</strong>
           </div>
           <div>
             <RadioTower size={16} aria-hidden="true" />
-            <span>public edge</span>
-            <strong>observable</strong>
+            <span>mirror sync</span>
+            <strong>current</strong>
           </div>
         </div>
       </section>
@@ -319,6 +337,7 @@ export default function Home() {
 
       <section className="section-shell engine-section">
         <div className="engine-visual">
+          <div className="proof-texture proof-texture--engine" />
           <div className="engine-node-stack">
             <span />
             <span />
@@ -371,15 +390,13 @@ export default function Home() {
             <Eye aria-hidden="true" size={28} />
           </div>
           <div className="observer-rows">
-            {["channel_registered", "policy_snapshot", "transition_accepted", "mirror_synced"].map(
-              (event, index) => (
-                <div className="observer-row" key={event}>
-                  <span>{event}</span>
-                  <strong>{index === 2 ? "0x8e41...d19a" : "current"}</strong>
-                  <em>{index === 0 ? "registry" : "observer"}</em>
-                </div>
-              ),
-            )}
+            {observerRows.map(([event, value, source]) => (
+              <div className="observer-row" key={event}>
+                <span>{event}</span>
+                <strong>{value}</strong>
+                <em>{source}</em>
+              </div>
+            ))}
           </div>
         </div>
       </section>
