@@ -55,7 +55,17 @@ export default function Home() {
 
         <div className="hero-copy" id="top">
           <span className="section-kicker">Validity-proven app channels</span>
-          <h1>Tonigma</h1>
+          <h1 className="hero-wordmark" aria-label="Tonigma">
+            <Image
+              alt=""
+              aria-hidden="true"
+              height={371}
+              priority
+              sizes="(max-width: 760px) calc(100vw - 32px), 620px"
+              src="/brand/tonigma-wordmark-white.svg"
+              width={2558}
+            />
+          </h1>
           <p>
             A product surface for DApps that need public proof boundaries,
             observable policy, and Ethereum-settled verification.

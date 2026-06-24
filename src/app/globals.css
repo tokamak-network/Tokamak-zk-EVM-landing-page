@@ -194,12 +194,16 @@ main {
   letter-spacing: 0.09em;
 }
 
-h1 {
-  margin-top: 18px;
-  color: var(--foreground);
-  font-size: 6.5rem;
-  line-height: 0.94;
-  font-weight: 760;
+.hero-wordmark {
+  width: min(620px, 100%);
+  margin-top: 22px;
+  line-height: 1;
+}
+
+.hero-wordmark img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 h2 {
@@ -321,10 +325,6 @@ code {
     justify-content: space-between;
   }
 
-  h1 {
-    font-size: 4.15rem;
-  }
-
   h2 {
     font-size: 2.2rem;
     line-height: 1.08;
@@ -358,8 +358,8 @@ code {
 }
 
 @media (max-width: 460px) {
-  h1 {
-    font-size: 3.18rem;
+  .hero-wordmark {
+    width: min(100%, 358px);
   }
 
   h2 {
