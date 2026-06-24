@@ -101,15 +101,13 @@ main {
 
 .background-layer--math-far,
 .background-layer--math-near {
-  inset: auto -18vw -8vh auto;
-  width: min(94vw, 1360px);
-  height: min(88vh, 900px);
+  inset: -18vh -24vw -18vh 22vw;
   background-image: url("/textures/math-layer.png");
   background-repeat: no-repeat;
-  background-position: center;
+  background-position: right center;
   background-size: cover;
   mix-blend-mode: screen;
-  mask-image: radial-gradient(ellipse at 62% 58%, #000 0 20%, rgba(0, 0, 0, 0.72) 48%, rgba(0, 0, 0, 0.28) 74%, transparent 96%);
+  mask-image: radial-gradient(ellipse at 72% 56%, #000 0 22%, rgba(0, 0, 0, 0.7) 50%, rgba(0, 0, 0, 0.24) 76%, transparent 98%);
 }
 
 .background-layer--math-far {
@@ -118,9 +116,7 @@ main {
 }
 
 .background-layer--math-near {
-  inset: 28vh -24vw auto auto;
-  width: min(78vw, 1120px);
-  height: min(68vh, 720px);
+  inset: -10vh -34vw -22vh 36vw;
   opacity: 0.046;
   transform: translate3d(calc(var(--scroll-depth) * 28px), calc(var(--scroll-depth) * -96px), 0) rotate(1deg);
 }
@@ -348,10 +344,8 @@ code {
 
   .background-layer--math-far,
   .background-layer--math-near {
-    inset: 30vh -76vw auto auto;
-    width: 170vw;
-    height: 96vh;
-    mask-image: radial-gradient(ellipse at 64% 64%, #000 0 18%, rgba(0, 0, 0, 0.62) 44%, rgba(0, 0, 0, 0.18) 72%, transparent 98%);
+    inset: -8vh -92vw -24vh 18vw;
+    mask-image: radial-gradient(ellipse at 74% 66%, #000 0 18%, rgba(0, 0, 0, 0.6) 46%, rgba(0, 0, 0, 0.18) 72%, transparent 98%);
   }
 
   .background-layer--math-far {
