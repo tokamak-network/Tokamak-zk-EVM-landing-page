@@ -2,6 +2,14 @@
 
 import { useEffect } from "react";
 
+const backgroundFormulas = [
+  "σ₁ = (α, β, δ, {xʰ}h=0ⁿ⁻¹, {γ⁻¹oᵢ(x)}i=0ˡ⁻¹)",
+  "O_prv := δ⁻¹(A + U*α + V*α² + W*α³ + B*α⁴ - ηO_mid - O_pub)",
+  "P_g→h(θ) := ∏(d + ωYʰθ₀ + ωʲθ₁ + θ₂) / ∏(d + ωYᵍθ₀ + ωʲθ₁ + θ₂)",
+  "R_xyG - R′xyF = r(χ, ζ)g(x, y) - r(ωm⁻¹χ, ζ)f(x, y)",
+  "Πχ := (x - χ)⁻¹(P_A + κ₁(V* - V*x,y) + κ₁²P_C)",
+];
+
 export function ParallaxBackground() {
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -42,11 +50,15 @@ export function ParallaxBackground() {
     <div aria-hidden="true" className="site-background">
       <div className="background-layer background-layer--base" />
       <div className="background-layer background-layer--proof-field">
-        <span>TONIGMA</span>
-        <span>TONIGMA</span>
+        {backgroundFormulas.slice(0, 3).map((formula) => (
+          <span key={formula}>{formula}</span>
+        ))}
       </div>
-      <div className="background-layer background-layer--symbol-far" />
-      <div className="background-layer background-layer--symbol-near" />
+      <div className="background-layer background-layer--formula-mid">
+        {backgroundFormulas.slice(2).map((formula) => (
+          <span key={formula}>{formula}</span>
+        ))}
+      </div>
       <div className="background-layer background-layer--surface">
         <div>
           <span>policy</span>
