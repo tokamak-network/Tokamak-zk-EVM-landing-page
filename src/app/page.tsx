@@ -73,13 +73,6 @@ const observerRows = [
   ["mirror_sync", "current", "mirror"],
 ];
 
-const heroFormulaFragments = [
-  "Pr[ Verify(σ, a, π) = 1 ] = 1",
-  "e([LHS]₁ + [AUX]₁, [1]₂) = e([O_pub]₁, [γ]₂) · e([O_mid]₁, [η]₂)",
-  "P(T) := P_B(T) + κ₂LHS(T) + κ₂²(R(T) - R′x,y)",
-  "[ΠC,χ]₁ := [κ₁²(πC,χ(x) + πZK,χ(x)) + κ₁³π1,χ(x)]₁",
-];
-
 const resources = [
   {
     icon: GitBranch,
@@ -147,33 +140,6 @@ function BoundaryColumn({
   );
 }
 
-function MathProofField() {
-  return (
-    <div className="hero-proof-field" aria-hidden="true">
-      <div className="formula-stack">
-        {heroFormulaFragments.map((formula) => (
-          <span key={formula}>{formula}</span>
-        ))}
-      </div>
-      <div className="formula-axis" />
-      <div className="boundary-ledger">
-        <div>
-          <span>accepted root</span>
-          <strong>0x8e41...d19a</strong>
-        </div>
-        <div>
-          <span>verifier snapshot</span>
-          <strong>v2.1 pinned</strong>
-        </div>
-        <div>
-          <span>policy surface</span>
-          <strong>observable</strong>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function Home() {
   return (
     <main>
@@ -219,8 +185,6 @@ export default function Home() {
               <DisabledAction variant="secondary">Explore DApps</DisabledAction>
             </div>
           </div>
-
-          <MathProofField />
         </div>
 
         <div className="hero-status" aria-label="Observer-style status preview">
