@@ -403,3 +403,219 @@ The landing page should combine:
 - clear boundary language separating Tonigma's general DApp-channel model from the specific private-state note transfer DApp behavior
 
 The result should make a first-time visitor understand that Tonigma is infrastructure for DApps running in proof-backed private app channels without forcing them through a literal protocol lecture. The private-state note transfer DApp does not turn TON itself into an anonymous asset; it lets self-custody users opt into a private-state DApp channel with channel-local note state.
+
+## Design Revision Plan
+
+The first implementation pass establishes the page structure, copy hierarchy, responsive behavior, and technical stack. It should now be treated as a scaffold, not as the final design. The next pass must raise the visual system to the quality bar described above.
+
+### Current Assessment
+
+Satisfied:
+
+- The page introduces Tonigma as the service surface for Tokamak Private App Channels.
+- The `private-state` note transfer DApp is treated as one example DApp, not the definition of Tonigma.
+- The copy avoids anonymous-asset, untraceable-transfer, private-exchange, and operator-controlled-privacy claims.
+- The information architecture mostly follows the intended order: hero, Tonigma model, public/private boundary, example DApp flow, proof engine, policy, observer, user control, and resources.
+- The implementation uses a 2D scroll-linked background rather than WebGL, Three.js, or perspective-heavy 3D.
+- The CTAs are visually present but disabled while the design direction is still being decided.
+
+Not yet sufficient:
+
+- The hero visual is still too close to a bordered prototype panel. It does not yet feel like a full-bleed or wide unframed system map.
+- The background layers are mostly CSS line and grid primitives. They do not yet read as professionally art-directed illustration layers derived from the Tonigma symbol.
+- The proof-textured wordmark language is not yet extended beyond the logo itself.
+- The mobile top rail still uses the full wordmark instead of the square symbol as the compact brand mark.
+- The hero graph animates edge drawing, but it does not yet have a subtle idle state, endpoint sharpening, or proof-texture condensation.
+- Observer/status and policy surfaces are structurally present, but they do not yet feel like credible real product fragments.
+- The product surface layer in the parallax background is underdeveloped and does not yet move as an independent, subtle product fragment layer.
+
+### Revision Priorities
+
+1. Upgrade the hero from panel prototype to product-defining visual surface.
+2. Replace generic background primitives with art-directed Tonigma-symbol layers.
+3. Introduce proof texture in a controlled way without turning the page into a technical diagram.
+4. Make product fragments look operationally credible, not decorative.
+5. Add restrained motion states that reinforce proof acceptance and public boundary visibility.
+6. Preserve the current copy principles, CTA disabled state, and user-first information hierarchy.
+
+### Hero Visual Revision
+
+Change the primary hero visual from a bordered `proof-map` panel into a wide, unframed system map that shares the hero field with the headline.
+
+Required changes:
+
+- Remove the visual's card-like outer border as the dominant frame.
+- Let the node graph occupy the right side and partially extend behind or around the hero copy without reducing text contrast.
+- Preserve the left-to-right `2 -> 3 -> 2 -> 1` rhythm through node placement only.
+- Keep the diamond endpoint visible and visually sharper than the intermediate nodes.
+- Make the observer telemetry strip feel attached to the public boundary edge, not floating as fake code.
+- Ensure the next section still peeks into the first viewport on desktop and mobile.
+
+Acceptance criteria:
+
+- The hero no longer reads as text beside a dashboard card.
+- The graph reads as a branded proof-boundary surface.
+- There are no labels explaining compiler stages, layer count, qap-compiler, Synthesizer, R1CS, WASM, polynomial domains, matrix domains, commitment layers, or proof compression.
+
+### Background Layer Revision
+
+Replace the current mostly generic CSS grid/line background with a more deliberate five-layer composition.
+
+Layer requirements:
+
+- Layer 0: near-black base with a subtle static noise or proof-paper texture. The texture must be barely visible and must not create visual dirt.
+- Layer 1: far proof field with faint mathematical or proof-texture marks inspired by the Tonigma wordmark. It should move the slowest.
+- Layer 2: mid graph field with low-opacity Tonigma-symbol edges and node traces. It should preserve the hidden `2 -> 3 -> 2 -> 1` rhythm without exposing it as text.
+- Layer 3: near graph field with a small number of sharper nodes, short line segments, and a quiet diamond endpoint motif. It should move faster than layer 1 and layer 2.
+- Layer 4: product surface field with observer/status or policy fragments that drift independently but remain subtle.
+
+Implementation constraints:
+
+- Use SVG and CSS where possible.
+- Avoid canvas unless SVG performance is insufficient.
+- Keep all layers `pointer-events: none`.
+- Animate only `transform` and `opacity` during scroll.
+- Respect `prefers-reduced-motion` by freezing layer movement.
+- Avoid bokeh, random particles, starfields, gradient blobs, cheap glowing lines, and noisy animated textures.
+
+Acceptance criteria:
+
+- The background feels spatial and branded, not like a generic dark tech grid.
+- Each layer has a clearly different visual purpose and scroll speed.
+- The background never lowers copy contrast or visually collides with buttons, telemetry, or section headings.
+
+### Proof Texture Revision
+
+Extend the proof-textured identity beyond the logo without overexplaining it.
+
+Required changes:
+
+- Extract a sparse proof-texture treatment from the logo's math/wordmark character.
+- Use it as a masked or clipped texture in one or two places only: the hero field, proof engine section, or transition endpoint.
+- Do not place raw formula blocks as decorative code.
+- Do not expose internal compiler or circuit terminology in primary marketing sections.
+
+Acceptance criteria:
+
+- The page feels connected to the official Tonigma wordmark even when the logo is not visible.
+- The texture supports the idea of proof formation without reading as pasted math wallpaper.
+
+### Mobile Brand Revision
+
+Use the square Tonigma symbol as the compact mobile brand mark.
+
+Required changes:
+
+- Desktop top rail may keep the full standard wordmark.
+- Mobile top rail should use the square symbol or square symbol plus short wordmark treatment if legibility requires it.
+- The favicon and compact mark should use the square symbol.
+- The mobile brand treatment must not reduce recognition of `Tonigma` in the first viewport; the H1 still carries the product name.
+
+Acceptance criteria:
+
+- Mobile first viewport has a compact, polished brand rail.
+- The square symbol becomes part of the visible design system, not only a static asset in `public/brand`.
+
+### Product Surface Revision
+
+Make observer, policy, and channel-state fragments credible enough to look like real product surfaces.
+
+Required changes:
+
+- Replace generic rows with more specific but still non-sensitive examples: channel ID fragments, verifier version, policy snapshot state, accepted transition hash, nullifier count, bridge edge status, and mirror sync state.
+- Keep fake values obviously illustrative and avoid implying live data.
+- Use compact row spacing, monospaced hashes, status icons, and restrained labels.
+- Avoid nested cards.
+- Ensure these fragments support the public-boundary story rather than becoming decorative code blocks.
+
+Acceptance criteria:
+
+- Observer/status sections look like a sober monitoring surface.
+- Policy cards look like operational metadata, not marketing badges.
+- The user can understand what is public without being forced into protocol documentation.
+
+### Motion Revision
+
+Motion must reinforce verification and boundary visibility.
+
+Required changes:
+
+- Keep the initial left-to-right edge draw.
+- Add a subtle idle state after load: low-amplitude endpoint pulse, line emphasis shift, or opacity breathing.
+- Sharpen or brighten the diamond endpoint after the graph resolves.
+- Allow observer/status rows to reveal one accepted state gently; do not animate like high-frequency trading.
+- Keep all motion restrained and disable it for reduced-motion users.
+
+Acceptance criteria:
+
+- The graph feels purposeful, not playful.
+- No nodes bounce.
+- Motion does not distract from hero copy or CTA affordances.
+
+### Typography And Layout Revision
+
+Retain the current high-contrast black-and-white direction, but improve polish.
+
+Required changes:
+
+- Keep `Tonigma` as the H1.
+- Keep supporting copy to one concise line or two short lines.
+- Avoid viewport-scaled typography and negative letter spacing.
+- Avoid oversized pill clusters.
+- Ensure all button text, labels, telemetry, and cards fit on small mobile widths.
+- Avoid placing cards inside cards.
+
+Acceptance criteria:
+
+- Desktop feels spacious and institution-grade.
+- Mobile feels dense but not cramped.
+- The first viewport never reads as a poster with no next-section hint.
+
+### Section Revision
+
+The section order should remain the same, but visual execution should become more product-like.
+
+Section-specific changes:
+
+- `What Tonigma Is`: keep the three statements, but make them more typographic and less generic-card-like.
+- `Public Edge / Private State`: strengthen the contrast between observable public events and user-held private state without using secrecy tropes.
+- `Example DApp Flow`: keep user value first. Add `mint notes` and `redeem` explicitly if the flow text has room, but do not turn it into a protocol manual.
+- `Underlying Proof Engine`: make the visual motif more elegant and less like a simplified diagram box.
+- `Proof And Policy`: include immutable policy, verifier snapshot, DApp metadata, and accepted transition indicators.
+- `Observer And Mirror`: center the story on accountability, recovery, and public boundary surfaces.
+- `User Control In Private-State`: keep spending key, viewing key, wallet backup, selective disclosure, and no master viewing key.
+- `Developer / Operator Resources`: keep it visually quieter than the user/product sections.
+
+Acceptance criteria:
+
+- The page remains user-first while still satisfying protocol/product evaluators.
+- Developer detail is available but does not dominate the brand story.
+
+### Validation Checklist For The Next Design Pass
+
+Before accepting the next implementation pass, verify:
+
+- Desktop viewport renders the hero with a visible next-section hint.
+- Mobile viewport renders the hero with a visible next-section hint.
+- No horizontal overflow exists at common widths: 390, 768, 1024, 1440.
+- Production build has no browser console errors or warnings.
+- Reduced-motion mode freezes scroll-linked motion and keeps the page visually coherent.
+- The hero visual is unframed or only minimally bounded by the overall composition.
+- The background has five intentional layers with distinct roles.
+- The square symbol appears as the mobile compact brand mark.
+- Product fragments look credible and are not random rectangles or fake code decoration.
+- The page contains no prohibited privacy or anonymity claims.
+- The page contains no literal symbol-layer explanation in user-facing copy.
+- The page remains English-only.
+
+### Implementation Order
+
+1. Refactor hero layout and remove the card-like hero visual frame.
+2. Build the revised SVG/CSS background layer system.
+3. Add the proof-texture treatment derived from the Tonigma identity.
+4. Replace product fragments with more credible observer, policy, and channel-state surfaces.
+5. Add restrained graph and endpoint motion with reduced-motion support.
+6. Switch mobile top rail to the square symbol treatment.
+7. Re-check copy against the prohibited-claims list.
+8. Run desktop and mobile browser verification.
+9. Run a focused over-engineering review before adding any new abstraction.
