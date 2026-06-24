@@ -619,3 +619,137 @@ Before accepting the next implementation pass, verify:
 7. Re-check copy against the prohibited-claims list.
 8. Run desktop and mobile browser verification.
 9. Run a focused over-engineering review before adding any new abstraction.
+
+## Owner Review Correction
+
+This section records the owner review after the design revision pass. It supersedes any weaker interpretation of the earlier design revision plan.
+
+### Owner Critique
+
+The current visual direction still fails the required quality bar. The image elements and background do not read as professional brand illustration. They look low-grade, improvised, and visually unsophisticated rather than like work produced by a professional illustrator or motion designer.
+
+The issue is not a small polish problem. The current hero graphics, background treatment, and abstract node-line surfaces should be treated as design rejects, not as assets to incrementally refine.
+
+There is also a positioning error in the current copy hierarchy:
+
+- `private state` must not be treated as a Tonigma brand keyword.
+- `private-state` identifies one Tonigma DApp: the `private-state` note transfer DApp.
+- Tonigma itself should be positioned around app-specific, validity-proven channels, public proof boundaries, observer/accountability surfaces, DApp-defined policy, and Ethereum-settled verification.
+- `private-state`, `private-state notes`, and channel-local note behavior belong inside the example DApp section, not in the hero or top-level Tonigma brand promise.
+
+This critique is accepted as valid and must drive the next implementation pass.
+
+### Immediate Correction Principles
+
+The next pass must not continue polishing the existing visual system. It must replace the weak hero/background art direction and correct the Tonigma/private-state messaging boundary.
+
+Corrective principles:
+
+- Treat the current hero graph, generic background grid, and decorative telemetry surfaces as disposable.
+- Remove any visual element that looks like a quick technical sketch, generic ZK network diagram, or low-grade generated decoration.
+- Make fewer, stronger visual choices based on official Tonigma assets and symbol geometry.
+- Use product surfaces only when they look like credible real interfaces.
+- Keep the page calm, precise, and product-grade.
+- Do not use visual complexity to compensate for weak art direction.
+- Do not use fallback visual decoration to hide unresolved design quality problems.
+
+### Tonigma Positioning Correction
+
+Top-level Tonigma copy should emphasize:
+
+- app-specific channels
+- validity-proven execution
+- public proof boundaries
+- observer/accountability surfaces
+- DApp-defined policy and disclosure models
+- Ethereum-settled custody, verification, and settlement
+
+Top-level Tonigma copy should avoid:
+
+- `private state` as a brand-defining phrase
+- `private-state` outside the example DApp context
+- privacy-first positioning that makes Tonigma sound like a generic privacy product
+- claims that imply Tonigma itself provides one universal privacy model
+
+Allowed top-level headline/supporting-copy directions:
+
+- `Verifiable app channels with public proof boundaries.`
+- `Proof-backed app channels for DApps with accountable public edges.`
+- `A product surface for validity-proven DApp channels.`
+- `App-specific channels with public verification and observable boundaries.`
+
+Do not use `Transparent Boundary, Private State` as public-facing hero copy. It can remain an internal design concept only if it does not leak into the brand message.
+
+### Private-State DApp Copy Boundary
+
+The `private-state` note transfer DApp should be introduced only as an example Tonigma DApp.
+
+Within that example section, the copy may explain:
+
+- what users get from the DApp
+- what users can expect when they opt into that DApp
+- channel-local private-state notes
+- encrypted note delivery events
+- user-held spending and viewing material
+- recovery and selective disclosure
+- public Ethereum entry and exit
+- why the DApp behavior is technically possible at an abstract level
+
+The example DApp section must first explain user value, then expectations, then the abstract technical reason. It must not start with protocol internals.
+
+### Visual Reset Plan
+
+The current hero and background should be redesigned from first principles.
+
+Hero reset:
+
+- Remove the current node-line hero illustration unless it can be rebuilt to a professional illustration quality.
+- Start from the official Tonigma square symbol and standard logo.
+- Use the square symbol's geometry as the primary visual grammar, not as a literal technical diagram.
+- Consider a large, restrained symbol-led composition instead of a sprawling graph.
+- Use a minimal observer/status boundary strip only if it looks like a real product surface.
+- Keep the H1 as `Tonigma`.
+- Replace top-level copy that says or implies `private state` as a Tonigma promise.
+
+Background reset:
+
+- Remove generic grid, random node-line fragments, and decorative telemetry-like background elements.
+- Use a near-black field with a minimal, carefully controlled texture.
+- Use at most one or two symbol-derived geometry layers.
+- If proof texture is used, it must look intentionally derived from the Tonigma wordmark and must not look like pasted math/code wallpaper.
+- The background must recede behind the brand/product message.
+- If a background element does not look art-directed, remove it.
+
+Product surface reset:
+
+- Keep detailed product surfaces mostly outside the hero.
+- Make observer and policy UI fragments look like real product interfaces with credible hierarchy, spacing, and data structure.
+- Remove placeholder-feeling labels such as decorative hashes or status values unless they support a coherent product surface.
+- Prefer one strong observer/policy surface over several weak fragments.
+
+### Updated Acceptance Criteria
+
+The next implementation pass is acceptable only if all of the following are true:
+
+- A first-viewport screenshot does not look like a generic dark ZK landing page.
+- The visual elements do not look like quick SVG placeholders, school-level drawing, or low-grade decorative network art.
+- The hero is anchored by Tonigma brand identity, not by a generic node graph.
+- The background is quiet, controlled, and professionally art-directed.
+- `private state` does not appear as a top-level Tonigma brand keyword.
+- `private-state` appears only in the example DApp context.
+- The page clearly distinguishes Tonigma's general app-channel model from the `private-state` note transfer DApp.
+- The product surfaces look operationally credible rather than decorative.
+- The page remains English-only.
+- The page contains no prohibited anonymity, untraceability, private-exchange, or universal-privacy claims.
+
+### Updated Implementation Order
+
+1. Remove top-level `private state` messaging from the hero and main Tonigma positioning sections.
+2. Rewrite hero support copy around public proof boundaries, validity-proven app channels, and observable public edges.
+3. Delete or replace the current low-quality hero graph and background visuals.
+4. Build a new symbol-led hero composition using official Tonigma assets and carefully derived geometry.
+5. Rebuild the background as a quiet, minimal brand field rather than a decorative technical grid.
+6. Move richer observer/policy UI detail below the hero and make it look like a credible product interface.
+7. Re-check all copy for Tonigma/private-state boundary violations.
+8. Verify desktop and mobile screenshots visually before accepting the design.
+9. Run production build, console, overflow, reduced-motion, and prohibited-copy checks.
