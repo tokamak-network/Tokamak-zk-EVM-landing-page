@@ -1,14 +1,33 @@
 # Tokamak zk-EVM Landing Page
 
-This repository is being reset for a full renewal of the Tokamak zk-EVM landing page.
+This repository contains the renewed Tonigma landing page for Tokamak Private App Channels.
 
 The previous implementation has been archived on the `archive-mar26` branch. The `main` branch is reserved for the new project implementation.
 
-## Status
+## Stack
 
-Project setup has not been selected yet. Add the application framework, package manager, and deployment configuration as part of the renewal work.
+- Next.js App Router
+- React
+- TypeScript
+- npm
+
+The app is configured to remain compatible with future use of `@tokamak-zk-evm/synthesizer-web` and `tokamak-l2js`.
+
+## Scripts
+
+```bash
+npm install
+npm run dev
+npm run typecheck
+npm run build
+```
+
+## Design Direction
+
+The current page focuses on a single English-language landing experience for users first, protocol/product evaluators second, and developers third.
+
+The visual concept is `Transparent Boundary, Private State`: public Ethereum and observer boundaries remain explicit, while DApp-defined private state stays scoped inside proof-backed application channels.
 
 ## Archived Version
 
 - Branch: `archive-mar26`
-

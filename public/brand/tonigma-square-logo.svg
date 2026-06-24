@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1254" height="1254" viewBox="0 0 1254 1254">
+  <defs>
+
+  </defs>
+  <g>
+    <rect width="1254" height="1254" fill="#000000"/>
+    <g transform="translate(627 627) scale(2) translate(-627 -627)">
+<line x1="433.044" y1="483.573" x2="492.068" y2="437.574" stroke="#FFFFFF" stroke-width="15" stroke-linecap="round"/>
+<line x1="433.044" y1="544.427" x2="492.068" y2="590.426" stroke="#FFFFFF" stroke-width="15" stroke-linecap="round"/>
+<line x1="433.044" y1="709.573" x2="492.068" y2="663.574" stroke="#FFFFFF" stroke-width="15" stroke-linecap="round"/>
+<line x1="433.044" y1="770.427" x2="492.068" y2="816.426" stroke="#FFFFFF" stroke-width="15" stroke-linecap="round"/>
+<line x1="585.932" y1="437.574" x2="629.181" y2="471.279" stroke="#FFFFFF" stroke-width="15" stroke-linecap="round"/>
+<line x1="585.932" y1="590.426" x2="629.181" y2="556.721" stroke="#FFFFFF" stroke-width="15" stroke-linecap="round"/>
+<line x1="585.932" y1="663.574" x2="629.181" y2="697.279" stroke="#FFFFFF" stroke-width="15" stroke-linecap="round"/>
+<line x1="585.932" y1="816.426" x2="629.181" y2="782.721" stroke="#FFFFFF" stroke-width="15" stroke-linecap="round"/>
+<line x1="738.819" y1="556.721" x2="773.035" y2="583.386" stroke="#FFFFFF" stroke-width="15" stroke-linecap="round"/>
+<line x1="738.819" y1="697.279" x2="773.035" y2="670.614" stroke="#FFFFFF" stroke-width="15" stroke-linecap="round"/>
+<circle cx="394" cy="514" r="45" fill="#000000"/>
+<circle cx="394" cy="514" r="30" fill="none" stroke="#FFFFFF" stroke-width="15"/>
+<circle cx="394" cy="740" r="45" fill="#000000"/>
+<circle cx="394" cy="740" r="30" fill="none" stroke="#FFFFFF" stroke-width="15"/>
+<circle cx="539" cy="401" r="40" fill="#FFFFFF"/>
+<circle cx="539" cy="627" r="40" fill="#FFFFFF"/>
+<circle cx="539" cy="853" r="40" fill="#FFFFFF"/>
+<circle cx="684" cy="514" r="50" fill="#FFFFFF"/>
+<circle cx="684" cy="740" r="50" fill="#FFFFFF"/>
+<polygon points="829 529.266 889 627 829 724.734 769 627" fill="#FFFFFF"/>
+    </g>
+  </g>
+</svg>
