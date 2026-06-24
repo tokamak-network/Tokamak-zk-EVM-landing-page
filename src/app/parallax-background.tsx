@@ -59,24 +59,6 @@ export function ParallaxBackground() {
           <span key={formula}>{formula}</span>
         ))}
       </div>
-      <div className="background-layer background-layer--surface">
-        <div>
-          <span>policy</span>
-          <strong>sealed</strong>
-        </div>
-        <div>
-          <span>verifier</span>
-          <strong>pinned</strong>
-        </div>
-        <div>
-          <span>root</span>
-          <strong>0x44b7</strong>
-        </div>
-        <div>
-          <span>mirror</span>
-          <strong>current</strong>
-        </div>
-      </div>
     </div>
   );
 }
