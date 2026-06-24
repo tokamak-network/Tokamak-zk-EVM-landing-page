@@ -101,27 +101,27 @@ main {
 
 .background-layer--math-far,
 .background-layer--math-near {
-  inset: auto -12vw -8vh auto;
-  width: min(76vw, 1120px);
-  height: min(78vh, 780px);
+  inset: auto -18vw -8vh auto;
+  width: min(94vw, 1360px);
+  height: min(88vh, 900px);
   background-image: url("/textures/math-layer.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
   mix-blend-mode: screen;
-  mask-image: radial-gradient(ellipse at 58% 58%, #000 0 26%, rgba(0, 0, 0, 0.78) 42%, transparent 74%);
+  mask-image: radial-gradient(ellipse at 60% 58%, #000 0 30%, rgba(0, 0, 0, 0.78) 48%, transparent 78%);
 }
 
 .background-layer--math-far {
-  opacity: 0.07;
+  opacity: 0.086;
   transform: translate3d(calc(var(--scroll-depth) * -18px), calc(var(--scroll-depth) * -32px), 0) rotate(-1deg);
 }
 
 .background-layer--math-near {
-  inset: 32vh -18vw auto auto;
-  width: min(62vw, 920px);
-  height: min(58vh, 620px);
-  opacity: 0.035;
+  inset: 28vh -24vw auto auto;
+  width: min(78vw, 1120px);
+  height: min(68vh, 720px);
+  opacity: 0.046;
   transform: translate3d(calc(var(--scroll-depth) * 28px), calc(var(--scroll-depth) * -96px), 0) rotate(1deg);
 }
 
@@ -348,18 +348,18 @@ code {
 
   .background-layer--math-far,
   .background-layer--math-near {
-    inset: 54vh -58vw auto auto;
-    width: 132vw;
-    height: 58vh;
-    mask-image: radial-gradient(ellipse at 58% 52%, #000 0 22%, rgba(0, 0, 0, 0.68) 42%, transparent 74%);
+    inset: 48vh -68vw auto auto;
+    width: 154vw;
+    height: 68vh;
+    mask-image: radial-gradient(ellipse at 60% 52%, #000 0 26%, rgba(0, 0, 0, 0.7) 46%, transparent 78%);
   }
 
   .background-layer--math-far {
-    opacity: 0.055;
+    opacity: 0.07;
   }
 
   .background-layer--math-near {
-    opacity: 0.026;
+    opacity: 0.034;
   }
 }
 
