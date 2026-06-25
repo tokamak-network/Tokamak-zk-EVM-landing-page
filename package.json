@@ -16,9 +16,12 @@
     "react-dom": "latest"
   },
   "devDependencies": {
+    "@remotion/cli": "^4.0.482",
+    "@remotion/renderer": "^4.0.482",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "remotion": "^4.0.482",
     "typescript": "latest"
   },
   "overrides": {
