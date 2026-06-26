@@ -161,7 +161,7 @@ export function EthereumLogoOrbit() {
           "(prefers-reduced-motion: reduce)",
         );
         const logoSpinSpeed = 0.74;
-        const axisOscillationSpeed = logoSpinSpeed * (3 / 7);
+        const axisOscillationSpeed = logoSpinSpeed * (2 / 7);
 
         const render = () => {
           if (!reducedMotion.matches) {
