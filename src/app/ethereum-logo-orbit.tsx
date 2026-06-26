@@ -69,10 +69,26 @@ export function EthereumLogoOrbit() {
         const lowerBack = new THREE.Vector3(0, lowerY, -0.74);
 
         const surfaces = [
-          { points: [top, upperLeft, upperFront], color: "#e7f1ff" },
-          { points: [top, upperFront, upperRight], color: "#a8d4ff" },
-          { points: [top, upperRight, upperBack], color: "#5d9df0" },
-          { points: [top, upperBack, upperLeft], color: "#263d76" },
+          {
+            points: [top, upperLeft, upperFront],
+            color: "#e7f1ff",
+            opacity: 0.75,
+          },
+          {
+            points: [top, upperFront, upperRight],
+            color: "#a8d4ff",
+            opacity: 0.75,
+          },
+          {
+            points: [top, upperRight, upperBack],
+            color: "#5d9df0",
+            opacity: 0.75,
+          },
+          {
+            points: [top, upperBack, upperLeft],
+            color: "#263d76",
+            opacity: 0.75,
+          },
           { points: [bottom, lowerFront, lowerLeft], color: "#d1e7ff" },
           { points: [bottom, lowerRight, lowerFront], color: "#84bdff" },
           { points: [bottom, lowerBack, lowerRight], color: "#3a75d1" },
@@ -102,8 +118,10 @@ export function EthereumLogoOrbit() {
             emissive: index % 4 === 0 ? "#12345c" : "#050a16",
             emissiveIntensity: index % 4 === 0 ? 0.18 : 0.08,
             metalness: 0.36,
+            opacity: surface.opacity ?? 1,
             roughness: 0.42,
             side: THREE.DoubleSide,
+            transparent: surface.opacity !== undefined,
           });
           disposableMaterials.push(material);
 
