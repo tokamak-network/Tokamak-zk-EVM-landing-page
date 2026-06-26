@@ -54,6 +54,7 @@ export function EthereumLogoOrbit() {
         scene.add(logoGroup);
         const disposableGeometries: Array<{ dispose: () => void }> = [];
         const disposableMaterials: Array<{ dispose: () => void }> = [];
+        const disposableTextures: Array<{ dispose: () => void }> = [];
 
         const top = new THREE.Vector3(0, 1.5041, 0);
         const bottom = new THREE.Vector3(0, -1.3241, 0);
@@ -142,69 +143,179 @@ export function EthereumLogoOrbit() {
           logoGroup.add(lines);
         });
 
-        const addCapEmission = (
-          points: Array<typeof upperLeft>,
-          offsetY: number,
-          scale: number,
-          opacity: number,
-        ) => {
-          const center = points
-            .reduce((sum, point) => sum.add(point), new THREE.Vector3())
-            .multiplyScalar(1 / points.length);
-          const emittedPoints = points.map((point) =>
-            point
-              .clone()
-              .sub(center)
-              .multiplyScalar(scale)
-              .add(center)
-              .add(new THREE.Vector3(0, offsetY, 0)),
-          );
-          const geometry = new THREE.BufferGeometry().setFromPoints(
-            emittedPoints,
-          );
-          geometry.setIndex([0, 1, 2, 0, 2, 3]);
-          geometry.computeVertexNormals();
+        const createDiamondGlowTexture = () => {
+          const size = 512;
+          const glowCanvas = document.createElement("canvas");
+          glowCanvas.width = size;
+          glowCanvas.height = size;
+          const context = glowCanvas.getContext("2d");
+
+          if (!context) {
+            throw new Error("Canvas 2D context is unavailable.");
+          }
+
+          const image = context.createImageData(size, size);
+          const data = image.data;
+
+          for (let y = 0; y < size; y += 1) {
+            for (let x = 0; x < size; x += 1) {
+              const nx = ((x + 0.5) / size) * 2 - 1;
+              const ny = ((y + 0.5) / size) * 2 - 1;
+              const diamondDistance = Math.abs(nx) + Math.abs(ny);
+              const radialDistance = Math.sqrt(nx * nx + ny * ny);
+              const pixelIndex = (y * size + x) * 4;
+
+              if (diamondDistance > 1.5) {
+                data[pixelIndex + 3] = 0;
+                continue;
+              }
+
+              const core = Math.max(0, 1 - diamondDistance / 0.34);
+              const face = Math.max(0, 1 - diamondDistance / 0.84);
+              const spill = Math.max(0, 1 - diamondDistance / 1.5);
+              const radialFade = Math.max(0, 1 - radialDistance / 1.05);
+              const alpha =
+                Math.pow(core, 1.15) * 0.62 +
+                Math.pow(face, 1.7) * 0.32 +
+                Math.pow(spill * radialFade, 2.2) * 0.4;
+
+              data[pixelIndex] = 244;
+              data[pixelIndex + 1] = 250;
+              data[pixelIndex + 2] = 255;
+              data[pixelIndex + 3] = Math.round(Math.min(1, alpha) * 255);
+            }
+          }
+
+          context.putImageData(image, 0, 0);
+
+          const texture = new THREE.CanvasTexture(glowCanvas);
+          texture.colorSpace = THREE.SRGBColorSpace;
+          texture.generateMipmaps = false;
+          texture.magFilter = THREE.LinearFilter;
+          texture.minFilter = THREE.LinearFilter;
+          texture.needsUpdate = true;
+
+          return texture;
+        };
+
+        const glowTexture = createDiamondGlowTexture();
+        disposableTextures.push(glowTexture);
+        const updateGlowLayers: Array<(time: number) => void> = [];
+
+        const addFaceGlow = ({
+          baseOpacity,
+          baseScale,
+          direction,
+          offset,
+          opacityPulse,
+          phase,
+          scalePulse,
+          y,
+        }: {
+          baseOpacity: number;
+          baseScale: number;
+          direction: -1 | 1;
+          offset: number;
+          opacityPulse: number;
+          phase: number;
+          scalePulse: number;
+          y: number;
+        }) => {
+          const geometry = new THREE.PlaneGeometry(1.52, 1.52);
           disposableGeometries.push(geometry);
 
           const material = new THREE.MeshBasicMaterial({
             blending: THREE.AdditiveBlending,
             color: 0xffffff,
+            depthTest: false,
             depthWrite: false,
-            opacity,
+            map: glowTexture,
+            opacity: baseOpacity,
             side: THREE.DoubleSide,
+            toneMapped: false,
             transparent: true,
           });
+          material.color.setRGB(3.4, 3.7, 4.05);
           disposableMaterials.push(material);
 
           const glow = new THREE.Mesh(geometry, material);
-          glow.renderOrder = 2;
+          glow.position.y = y + direction * offset;
+          glow.renderOrder = 3;
+          glow.rotation.x = -Math.PI / 2;
+          glow.scale.setScalar(baseScale);
           logoGroup.add(glow);
+
+          updateGlowLayers.push((time) => {
+            const pulse = (Math.sin(time * 1.62 + phase) + 1) / 2;
+            const easedPulse = pulse * pulse * (3 - 2 * pulse);
+
+            glow.position.y =
+              y + direction * (offset + easedPulse * 0.018);
+            glow.scale.setScalar(baseScale + easedPulse * scalePulse);
+            material.opacity = baseOpacity + easedPulse * opacityPulse;
+          });
         };
 
-        addCapEmission(
-          [upperLeft, upperBack, upperRight, upperFront],
-          -0.006,
-          1,
-          0.62,
-        );
-        addCapEmission(
-          [upperLeft, upperBack, upperRight, upperFront],
-          -0.014,
-          1.14,
-          0.22,
-        );
-        addCapEmission(
-          [lowerLeft, lowerFront, lowerRight, lowerBack],
-          0.006,
-          1,
-          0.52,
-        );
-        addCapEmission(
-          [lowerLeft, lowerFront, lowerRight, lowerBack],
-          0.014,
-          1.14,
-          0.18,
-        );
+        addFaceGlow({
+          baseOpacity: 0.36,
+          baseScale: 0.94,
+          direction: -1,
+          offset: 0.01,
+          opacityPulse: 0.14,
+          phase: 0.1,
+          scalePulse: 0.1,
+          y: upperY,
+        });
+        addFaceGlow({
+          baseOpacity: 0.15,
+          baseScale: 1.13,
+          direction: -1,
+          offset: 0.028,
+          opacityPulse: 0.12,
+          phase: 1.45,
+          scalePulse: 0.34,
+          y: upperY,
+        });
+        addFaceGlow({
+          baseOpacity: 0.065,
+          baseScale: 1.38,
+          direction: -1,
+          offset: 0.052,
+          opacityPulse: 0.075,
+          phase: 2.5,
+          scalePulse: 0.48,
+          y: upperY,
+        });
+        addFaceGlow({
+          baseOpacity: 0.31,
+          baseScale: 0.94,
+          direction: 1,
+          offset: 0.01,
+          opacityPulse: 0.12,
+          phase: 0.7,
+          scalePulse: 0.1,
+          y: lowerY,
+        });
+        addFaceGlow({
+          baseOpacity: 0.13,
+          baseScale: 1.11,
+          direction: 1,
+          offset: 0.028,
+          opacityPulse: 0.105,
+          phase: 2.05,
+          scalePulse: 0.3,
+          y: lowerY,
+        });
+        addFaceGlow({
+          baseOpacity: 0.055,
+          baseScale: 1.34,
+          direction: 1,
+          offset: 0.052,
+          opacityPulse: 0.065,
+          phase: 3.1,
+          scalePulse: 0.44,
+          y: lowerY,
+        });
 
         const ringGeometry = new THREE.TorusGeometry(1.26, 0.007, 8, 120);
         const ringMaterial = new THREE.MeshBasicMaterial({
@@ -261,6 +372,9 @@ export function EthereumLogoOrbit() {
             logoGroup.rotation.x =
               logoPitch + Math.sin(time * axisOscillationSpeed) * 0.03;
             ring.rotation.z = time * -0.42;
+            updateGlowLayers.forEach((updateGlowLayer) =>
+              updateGlowLayer(time),
+            );
           }
 
           renderer.render(scene, camera);
@@ -271,6 +385,7 @@ export function EthereumLogoOrbit() {
         disposeScene = () => {
           disposableGeometries.forEach((geometry) => geometry.dispose());
           disposableMaterials.forEach((material) => material.dispose());
+          disposableTextures.forEach((texture) => texture.dispose());
           renderer.dispose();
         };
       } catch (error) {
