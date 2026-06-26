@@ -59,8 +59,8 @@ export function EthereumLogoOrbit() {
         const bottom = new THREE.Vector3(0, -1.24, 0);
         const left = new THREE.Vector3(-0.74, 0, 0);
         const right = new THREE.Vector3(0.74, 0, 0);
-        const front = new THREE.Vector3(0, 0, 0.46);
-        const back = new THREE.Vector3(0, 0, -0.46);
+        const front = new THREE.Vector3(0, 0, 0.74);
+        const back = new THREE.Vector3(0, 0, -0.74);
 
         const faceColors = [
           "#e7f1ff",
