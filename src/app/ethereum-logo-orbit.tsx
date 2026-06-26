@@ -55,8 +55,8 @@ export function EthereumLogoOrbit() {
         const disposableGeometries: Array<{ dispose: () => void }> = [];
         const disposableMaterials: Array<{ dispose: () => void }> = [];
 
-        const top = new THREE.Vector3(0, 1.42, 0);
-        const bottom = new THREE.Vector3(0, -1.24, 0);
+        const top = new THREE.Vector3(0, 1.5041, 0);
+        const bottom = new THREE.Vector3(0, -1.3241, 0);
         const left = new THREE.Vector3(-0.74, 0, 0);
         const right = new THREE.Vector3(0.74, 0, 0);
         const front = new THREE.Vector3(0, 0, 0.74);
