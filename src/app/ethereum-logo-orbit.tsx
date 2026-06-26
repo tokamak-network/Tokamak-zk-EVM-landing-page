@@ -392,18 +392,18 @@ export function EthereumLogoOrbit() {
               void main() {
                 vec2 p = vUv * 2.0 - 1.0;
                 float r = length(p);
-                float edgeFade = 1.0 - smoothstep(0.76, 1.0, r);
-                float radius = mix(0.16, 0.9, uProgress);
-                float expandingGlow = exp(-pow(abs(r - radius), 2.0) / 0.075);
+                float edgeFade = 1.0 - smoothstep(0.88, 1.0, r);
+                float radius = mix(0.12, 0.92, uProgress);
+                float expandingGlow = exp(-pow(abs(r - radius), 2.0) / 0.11);
                 float broadIllumination =
-                  smoothstep(radius + 0.54, radius - 0.16, r) *
-                  exp(-r * r * 0.9);
+                  smoothstep(radius + 0.68, radius - 0.18, r) *
+                  exp(-r * r * 0.52);
                 float centerBurst = exp(-r * r * 3.2) * pow(1.0 - uProgress, 2.4);
                 float fade =
-                  smoothstep(1.0, 0.44, uProgress) *
-                  (1.0 - smoothstep(0.96, 1.0, uProgress));
+                  smoothstep(1.0, 0.62, uProgress) *
+                  (1.0 - smoothstep(0.985, 1.0, uProgress));
                 float alpha =
-                  (expandingGlow * 0.16 + broadIllumination * 0.2 + centerBurst * 0.06) *
+                  (expandingGlow * 0.18 + broadIllumination * 0.24 + centerBurst * 0.06) *
                   edgeFade *
                   fade *
                   uOpacity;
@@ -422,29 +422,29 @@ export function EthereumLogoOrbit() {
               void main() {
                 vec2 p = vUv * 2.0 - 1.0;
                 float r = length(p);
-                float edgeFade = 1.0 - smoothstep(0.82, 1.0, r);
-                float radius = mix(0.18, 0.94, uProgress);
+                float edgeFade = 1.0 - smoothstep(0.9, 1.0, r);
+                float radius = mix(0.14, 0.94, uProgress);
                 float ringDistance = abs(r - radius);
-                float brightCore = exp(-(ringDistance * ringDistance) / 0.0012);
-                float innerHalo = exp(-(ringDistance * ringDistance) / 0.018);
-                float outerHalo = exp(-(ringDistance * ringDistance) / 0.095);
+                float brightCore = exp(-(ringDistance * ringDistance) / 0.0016);
+                float innerHalo = exp(-(ringDistance * ringDistance) / 0.032);
+                float outerHalo = exp(-(ringDistance * ringDistance) / 0.18);
                 float softBody =
-                  smoothstep(radius, radius - 0.22, r) *
-                  smoothstep(radius + 0.26, radius, r);
+                  smoothstep(radius, radius - 0.32, r) *
+                  smoothstep(radius + 0.38, radius, r);
                 float tail =
-                  smoothstep(radius - 0.52, radius - 0.1, r) *
-                  smoothstep(radius + 0.08, radius - 0.12, r);
+                  smoothstep(radius - 0.68, radius - 0.12, r) *
+                  smoothstep(radius + 0.16, radius - 0.12, r);
                 float centerIgnition = exp(-r * r * 9.0) * pow(1.0 - uProgress, 2.8);
                 float fade =
-                  smoothstep(1.0, 0.54, uProgress) *
-                  (1.0 - smoothstep(0.94, 1.0, uProgress));
+                  smoothstep(1.0, 0.68, uProgress) *
+                  (1.0 - smoothstep(0.985, 1.0, uProgress));
                 float alpha =
                   (
                     brightCore * 0.9 +
-                    innerHalo * 0.34 +
-                    outerHalo * 0.18 +
-                    softBody * 0.07 +
-                    tail * 0.08 +
+                    innerHalo * 0.42 +
+                    outerHalo * 0.24 +
+                    softBody * 0.1 +
+                    tail * 0.12 +
                     centerIgnition * 0.06
                   ) *
                   edgeFade *
@@ -484,13 +484,13 @@ export function EthereumLogoOrbit() {
         [
           {
             duration: 2.8,
-            maxScale: 1.72,
+            maxScale: 5.2,
             opacity: 0.6,
             phase: 0,
           },
           {
             duration: 2.8,
-            maxScale: 2.08,
+            maxScale: 6.6,
             opacity: 0.34,
             phase: 1.4,
           },
@@ -507,7 +507,9 @@ export function EthereumLogoOrbit() {
           const width = Math.max(1, Math.floor(bounds.width));
           const height = Math.max(1, Math.floor(bounds.height));
           const aspect = width / height;
-          const verticalSize = 4.84;
+          const hostHeight = canvas.parentElement?.getBoundingClientRect().height;
+          const canvasScale = hostHeight && hostHeight > 0 ? height / hostHeight : 1.24;
+          const verticalSize = 3.9 * canvasScale;
 
           camera.left = (-verticalSize * aspect) / 2;
           camera.right = (verticalSize * aspect) / 2;
