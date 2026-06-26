@@ -123,25 +123,24 @@ main {
 
 .background-layer--math-far,
 .background-layer--math-near {
-  inset: -24vh -28vw -24vh -28vw;
+  inset: -18vh -24vw -18vh 22vw;
   background-image: url("/textures/math-layer.png");
   background-repeat: no-repeat;
   background-position: right center;
   background-size: cover;
-  filter: invert(1);
   mix-blend-mode: screen;
-  mask-image: radial-gradient(ellipse at 86% 60%, rgba(0, 0, 0, 0.58) 0%, rgba(0, 0, 0, 0.28) 36%, rgba(0, 0, 0, 0.08) 58%, transparent 82%);
+  mask-image: radial-gradient(ellipse at 72% 56%, #000 0 22%, rgba(0, 0, 0, 0.7) 50%, rgba(0, 0, 0, 0.24) 76%, transparent 98%);
 }
 
 .background-layer--math-far {
-  opacity: 0.052;
-  transform: translate3d(calc(var(--scroll-depth) * -18px), calc(var(--scroll-depth) * -32px), 0);
+  opacity: 0.086;
+  transform: translate3d(calc(var(--scroll-depth) * -18px), calc(var(--scroll-depth) * -32px), 0) rotate(-1deg);
 }
 
 .background-layer--math-near {
-  inset: -18vh -34vw -28vh -18vw;
-  opacity: 0.024;
-  transform: translate3d(calc(var(--scroll-depth) * 28px), calc(var(--scroll-depth) * -96px), 0);
+  inset: -10vh -34vw -22vh 36vw;
+  opacity: 0.046;
+  transform: translate3d(calc(var(--scroll-depth) * 28px), calc(var(--scroll-depth) * -96px), 0) rotate(1deg);
 }
 
 .section-shell {
