@@ -307,33 +307,33 @@ export function EthereumLogoOrbit() {
 
         [
           {
-            baseOpacity: 0.48,
+            baseOpacity: 0.22,
             baseScale: 0.66,
-            opacityPulse: 0.1,
+            opacityPulse: 0.035,
             phase: 0.1,
             scalePulse: 0.08,
             verticalScale: 0.052,
           },
           {
-            baseOpacity: 0.3,
+            baseOpacity: 0.08,
             baseScale: 1.16,
-            opacityPulse: 0.07,
+            opacityPulse: 0.018,
             phase: 1.45,
             scalePulse: 0.18,
             verticalScale: 0.062,
           },
           {
-            baseOpacity: 0.15,
+            baseOpacity: 0.025,
             baseScale: 1.86,
-            opacityPulse: 0.04,
+            opacityPulse: 0.008,
             phase: 2.5,
             scalePulse: 0.28,
             verticalScale: 0.07,
           },
           {
-            baseOpacity: 0.07,
+            baseOpacity: 0.009,
             baseScale: 2.55,
-            opacityPulse: 0.025,
+            opacityPulse: 0.003,
             phase: 0.7,
             scalePulse: 0.36,
             verticalScale: 0.076,
@@ -381,38 +381,6 @@ export function EthereumLogoOrbit() {
         }) => {
           const geometry = new THREE.PlaneGeometry(2, 2);
           disposableGeometries.push(geometry);
-          const spillGeometry = new THREE.PlaneGeometry(2, 2);
-          disposableGeometries.push(spillGeometry);
-
-          const spillMaterial = createDiscPulseMaterial(opacity, `
-              uniform float uOpacity;
-              uniform float uProgress;
-              varying vec2 vUv;
-
-              void main() {
-                vec2 p = vUv * 2.0 - 1.0;
-                float r = length(p);
-                float edgeFade = 1.0 - smoothstep(0.88, 1.0, r);
-                float radius = mix(0.12, 0.92, uProgress);
-                float expandingGlow = exp(-pow(abs(r - radius), 2.0) / 0.11);
-                float broadIllumination =
-                  smoothstep(radius + 0.68, radius - 0.18, r) *
-                  exp(-r * r * 0.52);
-                float centerBurst = exp(-r * r * 3.2) * pow(1.0 - uProgress, 2.4);
-                float fade =
-                  smoothstep(1.0, 0.62, uProgress) *
-                  (1.0 - smoothstep(0.995, 1.0, uProgress));
-                float alpha =
-                  (expandingGlow * 0.18 + broadIllumination * 0.24 + centerBurst * 0.06) *
-                  edgeFade *
-                  fade *
-                  uOpacity;
-                vec3 color = vec3(0.82, 0.94, 1.0) * (0.9 + expandingGlow * 0.55);
-
-                gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.28));
-              }
-            `);
-          disposableMaterials.push(spillMaterial);
 
           const material = createDiscPulseMaterial(opacity, `
               uniform float uOpacity;
@@ -422,49 +390,32 @@ export function EthereumLogoOrbit() {
               void main() {
                 vec2 p = vUv * 2.0 - 1.0;
                 float r = length(p);
-                float edgeFade = 1.0 - smoothstep(0.9, 1.0, r);
-                float radius = mix(0.14, 0.94, uProgress);
+                float edgeFade = 1.0 - smoothstep(0.94, 1.0, r);
+                float radius = mix(0.1, 0.96, uProgress);
                 float ringDistance = abs(r - radius);
-                float brightCore = exp(-(ringDistance * ringDistance) / 0.0016);
-                float innerHalo = exp(-(ringDistance * ringDistance) / 0.032);
-                float outerHalo = exp(-(ringDistance * ringDistance) / 0.18);
-                float softBody =
-                  smoothstep(radius, radius - 0.32, r) *
-                  smoothstep(radius + 0.38, radius, r);
-                float tail =
-                  smoothstep(radius - 0.68, radius - 0.12, r) *
-                  smoothstep(radius + 0.16, radius - 0.12, r);
+                float brightCore = 1.0 - smoothstep(0.003, 0.006, ringDistance);
+                float innerHalo = 1.0 - smoothstep(0.006, 0.012, ringDistance);
                 float centerIgnition = exp(-r * r * 9.0) * pow(1.0 - uProgress, 2.8);
                 float fade =
-                  smoothstep(1.0, 0.68, uProgress) *
-                  (1.0 - smoothstep(0.995, 1.0, uProgress));
+                  smoothstep(1.0, 0.74, uProgress) *
+                  (1.0 - smoothstep(0.99, 1.0, uProgress));
                 float alpha =
                   (
-                    brightCore * 0.9 +
-                    innerHalo * 0.42 +
-                    outerHalo * 0.24 +
-                    softBody * 0.1 +
-                    tail * 0.12 +
-                    centerIgnition * 0.06
+                    brightCore * 0.18 +
+                    innerHalo * 0.006 +
+                    centerIgnition * 0.008
                   ) *
                   edgeFade *
                   fade *
                   uOpacity;
                 vec3 color =
                   vec3(0.9, 0.975, 1.0) *
-                  (1.06 + brightCore * 7.2 + innerHalo * 2.45 + outerHalo * 0.95);
+                  (0.72 + brightCore * 1.25 + innerHalo * 0.06);
 
-                gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.9));
+                gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.2));
               }
             `);
           disposableMaterials.push(material);
-
-          const spill = new THREE.Mesh(spillGeometry, spillMaterial);
-          spill.position.set(0, gapCenterY, 0);
-          spill.renderOrder = 2;
-          spill.rotation.x = -Math.PI / 2;
-          spill.scale.setScalar(maxScale * 1.16);
-          logoGroup.add(spill);
 
           const pulse = new THREE.Mesh(geometry, material);
           pulse.position.set(0, gapCenterY, 0);
@@ -476,23 +427,22 @@ export function EthereumLogoOrbit() {
           updateGlowLayers.push((time) => {
             const progress = ((time + phase) % duration) / duration;
 
-            spillMaterial.uniforms.uProgress.value = progress;
             material.uniforms.uProgress.value = progress;
           });
         };
 
         [
           {
-            duration: 2.8,
+            duration: 18,
             maxScale: 12.8,
-            opacity: 0.6,
+            opacity: 0.22,
             phase: 0,
           },
           {
-            duration: 2.8,
+            duration: 18,
             maxScale: 15.6,
-            opacity: 0.34,
-            phase: 1.4,
+            opacity: 0.13,
+            phase: 9,
           },
         ].forEach(addExpandingDiscPulse);
 
