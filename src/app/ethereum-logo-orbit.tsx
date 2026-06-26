@@ -342,15 +342,17 @@ export function EthereumLogoOrbit() {
         });
 
         const addExpandingDiscPulse = ({
-          duration,
+          beatOffset,
+          cycleDuration,
           maxScale,
           opacity,
-          phase,
+          pulseDuration,
         }: {
-          duration: number;
+          beatOffset: number;
+          cycleDuration: number;
           maxScale: number;
           opacity: number;
-          phase: number;
+          pulseDuration: number;
         }) => {
           const geometry = new THREE.PlaneGeometry(2, 2, 96, 96);
           disposableGeometries.push(geometry);
@@ -384,17 +386,17 @@ export function EthereumLogoOrbit() {
               void main() {
                 vec2 p = vUv * 2.0 - 1.0;
                 float r = length(p);
-                float radius = mix(0.08, 0.9, uProgress);
+                float radius = mix(0.16, 0.9, uProgress);
                 float expandingGlow = exp(-pow(abs(r - radius), 2.0) / 0.075);
                 float broadIllumination =
                   smoothstep(radius + 0.54, radius - 0.16, r) *
                   exp(-r * r * 0.9);
-                float centerBurst = exp(-r * r * 3.2) * pow(1.0 - uProgress, 1.8);
+                float centerBurst = exp(-r * r * 3.2) * pow(1.0 - uProgress, 2.4);
                 float fade =
                   smoothstep(1.0, 0.44, uProgress) *
                   (1.0 - smoothstep(0.96, 1.0, uProgress));
                 float alpha =
-                  (expandingGlow * 0.16 + broadIllumination * 0.2 + centerBurst * 0.16) *
+                  (expandingGlow * 0.16 + broadIllumination * 0.2 + centerBurst * 0.06) *
                   fade *
                   uOpacity;
                 vec3 color = vec3(0.82, 0.94, 1.0) * (0.9 + expandingGlow * 0.55);
@@ -432,7 +434,7 @@ export function EthereumLogoOrbit() {
               void main() {
                 vec2 p = vUv * 2.0 - 1.0;
                 float r = length(p);
-                float radius = mix(0.1, 0.94, uProgress);
+                float radius = mix(0.18, 0.94, uProgress);
                 float ringDistance = abs(r - radius);
                 float brightCore = exp(-(ringDistance * ringDistance) / 0.0012);
                 float innerHalo = exp(-(ringDistance * ringDistance) / 0.018);
@@ -443,7 +445,7 @@ export function EthereumLogoOrbit() {
                 float tail =
                   smoothstep(radius - 0.52, radius - 0.1, r) *
                   smoothstep(radius + 0.08, radius - 0.12, r);
-                float centerIgnition = exp(-r * r * 9.0) * pow(1.0 - uProgress, 2.25);
+                float centerIgnition = exp(-r * r * 9.0) * pow(1.0 - uProgress, 2.8);
                 float fade =
                   smoothstep(1.0, 0.54, uProgress) *
                   (1.0 - smoothstep(0.94, 1.0, uProgress));
@@ -454,7 +456,7 @@ export function EthereumLogoOrbit() {
                     outerHalo * 0.18 +
                     softBody * 0.07 +
                     tail * 0.08 +
-                    centerIgnition * 0.2
+                    centerIgnition * 0.06
                   ) *
                   fade *
                   uOpacity;
@@ -483,7 +485,10 @@ export function EthereumLogoOrbit() {
           logoGroup.add(pulse);
 
           updateGlowLayers.push((time) => {
-            const progress = ((time + phase) % duration) / duration;
+            const beatTime =
+              (time - beatOffset + cycleDuration) % cycleDuration;
+            const progress =
+              beatTime < pulseDuration ? beatTime / pulseDuration : 1;
 
             spillMaterial.uniforms.uProgress.value = progress;
             material.uniforms.uProgress.value = progress;
@@ -491,33 +496,19 @@ export function EthereumLogoOrbit() {
         };
 
         addExpandingDiscPulse({
-          duration: 2.8,
+          beatOffset: 0,
+          cycleDuration: 0.84,
           maxScale: 1.72,
-          opacity: 0.66,
-          phase: 0,
+          opacity: 0.6,
+          pulseDuration: 0.46,
         });
         addExpandingDiscPulse({
-          duration: 2.8,
-          maxScale: 2.08,
-          opacity: 0.42,
-          phase: 1.4,
+          beatOffset: 0.24,
+          cycleDuration: 0.84,
+          maxScale: 1.5,
+          opacity: 0.34,
+          pulseDuration: 0.36,
         });
-
-        const ringGeometry = new THREE.TorusGeometry(1.26, 0.007, 8, 120);
-        const ringMaterial = new THREE.MeshBasicMaterial({
-          color: 0x61b8ff,
-          opacity: 0.3,
-          transparent: true,
-        });
-        disposableGeometries.push(ringGeometry);
-        disposableMaterials.push(ringMaterial);
-
-        const ring = new THREE.Mesh(
-          ringGeometry,
-          ringMaterial,
-        );
-        ring.rotation.x = Math.PI / 2;
-        logoGroup.add(ring);
 
         const logoPitch = (31.5 * Math.PI) / 180;
 
@@ -548,7 +539,7 @@ export function EthereumLogoOrbit() {
         const reducedMotion = window.matchMedia(
           "(prefers-reduced-motion: reduce)",
         );
-        const logoSpinSpeed = 0.74;
+        const logoSpinSpeed = 0.37;
         const axisOscillationSpeed = logoSpinSpeed * (2 / 7);
 
         const render = () => {
@@ -558,7 +549,6 @@ export function EthereumLogoOrbit() {
             logoGroup.rotation.y = 0.58 + time * logoSpinSpeed;
             logoGroup.rotation.x =
               logoPitch + Math.sin(time * axisOscillationSpeed) * 0.03;
-            ring.rotation.z = time * -0.42;
           }
 
           updateGlowLayers.forEach((updateGlowLayer) =>
