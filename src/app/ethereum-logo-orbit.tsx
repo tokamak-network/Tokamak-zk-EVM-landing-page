@@ -257,25 +257,24 @@ export function EthereumLogoOrbit() {
                 for (int i = 0; i < STEPS; i++) {
                   float t = start + (float(i) + 0.5) * stepSize;
                   vec3 p = rayOrigin + rayDirection * t;
-                  vec3 q = vec3(p.x * 0.72, p.y * 2.25, p.z * 0.72);
-                  float radius = length(q);
-                  float centerDensity = exp(-radius * radius * 2.6);
-                  float boundaryFade =
-                    smoothstep(1.0, 0.2, abs(p.x)) *
-                    smoothstep(1.0, 0.2, abs(p.y)) *
-                    smoothstep(1.0, 0.2, abs(p.z));
+                  vec3 densityShape = vec3(p.x * 0.72, p.y * 2.25, p.z * 0.72);
+                  vec3 ellipsoidShape = vec3(p.x * 1.08, p.y * 2.82, p.z * 1.08);
+                  float densityRadius = length(densityShape);
+                  float ellipsoidRadius = length(ellipsoidShape);
+                  float centerDensity = exp(-densityRadius * densityRadius * 2.6);
+                  float atmosphericFalloff = 1.0 - smoothstep(0.74, 1.08, ellipsoidRadius);
                   float turbulence =
                     noise(p * 3.6 + vec3(0.0, uTime * 0.2, uTime * 0.1)) * 0.45 +
                     noise(p * 8.0 - vec3(uTime * 0.12, 0.0, uTime * 0.16)) * 0.18;
                   float pulse = 0.9 + sin(uTime * 1.22) * 0.06;
                   float density =
                     centerDensity *
-                    boundaryFade *
+                    atmosphericFalloff *
                     (0.86 + turbulence * 0.34) *
                     pulse;
 
                   accumulatedDensity += density * stepSize;
-                  accumulatedCore += centerDensity * boundaryFade * stepSize;
+                  accumulatedCore += centerDensity * atmosphericFalloff * stepSize;
                 }
 
                 float alpha = 1.0 - exp(-accumulatedDensity * uOpacity * 1.48);
