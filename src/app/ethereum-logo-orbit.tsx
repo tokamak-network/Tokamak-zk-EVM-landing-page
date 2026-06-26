@@ -143,7 +143,7 @@ export function EthereumLogoOrbit() {
           logoGroup.add(lines);
         });
 
-        const createDiamondGlowTexture = () => {
+        const createPointGlowTexture = () => {
           const size = 512;
           const glowCanvas = document.createElement("canvas");
           glowCanvas.width = size;
@@ -161,23 +161,21 @@ export function EthereumLogoOrbit() {
             for (let x = 0; x < size; x += 1) {
               const nx = ((x + 0.5) / size) * 2 - 1;
               const ny = ((y + 0.5) / size) * 2 - 1;
-              const diamondDistance = Math.abs(nx) + Math.abs(ny);
               const radialDistance = Math.sqrt(nx * nx + ny * ny);
               const pixelIndex = (y * size + x) * 4;
 
-              if (diamondDistance > 1.5) {
+              if (radialDistance > 1) {
                 data[pixelIndex + 3] = 0;
                 continue;
               }
 
-              const core = Math.max(0, 1 - diamondDistance / 0.34);
-              const face = Math.max(0, 1 - diamondDistance / 0.84);
-              const spill = Math.max(0, 1 - diamondDistance / 1.5);
-              const radialFade = Math.max(0, 1 - radialDistance / 1.05);
+              const core = Math.max(0, 1 - radialDistance / 0.16);
+              const bloom = Math.max(0, 1 - radialDistance / 0.54);
+              const spill = Math.max(0, 1 - radialDistance);
               const alpha =
-                Math.pow(core, 1.15) * 0.62 +
-                Math.pow(face, 1.7) * 0.32 +
-                Math.pow(spill * radialFade, 2.2) * 0.4;
+                Math.pow(core, 0.72) * 0.98 +
+                Math.pow(bloom, 1.45) * 0.56 +
+                Math.pow(spill, 2.55) * 0.32;
 
               data[pixelIndex] = 244;
               data[pixelIndex + 1] = 250;
@@ -198,36 +196,32 @@ export function EthereumLogoOrbit() {
           return texture;
         };
 
-        const glowTexture = createDiamondGlowTexture();
+        const glowTexture = createPointGlowTexture();
         disposableTextures.push(glowTexture);
         const updateGlowLayers: Array<(time: number) => void> = [];
+        const gapCenterY = (upperY + lowerY) / 2;
 
-        const addFaceGlow = ({
+        const centerLight = new THREE.PointLight(0xf6fbff, 8.5, 4.4, 1.35);
+        centerLight.position.set(0, gapCenterY, 0);
+        logoGroup.add(centerLight);
+
+        const addCenteredGlow = ({
           baseOpacity,
           baseScale,
-          direction,
-          offset,
           opacityPulse,
           phase,
           scalePulse,
-          y,
         }: {
           baseOpacity: number;
           baseScale: number;
-          direction: -1 | 1;
-          offset: number;
           opacityPulse: number;
           phase: number;
           scalePulse: number;
-          y: number;
         }) => {
-          const geometry = new THREE.PlaneGeometry(1.52, 1.52);
-          disposableGeometries.push(geometry);
-
-          const material = new THREE.MeshBasicMaterial({
+          const material = new THREE.SpriteMaterial({
             blending: THREE.AdditiveBlending,
             color: 0xffffff,
-            depthTest: false,
+            depthTest: true,
             depthWrite: false,
             map: glowTexture,
             opacity: baseOpacity,
@@ -235,13 +229,12 @@ export function EthereumLogoOrbit() {
             toneMapped: false,
             transparent: true,
           });
-          material.color.setRGB(3.4, 3.7, 4.05);
+          material.color.setRGB(3.8, 4.15, 4.7);
           disposableMaterials.push(material);
 
-          const glow = new THREE.Mesh(geometry, material);
-          glow.position.y = y + direction * offset;
+          const glow = new THREE.Sprite(material);
+          glow.position.set(0, gapCenterY, 0);
           glow.renderOrder = 3;
-          glow.rotation.x = -Math.PI / 2;
           glow.scale.setScalar(baseScale);
           logoGroup.add(glow);
 
@@ -249,72 +242,38 @@ export function EthereumLogoOrbit() {
             const pulse = (Math.sin(time * 1.62 + phase) + 1) / 2;
             const easedPulse = pulse * pulse * (3 - 2 * pulse);
 
-            glow.position.y =
-              y + direction * (offset + easedPulse * 0.018);
             glow.scale.setScalar(baseScale + easedPulse * scalePulse);
             material.opacity = baseOpacity + easedPulse * opacityPulse;
           });
         };
 
-        addFaceGlow({
-          baseOpacity: 0.36,
-          baseScale: 0.94,
-          direction: -1,
-          offset: 0.01,
-          opacityPulse: 0.14,
+        addCenteredGlow({
+          baseOpacity: 0.94,
+          baseScale: 0.76,
+          opacityPulse: 0.2,
           phase: 0.1,
-          scalePulse: 0.1,
-          y: upperY,
+          scalePulse: 0.08,
         });
-        addFaceGlow({
-          baseOpacity: 0.15,
-          baseScale: 1.13,
-          direction: -1,
-          offset: 0.028,
-          opacityPulse: 0.12,
+        addCenteredGlow({
+          baseOpacity: 0.68,
+          baseScale: 1.58,
+          opacityPulse: 0.24,
           phase: 1.45,
-          scalePulse: 0.34,
-          y: upperY,
+          scalePulse: 0.32,
         });
-        addFaceGlow({
-          baseOpacity: 0.065,
-          baseScale: 1.38,
-          direction: -1,
-          offset: 0.052,
-          opacityPulse: 0.075,
+        addCenteredGlow({
+          baseOpacity: 0.38,
+          baseScale: 2.72,
+          opacityPulse: 0.16,
           phase: 2.5,
-          scalePulse: 0.48,
-          y: upperY,
+          scalePulse: 0.56,
         });
-        addFaceGlow({
-          baseOpacity: 0.31,
-          baseScale: 0.94,
-          direction: 1,
-          offset: 0.01,
-          opacityPulse: 0.12,
+        addCenteredGlow({
+          baseOpacity: 0.18,
+          baseScale: 4,
+          opacityPulse: 0.1,
           phase: 0.7,
-          scalePulse: 0.1,
-          y: lowerY,
-        });
-        addFaceGlow({
-          baseOpacity: 0.13,
-          baseScale: 1.11,
-          direction: 1,
-          offset: 0.028,
-          opacityPulse: 0.105,
-          phase: 2.05,
-          scalePulse: 0.3,
-          y: lowerY,
-        });
-        addFaceGlow({
-          baseOpacity: 0.055,
-          baseScale: 1.34,
-          direction: 1,
-          offset: 0.052,
-          opacityPulse: 0.065,
-          phase: 3.1,
-          scalePulse: 0.44,
-          y: lowerY,
+          scalePulse: 0.82,
         });
 
         const ringGeometry = new THREE.TorusGeometry(1.26, 0.007, 8, 120);
