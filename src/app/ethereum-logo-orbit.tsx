@@ -57,10 +57,16 @@ export function EthereumLogoOrbit() {
 
         const top = new THREE.Vector3(0, 1.5041, 0);
         const bottom = new THREE.Vector3(0, -1.3241, 0);
-        const left = new THREE.Vector3(-0.74, 0, 0);
-        const right = new THREE.Vector3(0.74, 0, 0);
-        const front = new THREE.Vector3(0, 0, 0.74);
-        const back = new THREE.Vector3(0, 0, -0.74);
+        const upperY = 0.1722;
+        const lowerY = 0.0078;
+        const upperLeft = new THREE.Vector3(-0.74, upperY, 0);
+        const upperRight = new THREE.Vector3(0.74, upperY, 0);
+        const upperFront = new THREE.Vector3(0, upperY, 0.74);
+        const upperBack = new THREE.Vector3(0, upperY, -0.74);
+        const lowerLeft = new THREE.Vector3(-0.74, lowerY, 0);
+        const lowerRight = new THREE.Vector3(0.74, lowerY, 0);
+        const lowerFront = new THREE.Vector3(0, lowerY, 0.74);
+        const lowerBack = new THREE.Vector3(0, lowerY, -0.74);
 
         const faceColors = [
           "#e7f1ff",
@@ -74,14 +80,14 @@ export function EthereumLogoOrbit() {
         ];
 
         const faces = [
-          [top, left, front],
-          [top, front, right],
-          [top, right, back],
-          [top, back, left],
-          [bottom, front, left],
-          [bottom, right, front],
-          [bottom, back, right],
-          [bottom, left, back],
+          [top, upperLeft, upperFront],
+          [top, upperFront, upperRight],
+          [top, upperRight, upperBack],
+          [top, upperBack, upperLeft],
+          [bottom, lowerFront, lowerLeft],
+          [bottom, lowerRight, lowerFront],
+          [bottom, lowerBack, lowerRight],
+          [bottom, lowerLeft, lowerBack],
         ];
 
         faces.forEach((points, index) => {
