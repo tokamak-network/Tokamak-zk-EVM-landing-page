@@ -383,24 +383,36 @@ export function EthereumLogoOrbit() {
                 vec2 p = vUv * 2.0 - 1.0;
                 float r = length(p);
                 float radius = mix(0.1, 0.94, uProgress);
-                float leadingEdge = 1.0 - smoothstep(0.0, 0.035, abs(r - radius));
+                float ringDistance = abs(r - radius);
+                float brightCore = exp(-(ringDistance * ringDistance) / 0.0012);
+                float innerHalo = exp(-(ringDistance * ringDistance) / 0.018);
+                float outerHalo = exp(-(ringDistance * ringDistance) / 0.095);
                 float softBody =
                   smoothstep(radius, radius - 0.22, r) *
                   smoothstep(radius + 0.26, radius, r);
                 float tail =
                   smoothstep(radius - 0.52, radius - 0.1, r) *
                   smoothstep(radius + 0.08, radius - 0.12, r);
-                float core = exp(-r * r * 10.0) * pow(1.0 - uProgress, 2.4);
-                float fade = smoothstep(1.0, 0.62, uProgress) * (1.0 - smoothstep(0.92, 1.0, uProgress));
+                float centerIgnition = exp(-r * r * 9.0) * pow(1.0 - uProgress, 2.25);
+                float fade =
+                  smoothstep(1.0, 0.54, uProgress) *
+                  (1.0 - smoothstep(0.94, 1.0, uProgress));
                 float alpha =
-                  (leadingEdge * 1.35 + softBody * 0.42 + tail * 0.2 + core * 0.55) *
+                  (
+                    brightCore * 0.9 +
+                    innerHalo * 0.34 +
+                    outerHalo * 0.18 +
+                    softBody * 0.07 +
+                    tail * 0.08 +
+                    centerIgnition * 0.2
+                  ) *
                   fade *
                   uOpacity;
                 vec3 color =
-                  vec3(0.93, 0.985, 1.0) *
-                  (1.25 + leadingEdge * 3.4 + softBody * 0.9);
+                  vec3(0.9, 0.975, 1.0) *
+                  (1.06 + brightCore * 7.2 + innerHalo * 2.45 + outerHalo * 0.95);
 
-                gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.86));
+                gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.9));
               }
             `,
           });
@@ -423,13 +435,13 @@ export function EthereumLogoOrbit() {
         addExpandingDiscPulse({
           duration: 2.8,
           maxScale: 1.72,
-          opacity: 0.78,
+          opacity: 0.66,
           phase: 0,
         });
         addExpandingDiscPulse({
           duration: 2.8,
           maxScale: 2.08,
-          opacity: 0.52,
+          opacity: 0.42,
           phase: 1.4,
         });
 
