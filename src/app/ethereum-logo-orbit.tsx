@@ -278,8 +278,8 @@ export function EthereumLogoOrbit() {
                   accumulatedCore += centerDensity * boundaryFade * stepSize;
                 }
 
-                float alpha = 1.0 - exp(-accumulatedDensity * uOpacity * 1.28);
-                vec3 color = uColor * (1.05 + accumulatedCore * 2.15);
+                float alpha = 1.0 - exp(-accumulatedDensity * uOpacity * 1.48);
+                vec3 color = uColor * (1.12 + accumulatedCore * 2.38);
                 gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.92));
               }
             `,
@@ -309,36 +309,119 @@ export function EthereumLogoOrbit() {
         };
 
         addScatteringVolume({
-          baseOpacity: 0.38,
+          baseOpacity: 0.48,
           baseScale: 0.66,
-          opacityPulse: 0.08,
+          opacityPulse: 0.1,
           phase: 0.1,
           scalePulse: 0.08,
           verticalScale: 0.052,
         });
         addScatteringVolume({
-          baseOpacity: 0.24,
+          baseOpacity: 0.3,
           baseScale: 1.16,
-          opacityPulse: 0.055,
+          opacityPulse: 0.07,
           phase: 1.45,
           scalePulse: 0.18,
           verticalScale: 0.062,
         });
         addScatteringVolume({
-          baseOpacity: 0.12,
+          baseOpacity: 0.15,
           baseScale: 1.86,
-          opacityPulse: 0.032,
+          opacityPulse: 0.04,
           phase: 2.5,
           scalePulse: 0.28,
           verticalScale: 0.07,
         });
         addScatteringVolume({
-          baseOpacity: 0.055,
+          baseOpacity: 0.07,
           baseScale: 2.55,
-          opacityPulse: 0.02,
+          opacityPulse: 0.025,
           phase: 0.7,
           scalePulse: 0.36,
           verticalScale: 0.076,
+        });
+
+        const addExpandingDiscPulse = ({
+          duration,
+          maxScale,
+          opacity,
+          phase,
+        }: {
+          duration: number;
+          maxScale: number;
+          opacity: number;
+          phase: number;
+        }) => {
+          const geometry = new THREE.PlaneGeometry(2, 2, 96, 96);
+          disposableGeometries.push(geometry);
+
+          const material = new THREE.ShaderMaterial({
+            blending: THREE.AdditiveBlending,
+            depthTest: true,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+            toneMapped: false,
+            transparent: true,
+            uniforms: {
+              uOpacity: { value: opacity },
+              uProgress: { value: 0 },
+            },
+            vertexShader: `
+              varying vec2 vUv;
+
+              void main() {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+              }
+            `,
+            fragmentShader: `
+              uniform float uOpacity;
+              uniform float uProgress;
+              varying vec2 vUv;
+
+              void main() {
+                vec2 p = vUv * 2.0 - 1.0;
+                float r = length(p);
+                float radius = mix(0.08, 0.92, uProgress);
+                float inner = smoothstep(radius, radius - 0.22, r);
+                float outer = smoothstep(radius + 0.18, radius, r);
+                float core = exp(-r * r * 6.0) * (1.0 - uProgress) * 0.38;
+                float wave = inner * outer;
+                float fade = pow(1.0 - uProgress, 1.45);
+                float alpha = (wave * 0.78 + core) * fade * uOpacity;
+                vec3 color = vec3(0.9, 0.97, 1.0) * (1.6 + wave * 1.4);
+
+                gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.68));
+              }
+            `,
+          });
+          disposableMaterials.push(material);
+
+          const pulse = new THREE.Mesh(geometry, material);
+          pulse.position.set(0, gapCenterY, 0);
+          pulse.renderOrder = 2;
+          pulse.rotation.x = -Math.PI / 2;
+          pulse.scale.setScalar(maxScale);
+          logoGroup.add(pulse);
+
+          updateGlowLayers.push((time) => {
+            const progress = ((time + phase) % duration) / duration;
+
+            material.uniforms.uProgress.value = progress;
+          });
+        };
+
+        addExpandingDiscPulse({
+          duration: 3.2,
+          maxScale: 1.45,
+          opacity: 0.44,
+          phase: 0,
+        });
+        addExpandingDiscPulse({
+          duration: 3.2,
+          maxScale: 1.8,
+          opacity: 0.28,
+          phase: 1.6,
         });
 
         const ringGeometry = new THREE.TorusGeometry(1.26, 0.007, 8, 120);
