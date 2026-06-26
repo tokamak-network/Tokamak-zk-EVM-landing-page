@@ -160,7 +160,7 @@ export function EthereumLogoOrbit() {
           scalePulse: number;
           verticalScale: number;
         }) => {
-          const geometry = new THREE.BoxGeometry(2, 2, 2);
+          const geometry = new THREE.SphereGeometry(1, 96, 48);
           disposableGeometries.push(geometry);
 
           const material = new THREE.ShaderMaterial({
@@ -225,22 +225,24 @@ export function EthereumLogoOrbit() {
                 return mix(nxy0, nxy1, f.z);
               }
 
-              vec2 intersectBox(vec3 rayOrigin, vec3 rayDirection) {
-                vec3 invDirection = 1.0 / rayDirection;
-                vec3 t0 = (-vec3(1.0) - rayOrigin) * invDirection;
-                vec3 t1 = (vec3(1.0) - rayOrigin) * invDirection;
-                vec3 tMin = min(t0, t1);
-                vec3 tMax = max(t0, t1);
-                float nearT = max(max(tMin.x, tMin.y), tMin.z);
-                float farT = min(min(tMax.x, tMax.y), tMax.z);
+              vec2 intersectSphere(vec3 rayOrigin, vec3 rayDirection) {
+                float b = dot(rayOrigin, rayDirection);
+                float c = dot(rayOrigin, rayOrigin) - 1.0;
+                float h = b * b - c;
 
-                return vec2(nearT, farT);
+                if (h < 0.0) {
+                  return vec2(1.0, -1.0);
+                }
+
+                h = sqrt(h);
+
+                return vec2(-b - h, -b + h);
               }
 
               void main() {
                 vec3 rayOrigin = uCameraLocalPosition;
                 vec3 rayDirection = normalize(vLocalPosition - rayOrigin);
-                vec2 hit = intersectBox(rayOrigin, rayDirection);
+                vec2 hit = intersectSphere(rayOrigin, rayDirection);
                 float start = max(hit.x, 0.0);
                 float end = hit.y;
 
