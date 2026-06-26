@@ -142,6 +142,69 @@ export function EthereumLogoOrbit() {
           logoGroup.add(lines);
         });
 
+        const glowCoreMaterial = new THREE.MeshBasicMaterial({
+          blending: THREE.AdditiveBlending,
+          color: 0xffffff,
+          depthWrite: false,
+          opacity: 0.92,
+          transparent: true,
+        });
+        const glowHaloMaterial = new THREE.MeshBasicMaterial({
+          blending: THREE.AdditiveBlending,
+          color: 0xdff3ff,
+          depthWrite: false,
+          opacity: 0.28,
+          transparent: true,
+        });
+        disposableMaterials.push(glowCoreMaterial, glowHaloMaterial);
+
+        const addGlowSegment = (
+          start: typeof upperLeft,
+          end: typeof upperLeft,
+          radius: number,
+          material: typeof glowCoreMaterial,
+        ) => {
+          const center = start.clone().add(end).multiplyScalar(0.5);
+          const outward = new THREE.Vector3(center.x, 0, center.z).normalize();
+          const shiftedStart = start.clone().addScaledVector(outward, 0.02);
+          const shiftedEnd = end.clone().addScaledVector(outward, 0.02);
+          const direction = shiftedEnd.clone().sub(shiftedStart);
+          const geometry = new THREE.CylinderGeometry(
+            radius,
+            radius,
+            direction.length(),
+            16,
+            1,
+            true,
+          );
+          const quaternion = new THREE.Quaternion().setFromUnitVectors(
+            new THREE.Vector3(0, 1, 0),
+            direction.normalize(),
+          );
+          geometry.applyQuaternion(quaternion);
+          geometry.translate(
+            (shiftedStart.x + shiftedEnd.x) / 2,
+            (shiftedStart.y + shiftedEnd.y) / 2,
+            (shiftedStart.z + shiftedEnd.z) / 2,
+          );
+          disposableGeometries.push(geometry);
+
+          const glow = new THREE.Mesh(geometry, material);
+          glow.renderOrder = 2;
+          logoGroup.add(glow);
+        };
+
+        const addCapGlow = (points: Array<typeof upperLeft>) => {
+          points.forEach((point, index) => {
+            const nextPoint = points[(index + 1) % points.length];
+            addGlowSegment(point, nextPoint, 0.014, glowCoreMaterial);
+            addGlowSegment(point, nextPoint, 0.052, glowHaloMaterial);
+          });
+        };
+
+        addCapGlow([upperLeft, upperBack, upperRight, upperFront]);
+        addCapGlow([lowerLeft, lowerFront, lowerRight, lowerBack]);
+
         const ringGeometry = new THREE.TorusGeometry(1.26, 0.007, 8, 120);
         const ringMaterial = new THREE.MeshBasicMaterial({
           color: 0x61b8ff,
