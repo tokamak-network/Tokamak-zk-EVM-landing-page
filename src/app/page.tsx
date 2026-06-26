@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import { EthereumLogoOrbit } from "./ethereum-logo-orbit";
 import { ParallaxBackground } from "./parallax-background";
 
 function DisabledAction({
@@ -77,6 +78,7 @@ export default function Home() {
               <DisabledAction>See How It Works</DisabledAction>
             </div>
           </div>
+          <EthereumLogoOrbit />
         </div>
       </section>
 
