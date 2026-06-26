@@ -3,57 +3,20 @@
 import { useEffect, useRef, useState } from "react";
 
 export function EthereumLogoOrbit() {
-  const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isPulseActive, setIsPulseActive] = useState(false);
   const [showFallback, setShowFallback] = useState(false);
 
   useEffect(() => {
-    const host = hostRef.current;
     const canvas = canvasRef.current;
 
-    if (!host || !canvas) {
+    if (!canvas) {
       return;
     }
 
     let animationFrame = 0;
-    let intersectionObserver: IntersectionObserver | null = null;
-    let pulseOriginFrame = 0;
     let resizeObserver: ResizeObserver | null = null;
     let disposeScene: (() => void) | null = null;
     let disposed = false;
-
-    const updatePulseOrigin = () => {
-      const bounds = host.getBoundingClientRect();
-
-      host.style.setProperty(
-        "--orbit-pulse-x",
-        `${bounds.left + bounds.width / 2}px`,
-      );
-      host.style.setProperty(
-        "--orbit-pulse-y",
-        `${bounds.top + bounds.height / 2}px`,
-      );
-    };
-
-    const schedulePulseOriginUpdate = () => {
-      cancelAnimationFrame(pulseOriginFrame);
-      pulseOriginFrame = requestAnimationFrame(updatePulseOrigin);
-    };
-
-    intersectionObserver = new IntersectionObserver(
-      ([entry]) => {
-        setIsPulseActive(entry.intersectionRatio >= 0.35);
-        updatePulseOrigin();
-      },
-      { threshold: [0, 0.35] },
-    );
-    intersectionObserver.observe(host);
-    updatePulseOrigin();
-    window.addEventListener("resize", schedulePulseOriginUpdate);
-    window.addEventListener("scroll", schedulePulseOriginUpdate, {
-      passive: true,
-    });
 
     const buildScene = async () => {
       try {
@@ -108,36 +71,36 @@ export function EthereumLogoOrbit() {
         const surfaces = [
           {
             points: [top, upperLeft, upperFront],
-            color: "#e7f1ff",
+            color: "#8a92b2",
             opacity: 0.75,
           },
           {
             points: [top, upperFront, upperRight],
-            color: "#a8d4ff",
+            color: "#62688f",
             opacity: 0.75,
           },
           {
             points: [top, upperRight, upperBack],
-            color: "#5d9df0",
+            color: "#454a75",
             opacity: 0.75,
           },
           {
             points: [top, upperBack, upperLeft],
-            color: "#263d76",
+            color: "#62688f",
             opacity: 0.75,
           },
-          { points: [bottom, lowerFront, lowerLeft], color: "#d1e7ff" },
-          { points: [bottom, lowerRight, lowerFront], color: "#84bdff" },
-          { points: [bottom, lowerBack, lowerRight], color: "#3a75d1" },
-          { points: [bottom, lowerLeft, lowerBack], color: "#15214b" },
+          { points: [bottom, lowerFront, lowerLeft], color: "#8a92b2" },
+          { points: [bottom, lowerRight, lowerFront], color: "#62688f" },
+          { points: [bottom, lowerBack, lowerRight], color: "#454a75" },
+          { points: [bottom, lowerLeft, lowerBack], color: "#62688f" },
           {
             points: [upperLeft, upperBack, upperRight, upperFront],
-            color: "#4a9dff",
+            color: "#62688f",
             index: [0, 1, 2, 0, 2, 3],
           },
           {
             points: [lowerLeft, lowerFront, lowerRight, lowerBack],
-            color: "#326faa",
+            color: "#8a92b2",
             index: [0, 1, 2, 0, 2, 3],
           },
         ];
@@ -444,24 +407,13 @@ export function EthereumLogoOrbit() {
     return () => {
       disposed = true;
       cancelAnimationFrame(animationFrame);
-      cancelAnimationFrame(pulseOriginFrame);
-      intersectionObserver?.disconnect();
       resizeObserver?.disconnect();
       disposeScene?.();
-      window.removeEventListener("resize", schedulePulseOriginUpdate);
-      window.removeEventListener("scroll", schedulePulseOriginUpdate);
     };
   }, []);
 
   return (
-    <div ref={hostRef} className="ethereum-orbit" aria-hidden="true">
-      <div
-        className={
-          isPulseActive
-            ? "ethereum-orbit__page-pulse ethereum-orbit__page-pulse--active"
-            : "ethereum-orbit__page-pulse"
-        }
-      />
+    <div className="ethereum-orbit" aria-hidden="true">
       <canvas ref={canvasRef} className="ethereum-orbit__canvas" />
       {showFallback ? <div className="ethereum-orbit__fallback" /> : null}
     </div>
