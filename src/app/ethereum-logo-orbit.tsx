@@ -142,68 +142,69 @@ export function EthereumLogoOrbit() {
           logoGroup.add(lines);
         });
 
-        const glowCoreMaterial = new THREE.MeshBasicMaterial({
-          blending: THREE.AdditiveBlending,
-          color: 0xffffff,
-          depthWrite: false,
-          opacity: 0.92,
-          transparent: true,
-        });
-        const glowHaloMaterial = new THREE.MeshBasicMaterial({
-          blending: THREE.AdditiveBlending,
-          color: 0xdff3ff,
-          depthWrite: false,
-          opacity: 0.28,
-          transparent: true,
-        });
-        disposableMaterials.push(glowCoreMaterial, glowHaloMaterial);
-
-        const addGlowSegment = (
-          start: typeof upperLeft,
-          end: typeof upperLeft,
-          radius: number,
-          material: typeof glowCoreMaterial,
+        const addCapEmission = (
+          points: Array<typeof upperLeft>,
+          offsetY: number,
+          scale: number,
+          opacity: number,
         ) => {
-          const center = start.clone().add(end).multiplyScalar(0.5);
-          const outward = new THREE.Vector3(center.x, 0, center.z).normalize();
-          const shiftedStart = start.clone().addScaledVector(outward, 0.02);
-          const shiftedEnd = end.clone().addScaledVector(outward, 0.02);
-          const direction = shiftedEnd.clone().sub(shiftedStart);
-          const geometry = new THREE.CylinderGeometry(
-            radius,
-            radius,
-            direction.length(),
-            16,
-            1,
-            true,
+          const center = points
+            .reduce((sum, point) => sum.add(point), new THREE.Vector3())
+            .multiplyScalar(1 / points.length);
+          const emittedPoints = points.map((point) =>
+            point
+              .clone()
+              .sub(center)
+              .multiplyScalar(scale)
+              .add(center)
+              .add(new THREE.Vector3(0, offsetY, 0)),
           );
-          const quaternion = new THREE.Quaternion().setFromUnitVectors(
-            new THREE.Vector3(0, 1, 0),
-            direction.normalize(),
+          const geometry = new THREE.BufferGeometry().setFromPoints(
+            emittedPoints,
           );
-          geometry.applyQuaternion(quaternion);
-          geometry.translate(
-            (shiftedStart.x + shiftedEnd.x) / 2,
-            (shiftedStart.y + shiftedEnd.y) / 2,
-            (shiftedStart.z + shiftedEnd.z) / 2,
-          );
+          geometry.setIndex([0, 1, 2, 0, 2, 3]);
+          geometry.computeVertexNormals();
           disposableGeometries.push(geometry);
+
+          const material = new THREE.MeshBasicMaterial({
+            blending: THREE.AdditiveBlending,
+            color: 0xffffff,
+            depthWrite: false,
+            opacity,
+            side: THREE.DoubleSide,
+            transparent: true,
+          });
+          disposableMaterials.push(material);
 
           const glow = new THREE.Mesh(geometry, material);
           glow.renderOrder = 2;
           logoGroup.add(glow);
         };
 
-        const addCapGlow = (points: Array<typeof upperLeft>) => {
-          points.forEach((point, index) => {
-            const nextPoint = points[(index + 1) % points.length];
-            addGlowSegment(point, nextPoint, 0.014, glowCoreMaterial);
-            addGlowSegment(point, nextPoint, 0.052, glowHaloMaterial);
-          });
-        };
-
-        addCapGlow([upperLeft, upperBack, upperRight, upperFront]);
-        addCapGlow([lowerLeft, lowerFront, lowerRight, lowerBack]);
+        addCapEmission(
+          [upperLeft, upperBack, upperRight, upperFront],
+          -0.006,
+          1,
+          0.62,
+        );
+        addCapEmission(
+          [upperLeft, upperBack, upperRight, upperFront],
+          -0.014,
+          1.14,
+          0.22,
+        );
+        addCapEmission(
+          [lowerLeft, lowerFront, lowerRight, lowerBack],
+          0.006,
+          1,
+          0.52,
+        );
+        addCapEmission(
+          [lowerLeft, lowerFront, lowerRight, lowerBack],
+          0.014,
+          1.14,
+          0.18,
+        );
 
         const ringGeometry = new THREE.TorusGeometry(1.26, 0.007, 8, 120);
         const ringMaterial = new THREE.MeshBasicMaterial({
