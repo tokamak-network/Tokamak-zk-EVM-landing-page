@@ -126,20 +126,6 @@ export function EthereumLogoOrbit() {
           disposableMaterials.push(material);
 
           logoGroup.add(new THREE.Mesh(geometry, material));
-
-          const edges = new THREE.EdgesGeometry(geometry);
-          disposableGeometries.push(edges);
-          const edgeMaterial = new THREE.LineBasicMaterial({
-            color: 0xd8ecff,
-            transparent: true,
-            opacity: 0.32,
-          });
-          disposableMaterials.push(edgeMaterial);
-          const lines = new THREE.LineSegments(
-            edges,
-            edgeMaterial,
-          );
-          logoGroup.add(lines);
         });
 
         const updateGlowLayers: Array<(time: number) => void> = [];
@@ -151,7 +137,6 @@ export function EthereumLogoOrbit() {
           opacityPulse,
           phase,
           scalePulse,
-          speed,
           verticalScale,
         }: {
           baseOpacity: number;
@@ -159,7 +144,6 @@ export function EthereumLogoOrbit() {
           opacityPulse: number;
           phase: number;
           scalePulse: number;
-          speed: number;
           verticalScale: number;
         }) => {
           const geometry = new THREE.SphereGeometry(1, 48, 24);
@@ -175,7 +159,6 @@ export function EthereumLogoOrbit() {
             uniforms: {
               uCameraLocalPosition: { value: new THREE.Vector3(0, 0, 4) },
               uColor: { value: new THREE.Color(0xf4fbff) },
-              uExpansion: { value: 0 },
               uOpacity: { value: baseOpacity },
               uTime: { value: 0 },
             },
@@ -190,7 +173,6 @@ export function EthereumLogoOrbit() {
             fragmentShader: `
               uniform vec3 uCameraLocalPosition;
               uniform vec3 uColor;
-              uniform float uExpansion;
               uniform float uOpacity;
               uniform float uTime;
               varying vec3 vLocalPosition;
@@ -264,14 +246,7 @@ export function EthereumLogoOrbit() {
                   float densityRadius = length(densityShape);
                   float ellipsoidRadius = length(ellipsoidShape);
                   float centerDensity = exp(-densityRadius * densityRadius * 2.6);
-                  float emissionFront = 1.0 - smoothstep(
-                    uExpansion - 0.12,
-                    uExpansion + 0.26,
-                    ellipsoidRadius
-                  );
-                  float atmosphericFalloff =
-                    (1.0 - smoothstep(0.8, 1.16, ellipsoidRadius)) *
-                    emissionFront;
+                  float atmosphericFalloff = 1.0 - smoothstep(0.68, 0.98, ellipsoidRadius);
                   float turbulence =
                     noise(p * 3.6 + vec3(0.0, uTime * 0.2, uTime * 0.1)) * 0.45 +
                     noise(p * 8.0 - vec3(uTime * 0.12, 0.0, uTime * 0.16)) * 0.18;
@@ -299,70 +274,52 @@ export function EthereumLogoOrbit() {
           logoGroup.add(volume);
 
           updateGlowLayers.push((time) => {
-            const progress = (time * speed + phase) % 1;
-            const easedProgress = progress * progress * (3 - 2 * progress);
-            const fadeIn = smoothstep(0, 0.14, progress);
-            const fadeOut = 1 - smoothstep(0.72, 1, progress);
-            const expansionOpacity = fadeIn * fadeOut;
-            const animatedScale = baseScale + easedProgress * scalePulse;
+            const pulse = (Math.sin(time * 1.34 + phase) + 1) / 2;
+            const easedPulse = pulse * pulse * (3 - 2 * pulse);
+            const animatedScale = baseScale + easedPulse * scalePulse;
 
             volume.scale.set(animatedScale, verticalScale, animatedScale);
             volume.updateWorldMatrix(true, false);
             material.uniforms.uCameraLocalPosition.value.copy(
               volume.worldToLocal(camera.position.clone()),
             );
-            material.uniforms.uExpansion.value = easedProgress;
             material.uniforms.uOpacity.value =
-              (baseOpacity + opacityPulse * (1 - easedProgress * 0.45)) *
-              expansionOpacity;
+              baseOpacity + easedPulse * opacityPulse;
             material.uniforms.uTime.value = time;
           });
-        };
-
-        const smoothstep = (edge0: number, edge1: number, value: number) => {
-          const x = Math.min(
-            1,
-            Math.max(0, (value - edge0) / (edge1 - edge0)),
-          );
-
-          return x * x * (3 - 2 * x);
         };
 
         [
           {
             baseOpacity: 0.34,
             baseScale: 0.66,
-            opacityPulse: 0.1,
+            opacityPulse: 0.018,
             phase: 0.1,
-            scalePulse: 0.18,
-            speed: 0.34,
+            scalePulse: 0.035,
             verticalScale: 0.052,
           },
           {
             baseOpacity: 0.16,
             baseScale: 1.16,
-            opacityPulse: 0.06,
+            opacityPulse: 0.01,
             phase: 1.45,
-            scalePulse: 0.32,
-            speed: 0.28,
+            scalePulse: 0.055,
             verticalScale: 0.062,
           },
           {
             baseOpacity: 0.07,
-            baseScale: 1.86,
-            opacityPulse: 0.026,
+            baseScale: 1.72,
+            opacityPulse: 0.006,
             phase: 2.5,
-            scalePulse: 0.44,
-            speed: 0.22,
+            scalePulse: 0.07,
             verticalScale: 0.07,
           },
           {
             baseOpacity: 0.032,
-            baseScale: 2.55,
-            opacityPulse: 0.012,
+            baseScale: 2.14,
+            opacityPulse: 0.003,
             phase: 0.7,
-            scalePulse: 0.54,
-            speed: 0.18,
+            scalePulse: 0.08,
             verticalScale: 0.076,
           },
         ].forEach(addScatteringVolume);
