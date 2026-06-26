@@ -77,6 +77,10 @@ export function EthereumLogoOrbit() {
           "#84bdff",
           "#3a75d1",
           "#15214b",
+          "#4a9dff",
+          "#2b6fd2",
+          "#326faa",
+          "#1a3569",
         ];
 
         const faces = [
@@ -88,6 +92,10 @@ export function EthereumLogoOrbit() {
           [bottom, lowerRight, lowerFront],
           [bottom, lowerBack, lowerRight],
           [bottom, lowerLeft, lowerBack],
+          [upperLeft, upperBack, upperRight],
+          [upperLeft, upperRight, upperFront],
+          [lowerLeft, lowerFront, lowerRight],
+          [lowerLeft, lowerRight, lowerBack],
         ];
 
         faces.forEach((points, index) => {
