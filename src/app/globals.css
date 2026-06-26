@@ -221,17 +221,10 @@ main {
   pointer-events: none;
 }
 
-.ethereum-orbit::before,
 .ethereum-orbit::after {
   position: absolute;
   content: "";
   pointer-events: none;
-}
-
-.ethereum-orbit::before {
-  inset: 11%;
-  border: 1px solid rgba(97, 184, 255, 0.22);
-  transform: rotate(-18deg) skewY(9deg);
 }
 
 .ethereum-orbit::after {
@@ -610,9 +603,5 @@ code {
 
   .background-layer {
     transform: none !important;
-  }
-
-  .ethereum-orbit::before {
-    transform: rotate(-18deg) skewY(9deg) !important;
   }
 }
