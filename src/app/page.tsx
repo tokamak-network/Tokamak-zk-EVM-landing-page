@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import { EthereumLogoOrbit } from "./ethereum-logo-orbit";
 import { ParallaxBackground } from "./parallax-background";
 
 function DisabledAction({
@@ -53,28 +54,31 @@ export default function Home() {
           </div>
         </nav>
 
-        <div className="hero-copy" id="top">
-          <span className="section-kicker">Validity-proven app channels</span>
-          <h1 className="hero-wordmark" aria-label="Tonigma">
-            <Image
-              alt=""
-              aria-hidden="true"
-              height={371}
-              priority
-              sizes="(max-width: 760px) calc(100vw - 32px), 620px"
-              src="/brand/tonigma-wordmark-white.svg"
-              width={2558}
-            />
-          </h1>
-          <p className="hero-lines">
-            <span>Run decentralized apps on your own device.</span>
-            <span>Generate your own proofs.</span>
-            <span>Verify on Ethereum.</span>
-          </p>
-          <div className="hero-actions">
-            <DisabledAction>Explore DApps</DisabledAction>
-            <DisabledAction>See How It Works</DisabledAction>
+        <div className="hero-stage">
+          <div className="hero-copy" id="top">
+            <span className="section-kicker">Validity-proven app channels</span>
+            <h1 className="hero-wordmark" aria-label="Tonigma">
+              <Image
+                alt=""
+                aria-hidden="true"
+                height={371}
+                priority
+                sizes="(max-width: 760px) calc(100vw - 32px), 620px"
+                src="/brand/tonigma-wordmark-white.svg"
+                width={2558}
+              />
+            </h1>
+            <p className="hero-lines">
+              <span>Run decentralized apps on your own device.</span>
+              <span>Generate your own proofs.</span>
+              <span>Verify on Ethereum.</span>
+            </p>
+            <div className="hero-actions">
+              <DisabledAction>Explore DApps</DisabledAction>
+              <DisabledAction>See How It Works</DisabledAction>
+            </div>
           </div>
+          <EthereumLogoOrbit />
         </div>
       </section>
 

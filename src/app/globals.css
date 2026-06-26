@@ -151,6 +151,14 @@ main {
   gap: 48px;
 }
 
+.hero-stage {
+  align-self: center;
+  display: grid;
+  grid-template-columns: minmax(0, 640px) minmax(320px, 1fr);
+  align-items: center;
+  gap: clamp(28px, 6vw, 80px);
+}
+
 .topbar {
   display: flex;
   align-items: center;
@@ -193,9 +201,62 @@ main {
 }
 
 .hero-copy {
-  align-self: center;
   width: 100%;
   max-width: 640px;
+}
+
+.ethereum-orbit {
+  position: relative;
+  width: min(42vw, 520px);
+  min-width: 320px;
+  aspect-ratio: 1;
+  justify-self: end;
+  pointer-events: none;
+}
+
+.ethereum-orbit::before,
+.ethereum-orbit::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+}
+
+.ethereum-orbit::before {
+  inset: 11%;
+  border: 1px solid rgba(97, 184, 255, 0.22);
+  transform: rotate(-18deg) skewY(9deg);
+}
+
+.ethereum-orbit::after {
+  right: 11%;
+  bottom: 14%;
+  left: 11%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(167, 216, 255, 0.28),
+    transparent
+  );
+}
+
+.ethereum-orbit__canvas {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ethereum-orbit__fallback {
+  position: absolute;
+  inset: 24%;
+  z-index: 0;
+  clip-path: polygon(50% 0, 94% 48%, 50% 100%, 6% 48%);
+  background:
+    linear-gradient(115deg, #eef6ff 0 28%, transparent 28%),
+    linear-gradient(245deg, #2e74d3 0 42%, transparent 42%),
+    linear-gradient(180deg, #8fcbff 0 50%, #18285a 50% 100%);
 }
 
 .section-kicker {
@@ -323,6 +384,17 @@ code {
   .compact-grid {
     grid-template-columns: 1fr;
   }
+
+  .hero-stage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ethereum-orbit {
+    width: min(54vw, 360px);
+    min-width: 260px;
+    justify-self: center;
+    margin-top: -16px;
+  }
 }
 
 @media (max-width: 760px) {
@@ -334,6 +406,10 @@ code {
     min-height: 72vh;
     padding-bottom: 40px;
     gap: 36px;
+  }
+
+  .hero-stage {
+    gap: 28px;
   }
 
   .topbar {
@@ -357,6 +433,11 @@ code {
 
   .hero-wordmark {
     width: calc(100vw - 32px);
+  }
+
+  .ethereum-orbit {
+    width: min(74vw, 320px);
+    min-width: 220px;
   }
 
   .hero-actions {
@@ -413,5 +494,9 @@ code {
 
   .background-layer {
     transform: none !important;
+  }
+
+  .ethereum-orbit::before {
+    transform: rotate(-18deg) skewY(9deg) !important;
   }
 }
