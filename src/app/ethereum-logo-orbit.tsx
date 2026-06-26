@@ -68,44 +68,37 @@ export function EthereumLogoOrbit() {
         const lowerFront = new THREE.Vector3(0, lowerY, 0.74);
         const lowerBack = new THREE.Vector3(0, lowerY, -0.74);
 
-        const faceColors = [
-          "#e7f1ff",
-          "#a8d4ff",
-          "#5d9df0",
-          "#263d76",
-          "#d1e7ff",
-          "#84bdff",
-          "#3a75d1",
-          "#15214b",
-          "#4a9dff",
-          "#4a9dff",
-          "#326faa",
-          "#326faa",
+        const surfaces = [
+          { points: [top, upperLeft, upperFront], color: "#e7f1ff" },
+          { points: [top, upperFront, upperRight], color: "#a8d4ff" },
+          { points: [top, upperRight, upperBack], color: "#5d9df0" },
+          { points: [top, upperBack, upperLeft], color: "#263d76" },
+          { points: [bottom, lowerFront, lowerLeft], color: "#d1e7ff" },
+          { points: [bottom, lowerRight, lowerFront], color: "#84bdff" },
+          { points: [bottom, lowerBack, lowerRight], color: "#3a75d1" },
+          { points: [bottom, lowerLeft, lowerBack], color: "#15214b" },
+          {
+            points: [upperLeft, upperBack, upperRight, upperFront],
+            color: "#4a9dff",
+            index: [0, 1, 2, 0, 2, 3],
+          },
+          {
+            points: [lowerLeft, lowerFront, lowerRight, lowerBack],
+            color: "#326faa",
+            index: [0, 1, 2, 0, 2, 3],
+          },
         ];
 
-        const faces = [
-          [top, upperLeft, upperFront],
-          [top, upperFront, upperRight],
-          [top, upperRight, upperBack],
-          [top, upperBack, upperLeft],
-          [bottom, lowerFront, lowerLeft],
-          [bottom, lowerRight, lowerFront],
-          [bottom, lowerBack, lowerRight],
-          [bottom, lowerLeft, lowerBack],
-          [upperLeft, upperBack, upperRight],
-          [upperLeft, upperRight, upperFront],
-          [lowerLeft, lowerFront, lowerRight],
-          [lowerLeft, lowerRight, lowerBack],
-        ];
-
-        faces.forEach((points, index) => {
-          const geometry = new THREE.BufferGeometry().setFromPoints([...points]);
-          geometry.setIndex([0, 1, 2]);
+        surfaces.forEach((surface, index) => {
+          const geometry = new THREE.BufferGeometry().setFromPoints([
+            ...surface.points,
+          ]);
+          geometry.setIndex(surface.index ?? [0, 1, 2]);
           geometry.computeVertexNormals();
           disposableGeometries.push(geometry);
 
           const material = new THREE.MeshStandardMaterial({
-            color: faceColors[index],
+            color: surface.color,
             emissive: index % 4 === 0 ? "#12345c" : "#050a16",
             emissiveIntensity: index % 4 === 0 ? 0.18 : 0.08,
             metalness: 0.36,
