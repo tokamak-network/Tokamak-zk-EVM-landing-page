@@ -214,6 +214,8 @@ main {
 
 .ethereum-orbit {
   --orbit-canvas-size: 124%;
+  --orbit-pulse-x: 50vw;
+  --orbit-pulse-y: 50vh;
 
   position: relative;
   width: min(42vw, 520px);
@@ -222,6 +224,42 @@ main {
   justify-self: end;
   overflow: visible;
   pointer-events: none;
+}
+
+.ethereum-orbit__page-pulse {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+.ethereum-orbit__page-pulse--active {
+  opacity: 1;
+}
+
+.ethereum-orbit__page-pulse::before,
+.ethereum-orbit__page-pulse::after {
+  position: absolute;
+  left: var(--orbit-pulse-x);
+  top: var(--orbit-pulse-y);
+  width: 230vmax;
+  height: 82vmax;
+  border: clamp(1px, 0.12vmax, 2px) solid rgba(230, 248, 255, 0.18);
+  border-radius: 50%;
+  content: "";
+  filter: blur(0.35px);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.02);
+  animation: ethereum-page-pulse 18s linear infinite;
+}
+
+.ethereum-orbit__page-pulse::after {
+  border-color: rgba(210, 240, 255, 0.11);
+  animation-delay: -9s;
 }
 
 .ethereum-orbit__canvas {
@@ -253,11 +291,29 @@ main {
 }
 
 .ethereum-orbit-section .ethereum-orbit {
-  --orbit-canvas-size: max(520%, 220vmax);
-
   width: min(72vw, 560px);
   justify-self: center;
   margin: 0 auto;
+}
+
+@keyframes ethereum-page-pulse {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.03);
+  }
+
+  6% {
+    opacity: 0.42;
+  }
+
+  72% {
+    opacity: 0.2;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
 .section-kicker {

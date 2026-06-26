@@ -3,20 +3,57 @@
 import { useEffect, useRef, useState } from "react";
 
 export function EthereumLogoOrbit() {
+  const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isPulseActive, setIsPulseActive] = useState(false);
   const [showFallback, setShowFallback] = useState(false);
 
   useEffect(() => {
+    const host = hostRef.current;
     const canvas = canvasRef.current;
 
-    if (!canvas) {
+    if (!host || !canvas) {
       return;
     }
 
     let animationFrame = 0;
+    let intersectionObserver: IntersectionObserver | null = null;
+    let pulseOriginFrame = 0;
     let resizeObserver: ResizeObserver | null = null;
     let disposeScene: (() => void) | null = null;
     let disposed = false;
+
+    const updatePulseOrigin = () => {
+      const bounds = host.getBoundingClientRect();
+
+      host.style.setProperty(
+        "--orbit-pulse-x",
+        `${bounds.left + bounds.width / 2}px`,
+      );
+      host.style.setProperty(
+        "--orbit-pulse-y",
+        `${bounds.top + bounds.height / 2}px`,
+      );
+    };
+
+    const schedulePulseOriginUpdate = () => {
+      cancelAnimationFrame(pulseOriginFrame);
+      pulseOriginFrame = requestAnimationFrame(updatePulseOrigin);
+    };
+
+    intersectionObserver = new IntersectionObserver(
+      ([entry]) => {
+        setIsPulseActive(entry.intersectionRatio >= 0.35);
+        updatePulseOrigin();
+      },
+      { threshold: [0, 0.35] },
+    );
+    intersectionObserver.observe(host);
+    updatePulseOrigin();
+    window.addEventListener("resize", schedulePulseOriginUpdate);
+    window.addEventListener("scroll", schedulePulseOriginUpdate, {
+      passive: true,
+    });
 
     const buildScene = async () => {
       try {
@@ -340,112 +377,6 @@ export function EthereumLogoOrbit() {
           },
         ].forEach(addScatteringVolume);
 
-        const discPulseVertexShader = `
-          varying vec2 vUv;
-
-          void main() {
-            vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `;
-
-        const createDiscPulseMaterial = (
-          opacity: number,
-          fragmentShader: string,
-        ) =>
-          new THREE.ShaderMaterial({
-            blending: THREE.AdditiveBlending,
-            depthTest: true,
-            depthWrite: false,
-            side: THREE.DoubleSide,
-            toneMapped: false,
-            transparent: true,
-            uniforms: {
-              uOpacity: { value: opacity },
-              uProgress: { value: 0 },
-            },
-            vertexShader: discPulseVertexShader,
-            fragmentShader,
-          });
-
-        const addExpandingDiscPulse = ({
-          duration,
-          maxScale,
-          opacity,
-          phase,
-        }: {
-          duration: number;
-          maxScale: number;
-          opacity: number;
-          phase: number;
-        }) => {
-          const geometry = new THREE.PlaneGeometry(2, 2);
-          disposableGeometries.push(geometry);
-
-          const material = createDiscPulseMaterial(opacity, `
-              uniform float uOpacity;
-              uniform float uProgress;
-              varying vec2 vUv;
-
-              void main() {
-                vec2 p = vUv * 2.0 - 1.0;
-                float r = length(p);
-                float edgeFade = 1.0 - smoothstep(0.94, 1.0, r);
-                float radius = mix(0.1, 0.96, uProgress);
-                float ringDistance = abs(r - radius);
-                float brightCore = 1.0 - smoothstep(0.003, 0.006, ringDistance);
-                float innerHalo = 1.0 - smoothstep(0.006, 0.012, ringDistance);
-                float centerIgnition = exp(-r * r * 9.0) * pow(1.0 - uProgress, 2.8);
-                float fade =
-                  smoothstep(1.0, 0.74, uProgress) *
-                  (1.0 - smoothstep(0.99, 1.0, uProgress));
-                float alpha =
-                  (
-                    brightCore * 0.18 +
-                    innerHalo * 0.006 +
-                    centerIgnition * 0.008
-                  ) *
-                  edgeFade *
-                  fade *
-                  uOpacity;
-                vec3 color =
-                  vec3(0.9, 0.975, 1.0) *
-                  (0.72 + brightCore * 1.25 + innerHalo * 0.06);
-
-                gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.2));
-              }
-            `);
-          disposableMaterials.push(material);
-
-          const pulse = new THREE.Mesh(geometry, material);
-          pulse.position.set(0, gapCenterY, 0);
-          pulse.renderOrder = 4;
-          pulse.rotation.x = -Math.PI / 2;
-          pulse.scale.setScalar(maxScale);
-          logoGroup.add(pulse);
-
-          updateGlowLayers.push((time) => {
-            const progress = ((time + phase) % duration) / duration;
-
-            material.uniforms.uProgress.value = progress;
-          });
-        };
-
-        [
-          {
-            duration: 18,
-            maxScale: 12.8,
-            opacity: 0.22,
-            phase: 0,
-          },
-          {
-            duration: 18,
-            maxScale: 15.6,
-            opacity: 0.13,
-            phase: 9,
-          },
-        ].forEach(addExpandingDiscPulse);
-
         const logoPitch = (31.5 * Math.PI) / 180;
 
         logoGroup.rotation.x = logoPitch;
@@ -513,13 +444,24 @@ export function EthereumLogoOrbit() {
     return () => {
       disposed = true;
       cancelAnimationFrame(animationFrame);
+      cancelAnimationFrame(pulseOriginFrame);
+      intersectionObserver?.disconnect();
       resizeObserver?.disconnect();
       disposeScene?.();
+      window.removeEventListener("resize", schedulePulseOriginUpdate);
+      window.removeEventListener("scroll", schedulePulseOriginUpdate);
     };
   }, []);
 
   return (
-    <div className="ethereum-orbit" aria-hidden="true">
+    <div ref={hostRef} className="ethereum-orbit" aria-hidden="true">
+      <div
+        className={
+          isPulseActive
+            ? "ethereum-orbit__page-pulse ethereum-orbit__page-pulse--active"
+            : "ethereum-orbit__page-pulse"
+        }
+      />
       <canvas ref={canvasRef} className="ethereum-orbit__canvas" />
       {showFallback ? <div className="ethereum-orbit__fallback" /> : null}
     </div>
