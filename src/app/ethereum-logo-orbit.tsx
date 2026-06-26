@@ -385,6 +385,7 @@ export function EthereumLogoOrbit() {
               void main() {
                 vec2 p = vUv * 2.0 - 1.0;
                 float r = length(p);
+                float edgeFade = 1.0 - smoothstep(0.76, 1.0, r);
                 float radius = mix(0.16, 0.9, uProgress);
                 float expandingGlow = exp(-pow(abs(r - radius), 2.0) / 0.075);
                 float broadIllumination =
@@ -396,6 +397,7 @@ export function EthereumLogoOrbit() {
                   (1.0 - smoothstep(0.96, 1.0, uProgress));
                 float alpha =
                   (expandingGlow * 0.16 + broadIllumination * 0.2 + centerBurst * 0.06) *
+                  edgeFade *
                   fade *
                   uOpacity;
                 vec3 color = vec3(0.82, 0.94, 1.0) * (0.9 + expandingGlow * 0.55);
@@ -433,6 +435,7 @@ export function EthereumLogoOrbit() {
               void main() {
                 vec2 p = vUv * 2.0 - 1.0;
                 float r = length(p);
+                float edgeFade = 1.0 - smoothstep(0.82, 1.0, r);
                 float radius = mix(0.18, 0.94, uProgress);
                 float ringDistance = abs(r - radius);
                 float brightCore = exp(-(ringDistance * ringDistance) / 0.0012);
@@ -457,6 +460,7 @@ export function EthereumLogoOrbit() {
                     tail * 0.08 +
                     centerIgnition * 0.06
                   ) *
+                  edgeFade *
                   fade *
                   uOpacity;
                 vec3 color =
@@ -515,7 +519,7 @@ export function EthereumLogoOrbit() {
           const width = Math.max(1, Math.floor(bounds.width));
           const height = Math.max(1, Math.floor(bounds.height));
           const aspect = width / height;
-          const verticalSize = 3.9;
+          const verticalSize = 4.84;
 
           camera.left = (-verticalSize * aspect) / 2;
           camera.right = (verticalSize * aspect) / 2;
