@@ -78,34 +78,14 @@ export default function Home() {
               <DisabledAction>See How It Works</DisabledAction>
             </div>
           </div>
-          <EthereumLogoOrbit />
         </div>
       </section>
 
-      <section className="section-shell compact-section">
-        <span className="section-kicker">What Tonigma is</span>
-        <h2>A channel between your device and Ethereum.</h2>
-        <ol className="flow-diagram" aria-label="Tonigma execution flow">
-          <li>
-            <span className="flow-step__index">01</span>
-            <strong>Your device</strong>
-            <span>Run the app locally.</span>
-          </li>
-          <li>
-            <span className="flow-step__index">02</span>
-            <strong>Your proof</strong>
-            <span>Create evidence of the run.</span>
-          </li>
-          <li>
-            <span className="flow-step__index">03</span>
-            <strong>Ethereum</strong>
-            <span>Verify the result.</span>
-          </li>
-        </ol>
-        <p className="section-note">
-          Tonigma helps Ethereum apps keep more app work on the user's device
-          while publishing the proof needed for public verification.
-        </p>
+      <section
+        className="section-shell compact-section ethereum-orbit-section"
+        aria-label="Ethereum logo orbit animation"
+      >
+        <EthereumLogoOrbit />
       </section>
 
       <section className="section-shell compact-section example-section">

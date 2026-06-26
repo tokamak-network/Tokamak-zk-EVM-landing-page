@@ -242,6 +242,18 @@ main {
     linear-gradient(180deg, #8fcbff 0 50%, #18285a 50% 100%);
 }
 
+.ethereum-orbit-section {
+  min-height: min(70vh, 680px);
+  display: grid;
+  place-items: center;
+}
+
+.ethereum-orbit-section .ethereum-orbit {
+  width: min(72vw, 560px);
+  justify-self: center;
+  margin: 0 auto;
+}
+
 .section-kicker {
   display: inline-flex;
   align-items: center;
