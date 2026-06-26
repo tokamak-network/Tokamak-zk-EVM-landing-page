@@ -221,25 +221,6 @@ main {
   pointer-events: none;
 }
 
-.ethereum-orbit::after {
-  position: absolute;
-  content: "";
-  pointer-events: none;
-}
-
-.ethereum-orbit::after {
-  right: 11%;
-  bottom: 14%;
-  left: 11%;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(167, 216, 255, 0.28),
-    transparent
-  );
-}
-
 .ethereum-orbit__canvas {
   position: relative;
   z-index: 1;
