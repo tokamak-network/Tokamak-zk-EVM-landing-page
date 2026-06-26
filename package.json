@@ -13,8 +13,7 @@
     "lucide-react": "latest",
     "next": "latest",
     "react": "latest",
-    "react-dom": "latest",
-    "three": "^0.185.0"
+    "react-dom": "latest"
   },
   "devDependencies": {
     "@remotion/cli": "^4.0.482",
@@ -22,7 +21,6 @@
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "@types/three": "^0.185.0",
     "remotion": "^4.0.482",
     "typescript": "latest"
   },

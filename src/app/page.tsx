@@ -1,6 +1,5 @@
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
-import { EthereumLogoOrbit } from "./ethereum-logo-orbit";
 import { ParallaxBackground } from "./parallax-background";
 
 function DisabledAction({
@@ -56,7 +55,7 @@ export default function Home() {
 
         <div className="hero-stage">
           <div className="hero-copy" id="top">
-            <span className="section-kicker">Validity-proven app channels</span>
+            <span className="section-kicker">Privacy channels for Ethereum</span>
             <h1 className="hero-wordmark" aria-label="Tonigma">
               <Image
                 alt=""
@@ -78,24 +77,33 @@ export default function Home() {
               <DisabledAction>See How It Works</DisabledAction>
             </div>
           </div>
-          <EthereumLogoOrbit />
         </div>
       </section>
 
       <section className="section-shell compact-section">
         <span className="section-kicker">What Tonigma is</span>
-        <h2>App-specific proof channels with public verification edges.</h2>
-        <div className="compact-grid">
-          <p>
-            Tonigma presents DApps as validity-proven channels with explicit
-            public boundaries for policy, proof acceptance, and settlement.
-          </p>
-          <p>
-            Ethereum remains the public anchor for custody and verification,
-            while each DApp defines its own channel behavior and disclosure
-            model.
-          </p>
-        </div>
+        <h2>A channel between your device and Ethereum.</h2>
+        <ol className="flow-diagram" aria-label="Tonigma execution flow">
+          <li>
+            <span className="flow-step__index">01</span>
+            <strong>Your device</strong>
+            <span>Run the app locally.</span>
+          </li>
+          <li>
+            <span className="flow-step__index">02</span>
+            <strong>Your proof</strong>
+            <span>Create evidence of the run.</span>
+          </li>
+          <li>
+            <span className="flow-step__index">03</span>
+            <strong>Ethereum</strong>
+            <span>Verify the result.</span>
+          </li>
+        </ol>
+        <p className="section-note">
+          Tonigma helps Ethereum apps keep more app work on the user's device
+          while publishing the proof needed for public verification.
+        </p>
       </section>
 
       <section className="section-shell compact-section example-section">

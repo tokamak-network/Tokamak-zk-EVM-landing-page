@@ -8,6 +8,13 @@
   --blue: #1f8fff;
   --blue-soft: rgba(31, 143, 255, 0.16);
   --scroll-depth: 0;
+  --page-gutter: 48px;
+  --hero-block-gap: 48px;
+  --section-padding: 96px;
+  --section-padding-large: 128px;
+  --heading-gap: 16px;
+  --content-gap: 32px;
+  --action-gap: 30px;
 }
 
 * {
@@ -139,24 +146,23 @@ main {
 .section-shell {
   position: relative;
   z-index: 1;
-  width: min(1180px, calc(100% - 48px));
+  width: min(1180px, calc(100% - var(--page-gutter)));
   margin: 0 auto;
 }
 
 .hero {
   min-height: 86vh;
-  padding: 24px 0 52px;
+  padding: 24px 0 calc(var(--section-padding) * 0.55);
   display: grid;
   grid-template-rows: auto 1fr;
-  gap: 48px;
+  gap: var(--hero-block-gap);
 }
 
 .hero-stage {
   align-self: center;
   display: grid;
-  grid-template-columns: minmax(0, 640px) minmax(320px, 1fr);
+  grid-template-columns: minmax(0, 680px);
   align-items: center;
-  gap: clamp(28px, 6vw, 80px);
 }
 
 .topbar {
@@ -205,60 +211,6 @@ main {
   max-width: 640px;
 }
 
-.ethereum-orbit {
-  position: relative;
-  width: min(42vw, 520px);
-  min-width: 320px;
-  aspect-ratio: 1;
-  justify-self: end;
-  pointer-events: none;
-}
-
-.ethereum-orbit::before,
-.ethereum-orbit::after {
-  position: absolute;
-  content: "";
-  pointer-events: none;
-}
-
-.ethereum-orbit::before {
-  inset: 11%;
-  border: 1px solid rgba(97, 184, 255, 0.22);
-  transform: rotate(-18deg) skewY(9deg);
-}
-
-.ethereum-orbit::after {
-  right: 11%;
-  bottom: 14%;
-  left: 11%;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(167, 216, 255, 0.28),
-    transparent
-  );
-}
-
-.ethereum-orbit__canvas {
-  position: relative;
-  z-index: 1;
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.ethereum-orbit__fallback {
-  position: absolute;
-  inset: 24%;
-  z-index: 0;
-  clip-path: polygon(50% 0, 94% 48%, 50% 100%, 6% 48%);
-  background:
-    linear-gradient(115deg, #eef6ff 0 28%, transparent 28%),
-    linear-gradient(245deg, #2e74d3 0 42%, transparent 42%),
-    linear-gradient(180deg, #8fcbff 0 50%, #18285a 50% 100%);
-}
-
 .section-kicker {
   display: inline-flex;
   align-items: center;
@@ -272,8 +224,8 @@ main {
 }
 
 .hero-wordmark {
-  width: min(620px, calc(100vw - 48px));
-  margin-top: 22px;
+  width: min(620px, calc(100vw - var(--page-gutter)));
+  margin-top: var(--heading-gap);
   line-height: 1;
 }
 
@@ -284,7 +236,7 @@ main {
 }
 
 h2 {
-  margin-top: 14px;
+  margin-top: var(--heading-gap);
   max-width: 860px;
   color: var(--foreground);
   font-size: 3.2rem;
@@ -299,7 +251,7 @@ p {
 }
 
 .hero-copy p {
-  margin-top: 22px;
+  margin-top: var(--heading-gap);
   max-width: 620px;
   color: #d6d9dd;
   font-size: 1.18rem;
@@ -312,7 +264,7 @@ p {
 }
 
 .hero-actions {
-  margin-top: 30px;
+  margin-top: var(--action-gap);
 }
 
 .action {
@@ -335,24 +287,92 @@ p {
 }
 
 .compact-section {
-  padding: 86px 0;
+  padding: var(--section-padding) 0;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.compact-grid {
+.flow-diagram {
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 28px;
-  margin-top: 30px;
-  max-width: 900px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--content-gap);
+  max-width: 980px;
+  margin: var(--content-gap) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.flow-diagram::before {
+  position: absolute;
+  top: 27px;
+  right: 11%;
+  left: 11%;
+  height: 1px;
+  content: "";
+  background: linear-gradient(
+    90deg,
+    rgba(31, 143, 255, 0.16),
+    rgba(255, 255, 255, 0.32),
+    rgba(31, 143, 255, 0.16)
+  );
+}
+
+.flow-diagram li {
+  position: relative;
+  display: grid;
+  min-height: 148px;
+  align-content: start;
+  gap: 12px;
+  padding: 0 0 0 2px;
+}
+
+.flow-step__index {
+  position: relative;
+  z-index: 1;
+  display: inline-grid;
+  width: 54px;
+  height: 54px;
+  place-items: center;
+  border: 1px solid rgba(31, 143, 255, 0.38);
+  border-radius: 8px;
+  color: #d9ecff;
+  background:
+    linear-gradient(180deg, rgba(31, 143, 255, 0.18), rgba(31, 143, 255, 0.07)),
+    rgba(5, 6, 7, 0.84);
+  font-family:
+    "Geist Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.flow-diagram strong {
+  color: var(--foreground);
+  font-size: 1.18rem;
+  line-height: 1.2;
+}
+
+.flow-diagram li > span:last-child {
+  max-width: 220px;
+  color: var(--muted);
+  font-size: 0.98rem;
+  line-height: 1.58;
+}
+
+.section-note {
+  margin-top: var(--content-gap);
+  max-width: 760px;
 }
 
 .example-section {
-  padding-bottom: 128px;
+  padding-bottom: var(--section-padding-large);
 }
 
 .example-section p {
-  margin-top: 24px;
+  margin-top: var(--content-gap);
   max-width: 760px;
 }
 
@@ -381,35 +401,55 @@ code {
     height: 42px;
   }
 
-  .compact-grid {
+  .flow-diagram {
     grid-template-columns: 1fr;
+    gap: 28px;
+    max-width: 620px;
   }
 
-  .hero-stage {
-    grid-template-columns: minmax(0, 1fr);
+  .flow-diagram::before {
+    top: 26px;
+    bottom: 26px;
+    left: 27px;
+    width: 1px;
+    height: auto;
+    background: linear-gradient(
+      180deg,
+      rgba(31, 143, 255, 0.16),
+      rgba(255, 255, 255, 0.32),
+      rgba(31, 143, 255, 0.16)
+    );
   }
 
-  .ethereum-orbit {
-    width: min(54vw, 360px);
-    min-width: 260px;
-    justify-self: center;
-    margin-top: -16px;
+  .flow-diagram li {
+    min-height: 0;
+    padding-left: 78px;
+  }
+
+  .flow-step__index {
+    position: absolute;
+    left: 0;
+    top: 0;
   }
 }
 
 @media (max-width: 760px) {
+  :root {
+    --page-gutter: 32px;
+    --hero-block-gap: 36px;
+    --section-padding: 72px;
+    --section-padding-large: 96px;
+    --content-gap: 28px;
+    --action-gap: 28px;
+  }
+
   .section-shell {
-    width: min(100% - 32px, 1180px);
+    width: min(100% - var(--page-gutter), 1180px);
   }
 
   .hero {
     min-height: 72vh;
-    padding-bottom: 40px;
-    gap: 36px;
-  }
-
-  .hero-stage {
-    gap: 28px;
+    padding-bottom: calc(var(--section-padding) * 0.55);
   }
 
   .topbar {
@@ -435,11 +475,6 @@ code {
     width: calc(100vw - 32px);
   }
 
-  .ethereum-orbit {
-    width: min(74vw, 320px);
-    min-width: 220px;
-  }
-
   .hero-actions {
     width: 100%;
   }
@@ -449,7 +484,7 @@ code {
   }
 
   .compact-section {
-    padding: 68px 0;
+    padding: var(--section-padding) 0;
   }
 
   .background-layer--math-far,
@@ -468,6 +503,12 @@ code {
 }
 
 @media (max-width: 460px) {
+  :root {
+    --page-gutter: 28px;
+    --section-padding: 64px;
+    --section-padding-large: 84px;
+  }
+
   .hero-copy .hero-lines {
     font-size: 0.98rem;
   }
@@ -496,7 +537,4 @@ code {
     transform: none !important;
   }
 
-  .ethereum-orbit::before {
-    transform: rotate(-18deg) skewY(9deg) !important;
-  }
 }
