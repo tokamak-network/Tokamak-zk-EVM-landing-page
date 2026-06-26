@@ -382,16 +382,25 @@ export function EthereumLogoOrbit() {
               void main() {
                 vec2 p = vUv * 2.0 - 1.0;
                 float r = length(p);
-                float radius = mix(0.08, 0.92, uProgress);
-                float inner = smoothstep(radius, radius - 0.22, r);
-                float outer = smoothstep(radius + 0.18, radius, r);
-                float core = exp(-r * r * 6.0) * (1.0 - uProgress) * 0.38;
-                float wave = inner * outer;
-                float fade = pow(1.0 - uProgress, 1.45);
-                float alpha = (wave * 0.78 + core) * fade * uOpacity;
-                vec3 color = vec3(0.9, 0.97, 1.0) * (1.6 + wave * 1.4);
+                float radius = mix(0.1, 0.94, uProgress);
+                float leadingEdge = 1.0 - smoothstep(0.0, 0.035, abs(r - radius));
+                float softBody =
+                  smoothstep(radius, radius - 0.22, r) *
+                  smoothstep(radius + 0.26, radius, r);
+                float tail =
+                  smoothstep(radius - 0.52, radius - 0.1, r) *
+                  smoothstep(radius + 0.08, radius - 0.12, r);
+                float core = exp(-r * r * 10.0) * pow(1.0 - uProgress, 2.4);
+                float fade = smoothstep(1.0, 0.62, uProgress) * (1.0 - smoothstep(0.92, 1.0, uProgress));
+                float alpha =
+                  (leadingEdge * 1.35 + softBody * 0.42 + tail * 0.2 + core * 0.55) *
+                  fade *
+                  uOpacity;
+                vec3 color =
+                  vec3(0.93, 0.985, 1.0) *
+                  (1.25 + leadingEdge * 3.4 + softBody * 0.9);
 
-                gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.68));
+                gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.86));
               }
             `,
           });
@@ -399,7 +408,7 @@ export function EthereumLogoOrbit() {
 
           const pulse = new THREE.Mesh(geometry, material);
           pulse.position.set(0, gapCenterY, 0);
-          pulse.renderOrder = 2;
+          pulse.renderOrder = 4;
           pulse.rotation.x = -Math.PI / 2;
           pulse.scale.setScalar(maxScale);
           logoGroup.add(pulse);
@@ -412,16 +421,16 @@ export function EthereumLogoOrbit() {
         };
 
         addExpandingDiscPulse({
-          duration: 3.2,
-          maxScale: 1.45,
-          opacity: 0.44,
+          duration: 2.8,
+          maxScale: 1.72,
+          opacity: 0.78,
           phase: 0,
         });
         addExpandingDiscPulse({
-          duration: 3.2,
-          maxScale: 1.8,
-          opacity: 0.28,
-          phase: 1.6,
+          duration: 2.8,
+          maxScale: 2.08,
+          opacity: 0.52,
+          phase: 1.4,
         });
 
         const ringGeometry = new THREE.TorusGeometry(1.26, 0.007, 8, 120);
