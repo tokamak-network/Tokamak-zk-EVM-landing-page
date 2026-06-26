@@ -160,12 +160,15 @@ export function EthereumLogoOrbit() {
         const reducedMotion = window.matchMedia(
           "(prefers-reduced-motion: reduce)",
         );
+        const logoSpinSpeed = 0.74;
+        const axisOscillationSpeed = logoSpinSpeed * (3 / 7);
 
         const render = () => {
           if (!reducedMotion.matches) {
             const time = performance.now() * 0.001;
-            logoGroup.rotation.y = 0.58 + time * 0.74;
-            logoGroup.rotation.x = Math.PI / 6 + Math.sin(time * 0.65) * 0.03;
+            logoGroup.rotation.y = 0.58 + time * logoSpinSpeed;
+            logoGroup.rotation.x =
+              Math.PI / 6 + Math.sin(time * axisOscillationSpeed) * 0.03;
             ring.rotation.z = time * -0.42;
           }
 
