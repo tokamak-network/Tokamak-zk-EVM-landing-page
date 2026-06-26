@@ -37,7 +37,7 @@ export function EthereumLogoOrbit() {
 
         const scene = new THREE.Scene();
         const camera = new THREE.OrthographicCamera(-2, 2, 2, -2, 0.1, 100);
-        camera.position.set(0, 0.05, 5.4);
+        camera.position.set(0, 0.28, 5.4);
         camera.lookAt(0, 0, 0);
 
         scene.add(new THREE.AmbientLight(0xd9e8ff, 1.8));
@@ -133,7 +133,7 @@ export function EthereumLogoOrbit() {
         ring.rotation.x = Math.PI / 2;
         logoGroup.add(ring);
 
-        logoGroup.rotation.x = -0.42;
+        logoGroup.rotation.x = 0.34;
         logoGroup.rotation.y = 0.58;
         logoGroup.rotation.z = -0.08;
 
@@ -165,7 +165,7 @@ export function EthereumLogoOrbit() {
           if (!reducedMotion.matches) {
             const time = performance.now() * 0.001;
             logoGroup.rotation.y = 0.58 + time * 0.74;
-            logoGroup.rotation.x = -0.42 + Math.sin(time * 0.65) * 0.08;
+            logoGroup.rotation.x = 0.34 + Math.sin(time * 0.65) * 0.06;
             ring.rotation.z = time * -0.42;
           }
 
