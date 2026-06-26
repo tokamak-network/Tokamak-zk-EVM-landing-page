@@ -151,6 +151,7 @@ export function EthereumLogoOrbit() {
           opacityPulse,
           phase,
           scalePulse,
+          speed,
           verticalScale,
         }: {
           baseOpacity: number;
@@ -158,6 +159,7 @@ export function EthereumLogoOrbit() {
           opacityPulse: number;
           phase: number;
           scalePulse: number;
+          speed: number;
           verticalScale: number;
         }) => {
           const geometry = new THREE.SphereGeometry(1, 48, 24);
@@ -173,6 +175,7 @@ export function EthereumLogoOrbit() {
             uniforms: {
               uCameraLocalPosition: { value: new THREE.Vector3(0, 0, 4) },
               uColor: { value: new THREE.Color(0xf4fbff) },
+              uExpansion: { value: 0 },
               uOpacity: { value: baseOpacity },
               uTime: { value: 0 },
             },
@@ -187,6 +190,7 @@ export function EthereumLogoOrbit() {
             fragmentShader: `
               uniform vec3 uCameraLocalPosition;
               uniform vec3 uColor;
+              uniform float uExpansion;
               uniform float uOpacity;
               uniform float uTime;
               varying vec3 vLocalPosition;
@@ -260,23 +264,28 @@ export function EthereumLogoOrbit() {
                   float densityRadius = length(densityShape);
                   float ellipsoidRadius = length(ellipsoidShape);
                   float centerDensity = exp(-densityRadius * densityRadius * 2.6);
-                  float atmosphericFalloff = 1.0 - smoothstep(0.74, 1.08, ellipsoidRadius);
+                  float emissionFront = 1.0 - smoothstep(
+                    uExpansion - 0.12,
+                    uExpansion + 0.26,
+                    ellipsoidRadius
+                  );
+                  float atmosphericFalloff =
+                    (1.0 - smoothstep(0.8, 1.16, ellipsoidRadius)) *
+                    emissionFront;
                   float turbulence =
                     noise(p * 3.6 + vec3(0.0, uTime * 0.2, uTime * 0.1)) * 0.45 +
                     noise(p * 8.0 - vec3(uTime * 0.12, 0.0, uTime * 0.16)) * 0.18;
-                  float pulse = 0.9 + sin(uTime * 1.22) * 0.06;
                   float density =
                     centerDensity *
                     atmosphericFalloff *
-                    (0.86 + turbulence * 0.34) *
-                    pulse;
+                    (0.9 + turbulence * 0.36);
 
                   accumulatedDensity += density * stepSize;
                   accumulatedCore += centerDensity * atmosphericFalloff * stepSize;
                 }
 
-                float alpha = 1.0 - exp(-accumulatedDensity * uOpacity * 1.48);
-                vec3 color = uColor * (1.12 + accumulatedCore * 2.38);
+                float alpha = 1.0 - exp(-accumulatedDensity * uOpacity * 1.72);
+                vec3 color = uColor * (1.2 + accumulatedCore * 2.8);
                 gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.92));
               }
             `,
@@ -290,52 +299,70 @@ export function EthereumLogoOrbit() {
           logoGroup.add(volume);
 
           updateGlowLayers.push((time) => {
-            const pulse = (Math.sin(time * 1.62 + phase) + 1) / 2;
-            const easedPulse = pulse * pulse * (3 - 2 * pulse);
-            const animatedScale = baseScale + easedPulse * scalePulse;
+            const progress = (time * speed + phase) % 1;
+            const easedProgress = progress * progress * (3 - 2 * progress);
+            const fadeIn = smoothstep(0, 0.14, progress);
+            const fadeOut = 1 - smoothstep(0.72, 1, progress);
+            const expansionOpacity = fadeIn * fadeOut;
+            const animatedScale = baseScale + easedProgress * scalePulse;
 
             volume.scale.set(animatedScale, verticalScale, animatedScale);
             volume.updateWorldMatrix(true, false);
             material.uniforms.uCameraLocalPosition.value.copy(
               volume.worldToLocal(camera.position.clone()),
             );
+            material.uniforms.uExpansion.value = easedProgress;
             material.uniforms.uOpacity.value =
-              baseOpacity + easedPulse * opacityPulse;
+              (baseOpacity + opacityPulse * (1 - easedProgress * 0.45)) *
+              expansionOpacity;
             material.uniforms.uTime.value = time;
           });
         };
 
+        const smoothstep = (edge0: number, edge1: number, value: number) => {
+          const x = Math.min(
+            1,
+            Math.max(0, (value - edge0) / (edge1 - edge0)),
+          );
+
+          return x * x * (3 - 2 * x);
+        };
+
         [
           {
-            baseOpacity: 0.22,
+            baseOpacity: 0.34,
             baseScale: 0.66,
-            opacityPulse: 0.035,
+            opacityPulse: 0.1,
             phase: 0.1,
-            scalePulse: 0.08,
+            scalePulse: 0.18,
+            speed: 0.34,
             verticalScale: 0.052,
           },
           {
-            baseOpacity: 0.08,
+            baseOpacity: 0.16,
             baseScale: 1.16,
-            opacityPulse: 0.018,
+            opacityPulse: 0.06,
             phase: 1.45,
-            scalePulse: 0.18,
+            scalePulse: 0.32,
+            speed: 0.28,
             verticalScale: 0.062,
           },
           {
-            baseOpacity: 0.025,
+            baseOpacity: 0.07,
             baseScale: 1.86,
-            opacityPulse: 0.008,
+            opacityPulse: 0.026,
             phase: 2.5,
-            scalePulse: 0.28,
+            scalePulse: 0.44,
+            speed: 0.22,
             verticalScale: 0.07,
           },
           {
-            baseOpacity: 0.009,
+            baseOpacity: 0.032,
             baseScale: 2.55,
-            opacityPulse: 0.003,
+            opacityPulse: 0.012,
             phase: 0.7,
-            scalePulse: 0.36,
+            scalePulse: 0.54,
+            speed: 0.18,
             verticalScale: 0.076,
           },
         ].forEach(addScatteringVolume);
@@ -372,15 +399,12 @@ export function EthereumLogoOrbit() {
           "(prefers-reduced-motion: reduce)",
         );
         const logoSpinSpeed = 0.37;
-        const axisOscillationSpeed = logoSpinSpeed * (2 / 7);
 
         const render = () => {
           const time = performance.now() * 0.001;
 
           if (!reducedMotion.matches) {
             logoGroup.rotation.y = 0.58 + time * logoSpinSpeed;
-            logoGroup.rotation.x =
-              logoPitch + Math.sin(time * axisOscillationSpeed) * 0.03;
           }
 
           updateGlowLayers.forEach((updateGlowLayer) =>
