@@ -342,17 +342,15 @@ export function EthereumLogoOrbit() {
         });
 
         const addExpandingDiscPulse = ({
-          beatOffset,
-          cycleDuration,
+          duration,
           maxScale,
           opacity,
-          pulseDuration,
+          phase,
         }: {
-          beatOffset: number;
-          cycleDuration: number;
+          duration: number;
           maxScale: number;
           opacity: number;
-          pulseDuration: number;
+          phase: number;
         }) => {
           const geometry = new THREE.PlaneGeometry(2, 2, 96, 96);
           disposableGeometries.push(geometry);
@@ -485,10 +483,7 @@ export function EthereumLogoOrbit() {
           logoGroup.add(pulse);
 
           updateGlowLayers.push((time) => {
-            const beatTime =
-              (time - beatOffset + cycleDuration) % cycleDuration;
-            const progress =
-              beatTime < pulseDuration ? beatTime / pulseDuration : 1;
+            const progress = ((time + phase) % duration) / duration;
 
             spillMaterial.uniforms.uProgress.value = progress;
             material.uniforms.uProgress.value = progress;
@@ -496,18 +491,16 @@ export function EthereumLogoOrbit() {
         };
 
         addExpandingDiscPulse({
-          beatOffset: 0,
-          cycleDuration: 0.84,
+          duration: 2.8,
           maxScale: 1.72,
           opacity: 0.6,
-          pulseDuration: 0.46,
+          phase: 0,
         });
         addExpandingDiscPulse({
-          beatOffset: 0.24,
-          cycleDuration: 0.84,
-          maxScale: 1.5,
+          duration: 2.8,
+          maxScale: 2.08,
           opacity: 0.34,
-          pulseDuration: 0.36,
+          phase: 1.4,
         });
 
         const logoPitch = (31.5 * Math.PI) / 180;
