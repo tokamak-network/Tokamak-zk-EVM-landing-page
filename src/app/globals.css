@@ -247,13 +247,13 @@ main {
 }
 
 .ethereum-orbit-section {
-  min-height: 100vh;
+  min-height: auto;
   display: grid;
   place-items: center;
 }
 
 .ethereum-orbit-section .ethereum-orbit {
-  --orbit-canvas-size: 480%;
+  --orbit-canvas-size: max(520%, 220vmax);
 
   width: min(72vw, 560px);
   justify-self: center;
@@ -338,6 +338,10 @@ p {
 .compact-section {
   padding: var(--section-padding) 0;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.compact-section.ethereum-orbit-section {
+  padding-block: 0;
 }
 
 .flow-diagram {

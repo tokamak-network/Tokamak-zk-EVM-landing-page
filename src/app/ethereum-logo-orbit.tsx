@@ -401,7 +401,7 @@ export function EthereumLogoOrbit() {
                 float centerBurst = exp(-r * r * 3.2) * pow(1.0 - uProgress, 2.4);
                 float fade =
                   smoothstep(1.0, 0.62, uProgress) *
-                  (1.0 - smoothstep(0.985, 1.0, uProgress));
+                  (1.0 - smoothstep(0.995, 1.0, uProgress));
                 float alpha =
                   (expandingGlow * 0.18 + broadIllumination * 0.24 + centerBurst * 0.06) *
                   edgeFade *
@@ -437,7 +437,7 @@ export function EthereumLogoOrbit() {
                 float centerIgnition = exp(-r * r * 9.0) * pow(1.0 - uProgress, 2.8);
                 float fade =
                   smoothstep(1.0, 0.68, uProgress) *
-                  (1.0 - smoothstep(0.985, 1.0, uProgress));
+                  (1.0 - smoothstep(0.995, 1.0, uProgress));
                 float alpha =
                   (
                     brightCore * 0.9 +
@@ -484,13 +484,13 @@ export function EthereumLogoOrbit() {
         [
           {
             duration: 2.8,
-            maxScale: 5.2,
+            maxScale: 12.8,
             opacity: 0.6,
             phase: 0,
           },
           {
             duration: 2.8,
-            maxScale: 6.6,
+            maxScale: 15.6,
             opacity: 0.34,
             phase: 1.4,
           },
