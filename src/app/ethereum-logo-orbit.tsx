@@ -160,7 +160,7 @@ export function EthereumLogoOrbit() {
           scalePulse: number;
           verticalScale: number;
         }) => {
-          const geometry = new THREE.SphereGeometry(1, 96, 48);
+          const geometry = new THREE.SphereGeometry(1, 48, 24);
           disposableGeometries.push(geometry);
 
           const material = new THREE.ShaderMaterial({
@@ -178,13 +178,10 @@ export function EthereumLogoOrbit() {
             },
             vertexShader: `
               varying vec3 vLocalPosition;
-              varying vec3 vWorldPosition;
 
               void main() {
                 vLocalPosition = position;
-                vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-                vWorldPosition = worldPosition.xyz;
-                gl_Position = projectionMatrix * viewMatrix * worldPosition;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
               }
             `,
             fragmentShader: `
@@ -193,7 +190,6 @@ export function EthereumLogoOrbit() {
               uniform float uOpacity;
               uniform float uTime;
               varying vec3 vLocalPosition;
-              varying vec3 vWorldPosition;
 
               float hash(vec3 p) {
                 p = fract(p * 0.3183099 + vec3(0.11, 0.17, 0.23));
@@ -309,38 +305,68 @@ export function EthereumLogoOrbit() {
           });
         };
 
-        addScatteringVolume({
-          baseOpacity: 0.48,
-          baseScale: 0.66,
-          opacityPulse: 0.1,
-          phase: 0.1,
-          scalePulse: 0.08,
-          verticalScale: 0.052,
-        });
-        addScatteringVolume({
-          baseOpacity: 0.3,
-          baseScale: 1.16,
-          opacityPulse: 0.07,
-          phase: 1.45,
-          scalePulse: 0.18,
-          verticalScale: 0.062,
-        });
-        addScatteringVolume({
-          baseOpacity: 0.15,
-          baseScale: 1.86,
-          opacityPulse: 0.04,
-          phase: 2.5,
-          scalePulse: 0.28,
-          verticalScale: 0.07,
-        });
-        addScatteringVolume({
-          baseOpacity: 0.07,
-          baseScale: 2.55,
-          opacityPulse: 0.025,
-          phase: 0.7,
-          scalePulse: 0.36,
-          verticalScale: 0.076,
-        });
+        [
+          {
+            baseOpacity: 0.48,
+            baseScale: 0.66,
+            opacityPulse: 0.1,
+            phase: 0.1,
+            scalePulse: 0.08,
+            verticalScale: 0.052,
+          },
+          {
+            baseOpacity: 0.3,
+            baseScale: 1.16,
+            opacityPulse: 0.07,
+            phase: 1.45,
+            scalePulse: 0.18,
+            verticalScale: 0.062,
+          },
+          {
+            baseOpacity: 0.15,
+            baseScale: 1.86,
+            opacityPulse: 0.04,
+            phase: 2.5,
+            scalePulse: 0.28,
+            verticalScale: 0.07,
+          },
+          {
+            baseOpacity: 0.07,
+            baseScale: 2.55,
+            opacityPulse: 0.025,
+            phase: 0.7,
+            scalePulse: 0.36,
+            verticalScale: 0.076,
+          },
+        ].forEach(addScatteringVolume);
+
+        const discPulseVertexShader = `
+          varying vec2 vUv;
+
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `;
+
+        const createDiscPulseMaterial = (
+          opacity: number,
+          fragmentShader: string,
+        ) =>
+          new THREE.ShaderMaterial({
+            blending: THREE.AdditiveBlending,
+            depthTest: true,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+            toneMapped: false,
+            transparent: true,
+            uniforms: {
+              uOpacity: { value: opacity },
+              uProgress: { value: 0 },
+            },
+            vertexShader: discPulseVertexShader,
+            fragmentShader,
+          });
 
         const addExpandingDiscPulse = ({
           duration,
@@ -353,31 +379,12 @@ export function EthereumLogoOrbit() {
           opacity: number;
           phase: number;
         }) => {
-          const geometry = new THREE.PlaneGeometry(2, 2, 96, 96);
+          const geometry = new THREE.PlaneGeometry(2, 2);
           disposableGeometries.push(geometry);
-          const spillGeometry = new THREE.PlaneGeometry(2, 2, 96, 96);
+          const spillGeometry = new THREE.PlaneGeometry(2, 2);
           disposableGeometries.push(spillGeometry);
 
-          const spillMaterial = new THREE.ShaderMaterial({
-            blending: THREE.AdditiveBlending,
-            depthTest: true,
-            depthWrite: false,
-            side: THREE.DoubleSide,
-            toneMapped: false,
-            transparent: true,
-            uniforms: {
-              uOpacity: { value: opacity },
-              uProgress: { value: 0 },
-            },
-            vertexShader: `
-              varying vec2 vUv;
-
-              void main() {
-                vUv = uv;
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-              }
-            `,
-            fragmentShader: `
+          const spillMaterial = createDiscPulseMaterial(opacity, `
               uniform float uOpacity;
               uniform float uProgress;
               varying vec2 vUv;
@@ -404,30 +411,10 @@ export function EthereumLogoOrbit() {
 
                 gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.28));
               }
-            `,
-          });
+            `);
           disposableMaterials.push(spillMaterial);
 
-          const material = new THREE.ShaderMaterial({
-            blending: THREE.AdditiveBlending,
-            depthTest: true,
-            depthWrite: false,
-            side: THREE.DoubleSide,
-            toneMapped: false,
-            transparent: true,
-            uniforms: {
-              uOpacity: { value: opacity },
-              uProgress: { value: 0 },
-            },
-            vertexShader: `
-              varying vec2 vUv;
-
-              void main() {
-                vUv = uv;
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-              }
-            `,
-            fragmentShader: `
+          const material = createDiscPulseMaterial(opacity, `
               uniform float uOpacity;
               uniform float uProgress;
               varying vec2 vUv;
@@ -469,8 +456,7 @@ export function EthereumLogoOrbit() {
 
                 gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.9));
               }
-            `,
-          });
+            `);
           disposableMaterials.push(material);
 
           const spill = new THREE.Mesh(spillGeometry, spillMaterial);
@@ -495,18 +481,20 @@ export function EthereumLogoOrbit() {
           });
         };
 
-        addExpandingDiscPulse({
-          duration: 2.8,
-          maxScale: 1.72,
-          opacity: 0.6,
-          phase: 0,
-        });
-        addExpandingDiscPulse({
-          duration: 2.8,
-          maxScale: 2.08,
-          opacity: 0.34,
-          phase: 1.4,
-        });
+        [
+          {
+            duration: 2.8,
+            maxScale: 1.72,
+            opacity: 0.6,
+            phase: 0,
+          },
+          {
+            duration: 2.8,
+            maxScale: 2.08,
+            opacity: 0.34,
+            phase: 1.4,
+          },
+        ].forEach(addExpandingDiscPulse);
 
         const logoPitch = (31.5 * Math.PI) / 180;
 
