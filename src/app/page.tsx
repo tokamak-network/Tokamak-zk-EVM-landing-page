@@ -58,7 +58,15 @@ export default function Home() {
           <div className="hero-copy" id="top">
             <span className="section-kicker">Privacy channels for Ethereum</span>
             <h1 className="hero-wordmark" aria-label="Tonigma">
-              <span className="visually-hidden">Tonigma</span>
+              <Image
+                alt=""
+                aria-hidden="true"
+                height={371}
+                priority
+                sizes="(max-width: 760px) calc(100vw - 32px), 620px"
+                src="/brand/tonigma-wordmark-white.svg"
+                width={2558}
+              />
             </h1>
             <p className="hero-lines">
               <span>Run decentralized apps on your own device.</span>

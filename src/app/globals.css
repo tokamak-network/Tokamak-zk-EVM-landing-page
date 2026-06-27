@@ -272,30 +272,14 @@ main {
 
 .hero-wordmark {
   width: min(620px, calc(100vw - var(--page-gutter)));
-  aspect-ratio: 2558 / 371;
   margin-top: var(--heading-gap);
   line-height: 1;
-  background-color: #f7f7f2;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.68)),
-    url("/textures/math-layer.png");
-  background-position: center, 44% 52%;
-  background-repeat: no-repeat, repeat;
-  background-size: auto, 560px auto;
-  mask: url("/brand/tonigma-wordmark-white.svg") center / contain no-repeat;
-  -webkit-mask: url("/brand/tonigma-wordmark-white.svg") center / contain no-repeat;
 }
 
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+.hero-wordmark img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 h2 {
