@@ -559,8 +559,7 @@ export function TonigmaNetworkLogo() {
                   float center = 1.0 - smoothstep(0.16, 0.5, abs(vUv.y - 0.5));
                   float taperedTail = smoothstep(0.0, 0.22, vUv.x);
                   float hotHead = pow(vUv.x, 2.2);
-                  float softEnd = 1.0 - smoothstep(0.97, 1.0, vUv.x);
-                  float alpha = center * taperedTail * (0.2 + hotHead * 0.8) * softEnd * uOpacity;
+                  float alpha = center * taperedTail * (0.22 + hotHead * 0.78) * uOpacity;
                   vec3 color = mix(uSecondary, uPrimary, smoothstep(0.45, 1.0, vUv.x));
 
                   gl_FragColor = vec4(color, alpha);
@@ -577,8 +576,8 @@ export function TonigmaNetworkLogo() {
           const fullDy = to.y - from.y;
           const fullLength = Math.max(Math.hypot(fullDx, fullDy), 0.001);
           const angle = Math.atan2(fullDy, fullDx);
-          const maxTrailLength = Math.min(fullLength * 0.24, sceneLength(62));
-          const width = sceneLength(LINE_WIDTH * 1.25);
+          const maxTrailLength = Math.min(fullLength * 0.3, sceneLength(76));
+          const width = sceneLength(LINE_WIDTH * 1.32);
 
           mesh.rotation.z = angle;
           mesh.position.set(from.x, from.y, 0.08);
@@ -756,15 +755,15 @@ export function TonigmaNetworkLogo() {
 
           edgeRenders.forEach(({ active, edge, trail }) => {
             const rawProgress = (cycleTime - edge.startAt) / edge.duration;
-            const progress = smoothstep(rawProgress);
+            const fillProgress = smoothstep(rawProgress);
             const inFlight = rawProgress > 0 && rawProgress < 1;
             const trailOpacity = inFlight
-              ? 0.42 + breathing * 0.06
+              ? 0.5 + breathing * 0.06
               : 0;
 
-            active.update(progress);
-            active.material.opacity = progress > 0.001 ? 1 : 0;
-            trail.update(progress, trailOpacity);
+            active.update(fillProgress);
+            active.material.opacity = fillProgress > 0.001 ? 1 : 0;
+            trail.update(fillProgress, trailOpacity);
           });
 
           root.scale.setScalar(1 + finalGlow * 0.012 + breathing * finalGlow * 0.006);
