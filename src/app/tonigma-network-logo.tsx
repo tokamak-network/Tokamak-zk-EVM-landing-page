@@ -278,6 +278,10 @@ export function TonigmaNetworkLogo() {
         const nodeRenders: Array<{
           active: BasicMesh;
           bloom: BasicMesh;
+          flash: {
+            material: InstanceType<typeof THREE.ShaderMaterial>;
+            scale: { setScalar: (value: number) => void };
+          };
           rim: BasicMesh;
           node: LogoNode;
         }> = [];
@@ -417,6 +421,57 @@ export function TonigmaNetworkLogo() {
           return mesh as BasicMesh;
         }
 
+        function createNodeFlash(node: LogoNode) {
+          const material = trackMaterial(
+            new THREE.ShaderMaterial({
+              blending: THREE.AdditiveBlending,
+              depthWrite: false,
+              transparent: true,
+              uniforms: {
+                uColor: { value: new THREE.Color(0x9bddff) },
+                uOpacity: { value: 0 },
+              },
+              vertexShader: `
+                varying vec2 vUv;
+
+                void main() {
+                  vUv = uv;
+                  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+              `,
+              fragmentShader: `
+                uniform vec3 uColor;
+                uniform float uOpacity;
+                varying vec2 vUv;
+
+                void main() {
+                  float d = distance(vUv, vec2(0.5));
+                  float core = 1.0 - smoothstep(0.0, 0.24, d);
+                  float aura = 1.0 - smoothstep(0.18, 0.5, d);
+                  float alpha = (core * 0.28 + aura * 0.72) * uOpacity;
+
+                  gl_FragColor = vec4(uColor, alpha);
+                }
+              `,
+            }),
+          );
+          const radiusScale =
+            node.shape === "diamond" ? 1.85 : node.shape === "ring" ? 2.15 : 1.82;
+          const mesh = new THREE.Mesh(
+            createCircleGeometry(node.radius * radiusScale, 96),
+            material,
+          );
+          const position = scenePoint(node.point);
+
+          mesh.position.set(position.x, position.y, 0.03);
+          root.add(mesh);
+
+          return {
+            material,
+            scale: mesh.scale,
+          };
+        }
+
         function createTrailMaterial() {
           return trackMaterial(
             new THREE.ShaderMaterial({
@@ -501,7 +556,7 @@ export function TonigmaNetworkLogo() {
           );
           const activeMaterial = trackMaterial(
             new THREE.MeshBasicMaterial({
-              color: 0xf3fbff,
+              color: 0xffffff,
               depthWrite: false,
               opacity: 0,
               transparent: true,
@@ -550,8 +605,9 @@ export function TonigmaNetworkLogo() {
             radiusScale: 1.015,
             z: 0.06,
           });
+          const flash = createNodeFlash(node);
 
-          nodeRenders.push({ active, bloom, rim, node });
+          nodeRenders.push({ active, bloom, flash, rim, node });
         });
 
         const resize = () => {
@@ -588,14 +644,14 @@ export function TonigmaNetworkLogo() {
             ? 0
             : (Math.sin(absoluteTime * 2.6) + 1) / 2;
 
-          nodeRenders.forEach(({ active, bloom, rim, node }) => {
+          nodeRenders.forEach(({ active, bloom, flash, rim, node }) => {
             const activation = smoothstep((cycleTime - node.turnOnAt) / 0.48);
             const emphasize =
               smoothstep((cycleTime - node.turnOnAt) / 0.16) *
               (1 - smoothstep((cycleTime - node.turnOnAt - 0.58) / 0.5));
             const postFillGlow =
               smoothstep((cycleTime - node.turnOnAt - 0.42) / 0.14) *
-              (1 - smoothstep((cycleTime - node.turnOnAt - 0.88) / 0.36));
+              (1 - smoothstep((cycleTime - node.turnOnAt - 1.0) / 0.42));
             const scale =
               1 +
               emphasize * 0.09 +
@@ -612,10 +668,13 @@ export function TonigmaNetworkLogo() {
             bloom.scale.setScalar(
               1 + emphasize * 0.035 + postFillGlow * 0.07 + finalGlow * 0.012,
             );
+            flash.material.uniforms.uOpacity.value =
+              postFillGlow * 0.22 + emphasize * 0.06;
+            flash.scale.setScalar(1 + postFillGlow * 0.12);
             rim.material.opacity =
               activation * 0.08 +
               emphasize * 0.14 +
-              postFillGlow * 0.18 +
+              postFillGlow * 0.24 +
               finalGlow * (0.055 + breathing * 0.018);
             rim.scale.setScalar(1 + emphasize * 0.025 + postFillGlow * 0.04);
           });
@@ -629,7 +688,7 @@ export function TonigmaNetworkLogo() {
               : 0;
 
             active.update(progress);
-            active.material.opacity = progress * (0.8 + finalGlow * 0.18);
+            active.material.opacity = progress;
             trail.update(rawProgress, trailOpacity);
           });
 
