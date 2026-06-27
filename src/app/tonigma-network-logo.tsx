@@ -28,7 +28,10 @@ const LOGO_SCALE = 2;
 const LINE_WIDTH = 15;
 const VISIBLE_GAP = 12;
 const ETHEREUM_RATIO = 834 / 512;
-const CYCLE_SECONDS = 11.8;
+const TIMELINE_SECONDS = 8.8;
+const ANIMATION_SPEED = 1.2;
+const COMPLETION_HOLD_SECONDS = 3;
+const CYCLE_SECONDS = TIMELINE_SECONDS / ANIMATION_SPEED + COMPLETION_HOLD_SECONDS;
 
 const inputNodes: LogoNode[] = [
   {
@@ -715,24 +718,27 @@ export function TonigmaNetworkLogo() {
           const cycleTime = reducedMotion.matches
             ? 6.9
             : (absoluteTime - startedAt) % CYCLE_SECONDS;
-          const finalGlow = smoothstep((cycleTime - 6.1) / 0.85);
-          const sweepProgress = clamp((cycleTime - 6.18) / 1.22);
+          const timelineTime = reducedMotion.matches
+            ? 6.9
+            : Math.min(cycleTime * ANIMATION_SPEED, TIMELINE_SECONDS);
+          const finalGlow = smoothstep((timelineTime - 6.1) / 0.85);
+          const sweepProgress = clamp((timelineTime - 6.18) / 1.22);
           const sweepEnvelope =
-            smoothstep((cycleTime - 6.12) / 0.18) *
-            (1 - smoothstep((cycleTime - 7.42) / 0.28));
+            smoothstep((timelineTime - 6.12) / 0.18) *
+            (1 - smoothstep((timelineTime - 7.42) / 0.28));
           const sweepCenter = -1.56 + smoothstep(sweepProgress) * 3.28;
           const breathing = reducedMotion.matches
             ? 0
             : (Math.sin(absoluteTime * 2.6) + 1) / 2;
 
           nodeRenders.forEach(({ active, bloom, flash, rim, node }) => {
-            const activation = smoothstep((cycleTime - node.turnOnAt) / 0.48);
+            const activation = smoothstep((timelineTime - node.turnOnAt) / 0.48);
             const emphasize =
-              smoothstep((cycleTime - node.turnOnAt) / 0.16) *
-              (1 - smoothstep((cycleTime - node.turnOnAt - 0.58) / 0.5));
+              smoothstep((timelineTime - node.turnOnAt) / 0.16) *
+              (1 - smoothstep((timelineTime - node.turnOnAt - 0.58) / 0.5));
             const postFillGlow =
-              smoothstep((cycleTime - node.turnOnAt - 0.42) / 0.14) *
-              (1 - smoothstep((cycleTime - node.turnOnAt - 1.0) / 0.42));
+              smoothstep((timelineTime - node.turnOnAt - 0.42) / 0.14) *
+              (1 - smoothstep((timelineTime - node.turnOnAt - 1.0) / 0.42));
             const scale =
               1 +
               emphasize * 0.09 +
@@ -761,7 +767,7 @@ export function TonigmaNetworkLogo() {
           });
 
           edgeRenders.forEach(({ active, edge, trail }) => {
-            const rawProgress = (cycleTime - edge.startAt) / edge.duration;
+            const rawProgress = (timelineTime - edge.startAt) / edge.duration;
             const fillProgress = smoothstep(rawProgress);
             const inFlight = rawProgress > 0 && rawProgress < 1;
             const trailOpacity = inFlight
