@@ -425,6 +425,13 @@ export function EthereumLogoOrbit({
           phase: number;
           target: InstanceType<typeof THREE.Vector3>;
         }> = [];
+        const meshPacketAnimations: Array<{
+          from: InstanceType<typeof THREE.Vector3>;
+          packet: InstanceType<typeof THREE.Mesh>;
+          phase: number;
+          speed: number;
+          to: InstanceType<typeof THREE.Vector3>;
+        }> = [];
 
         const observerCount = 22;
         const strengthVerificationTarget = new THREE.Vector3(0, -1.34, 0.18);
@@ -509,6 +516,27 @@ export function EthereumLogoOrbit({
               observerGroup.add(
                 new THREE.Line(meshLineGeometry, replayLineMaterial),
               );
+
+              const meshPacketMaterial = trackDisposable(
+                (index % 2 === 0
+                  ? replayPacketMaterial
+                  : observePacketMaterial
+                ).clone(),
+              );
+              meshPacketMaterial.opacity = 0.18;
+              const meshPacket = new THREE.Mesh(
+                packetGeometry,
+                meshPacketMaterial,
+              );
+              observerGroup.add(meshPacket);
+
+              meshPacketAnimations.push({
+                from: home,
+                packet: meshPacket,
+                phase: ((index * 13 + edge * 17) % 29) / 29,
+                speed: 0.08 + ((index * 7 + edge * 11) % 5) * 0.012,
+                to: meshTarget,
+              });
             }
           }
 
@@ -530,6 +558,17 @@ export function EthereumLogoOrbit({
         }
 
         updateStoryLayers.push((time) => {
+          meshPacketAnimations.forEach(({ from, packet, phase, speed, to }) => {
+            const progress = (time * speed + phase) % 1;
+            const visibility = Math.sin(progress * Math.PI);
+
+            packet.position.lerpVectors(from, to, progress);
+            packet.scale.setScalar(0.72 + visibility * 0.32);
+            (
+              packet.material as InstanceType<typeof THREE.MeshBasicMaterial>
+            ).opacity = 0.12 + visibility * 0.3;
+          });
+
           observerAnimations.forEach(
             ({ group, home, observePacket, phase, replayPacket, target }) => {
               const bob = Math.sin(time * 1.8 + phase) * 0.026;
