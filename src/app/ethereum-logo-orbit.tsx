@@ -330,7 +330,6 @@ export function EthereumLogoOrbit() {
         const logoPitch = (31.5 * Math.PI) / 180;
 
         viewGroup.rotation.x = logoPitch;
-        viewGroup.rotation.z = -0.08;
         logoGroup.rotation.y = 0.58;
 
         const resize = () => {
