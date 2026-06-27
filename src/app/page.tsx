@@ -95,7 +95,7 @@ export default function Home() {
         aria-labelledby="ethereum-strengths-title"
       >
         <div className="story-copy">
-          <span className="section-kicker">Ethereum strengths</span>
+          <span className="section-kicker">Why Ethereum</span>
           <h2 id="ethereum-strengths-title">
             Ethereum gives applications a secure, immutable settlement layer.
           </h2>

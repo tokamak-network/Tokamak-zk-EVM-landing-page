@@ -579,12 +579,108 @@ export function EthereumLogoOrbit({
         const checkLine = new THREE.Line(checkGeometry, iconLineMaterial);
         securityGroup.add(checkLine);
 
+        const decentralizationGroup = new THREE.Group();
+        decentralizationGroup.position.set(0.1, -0.1, 0.04);
+        if (variant === "strength") {
+          storyGroup.add(decentralizationGroup);
+        }
+
+        const networkNodeGeometry = trackDisposable(
+          new THREE.SphereGeometry(0.052, 18, 12),
+        );
+        const primaryNodeMaterial = trackDisposable(
+          new THREE.MeshBasicMaterial({
+            blending: THREE.AdditiveBlending,
+            color: "#dff7ff",
+            depthWrite: false,
+            opacity: 0.9,
+            transparent: true,
+          }),
+        );
+        const secondaryNodeMaterial = trackDisposable(
+          new THREE.MeshBasicMaterial({
+            blending: THREE.AdditiveBlending,
+            color: "#67c7ff",
+            depthWrite: false,
+            opacity: 0.62,
+            transparent: true,
+          }),
+        );
+        const networkLineMaterial = trackDisposable(
+          new THREE.LineBasicMaterial({
+            blending: THREE.AdditiveBlending,
+            color: "#9ee4ff",
+            depthWrite: false,
+            opacity: 0.28,
+            transparent: true,
+          }),
+        );
+        const networkPositions = [
+          new THREE.Vector3(-1.1, 0.12, 0.04),
+          new THREE.Vector3(-0.68, 0.7, -0.02),
+          new THREE.Vector3(0.05, 0.84, 0.08),
+          new THREE.Vector3(0.75, 0.56, -0.04),
+          new THREE.Vector3(1.08, -0.08, 0.04),
+          new THREE.Vector3(0.62, -0.72, 0.02),
+          new THREE.Vector3(-0.14, -0.84, -0.04),
+          new THREE.Vector3(-0.78, -0.52, 0.06),
+        ];
+        const networkNodes: Array<InstanceType<typeof THREE.Mesh>> = [];
+
+        networkPositions.forEach((position, index) => {
+          const node = new THREE.Mesh(
+            networkNodeGeometry,
+            index % 3 === 0 ? primaryNodeMaterial : secondaryNodeMaterial,
+          );
+          node.position.copy(position);
+          decentralizationGroup.add(node);
+          networkNodes.push(node);
+        });
+
+        const networkEdges = [
+          [0, 1],
+          [1, 2],
+          [2, 3],
+          [3, 4],
+          [4, 5],
+          [5, 6],
+          [6, 7],
+          [7, 0],
+          [0, 3],
+          [1, 5],
+          [2, 6],
+          [4, 7],
+        ] as const;
+
+        networkEdges.forEach(([start, end]) => {
+          const edgeGeometry = trackDisposable(
+            new THREE.BufferGeometry().setFromPoints([
+              networkPositions[start],
+              networkPositions[end],
+            ]),
+          );
+          decentralizationGroup.add(
+            new THREE.Line(edgeGeometry, networkLineMaterial),
+          );
+        });
+
         if (variant === "strength") {
           updateStoryLayers.push((time) => {
             const securityPulse = (Math.sin(time * 1.44) + 1) / 2;
+            const networkPulse = (Math.sin(time * 1.12 + 0.6) + 1) / 2;
 
             securityGroup.scale.setScalar(0.8 + securityPulse * 0.05);
             shieldMaterial.opacity = 0.22 + securityPulse * 0.16;
+            decentralizationGroup.rotation.z = Math.sin(time * 0.22) * 0.08;
+            networkLineMaterial.opacity = 0.2 + networkPulse * 0.16;
+            primaryNodeMaterial.opacity = 0.72 + networkPulse * 0.22;
+            secondaryNodeMaterial.opacity = 0.46 + networkPulse * 0.2;
+
+            networkNodes.forEach((node, index) => {
+              const nodePulse = Math.sin(time * 1.35 + index * 0.64) * 0.05;
+
+              node.scale.setScalar(1 + nodePulse);
+            });
           });
         }
 
