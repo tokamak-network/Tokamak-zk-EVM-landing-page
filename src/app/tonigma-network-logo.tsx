@@ -406,14 +406,21 @@ export function TonigmaNetworkLogo() {
           radiusScale?: number;
           z: number;
         }) {
+          const materialOptions: ConstructorParameters<
+            typeof THREE.MeshBasicMaterial
+          >[0] = {
+            color,
+            depthWrite: false,
+            opacity,
+            transparent: true,
+          };
+
+          if (blending !== undefined) {
+            materialOptions.blending = blending;
+          }
+
           const material = trackMaterial(
-            new THREE.MeshBasicMaterial({
-              blending,
-              color,
-              depthWrite: false,
-              opacity,
-              transparent: true,
-            }),
+            new THREE.MeshBasicMaterial(materialOptions),
           );
           const mesh = new THREE.Mesh(createNodeGeometry(node, radiusScale), material);
           const position = scenePoint(node.point);
