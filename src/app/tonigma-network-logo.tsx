@@ -275,6 +275,9 @@ export function TonigmaNetworkLogo() {
         type BasicMesh = InstanceType<typeof THREE.Mesh> & {
           material: InstanceType<typeof THREE.MeshBasicMaterial>;
         };
+        type CapsuleMaterial =
+          | InstanceType<typeof THREE.MeshBasicMaterial>
+          | InstanceType<typeof THREE.ShaderMaterial>;
         const nodeRenders: Array<{
           active: BasicMesh;
           bloom: BasicMesh;
@@ -284,13 +287,10 @@ export function TonigmaNetworkLogo() {
           };
           rim: BasicMesh;
           node: LogoNode;
-          sweep: BasicMesh;
         }> = [];
         const edgeRenders: Array<{
           active: ReturnType<typeof createCapsule>;
-          centerX: number;
           edge: LogoEdge;
-          sweep: ReturnType<typeof createCapsule>;
           trail: ReturnType<typeof createTrail>;
         }> = [];
 
@@ -325,7 +325,7 @@ export function TonigmaNetworkLogo() {
           from: Point,
           to: Point,
           radius: number,
-          material: InstanceType<typeof THREE.MeshBasicMaterial>,
+          material: CapsuleMaterial,
           z: number,
         ) {
           const makeGeometry = (length: number) => {
@@ -422,6 +422,61 @@ export function TonigmaNetworkLogo() {
           root.add(mesh);
 
           return mesh as BasicMesh;
+        }
+
+        function createSweepMaterial() {
+          return trackMaterial(
+            new THREE.ShaderMaterial({
+              blending: THREE.AdditiveBlending,
+              depthWrite: false,
+              transparent: true,
+              uniforms: {
+                uBandWidth: { value: 0.22 },
+                uColor: { value: new THREE.Color(0x9fe6ff) },
+                uOpacity: { value: 0 },
+                uSweepCenter: { value: -2 },
+              },
+              vertexShader: `
+                varying float vWorldX;
+
+                void main() {
+                  vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+                  vWorldX = worldPosition.x;
+                  gl_Position = projectionMatrix * viewMatrix * worldPosition;
+                }
+              `,
+              fragmentShader: `
+                uniform float uBandWidth;
+                uniform vec3 uColor;
+                uniform float uOpacity;
+                uniform float uSweepCenter;
+                varying float vWorldX;
+
+                void main() {
+                  float distanceToBand = abs(vWorldX - uSweepCenter);
+                  float core = 1.0 - smoothstep(0.0, uBandWidth * 0.38, distanceToBand);
+                  float aura = 1.0 - smoothstep(uBandWidth * 0.22, uBandWidth, distanceToBand);
+                  float alpha = (core * 0.72 + aura * 0.42) * uOpacity;
+                  vec3 color = mix(uColor, vec3(1.0), core);
+
+                  gl_FragColor = vec4(color, alpha);
+                }
+              `,
+            }),
+          );
+        }
+
+        const sweepMaterial = createSweepMaterial();
+
+        function createNodeSweep(node: LogoNode) {
+          const mesh = new THREE.Mesh(
+            createNodeGeometry(node, node.shape === "diamond" ? 1.13 : 1.2),
+            sweepMaterial,
+          );
+          const position = scenePoint(node.point);
+
+          mesh.position.set(position.x, position.y, 0.09);
+          root.add(mesh);
         }
 
         function createNodeFlash(node: LogoNode) {
@@ -574,16 +629,7 @@ export function TonigmaNetworkLogo() {
             activeMaterial,
             0.02,
           );
-          const sweepMaterial = trackMaterial(
-            new THREE.MeshBasicMaterial({
-              blending: THREE.AdditiveBlending,
-              color: 0x9fe6ff,
-              depthWrite: false,
-              opacity: 0,
-              transparent: true,
-            }),
-          );
-          const sweep = createCapsule(
+          createCapsule(
             from,
             to,
             sceneLength(LINE_WIDTH / 1.35),
@@ -594,9 +640,7 @@ export function TonigmaNetworkLogo() {
 
           edgeRenders.push({
             active,
-            centerX: (from.x + to.x) / 2,
             edge,
-            sweep,
             trail,
           });
         });
@@ -631,16 +675,9 @@ export function TonigmaNetworkLogo() {
             z: 0.06,
           });
           const flash = createNodeFlash(node);
-          const sweep = createNodeMesh({
-            blending: THREE.AdditiveBlending,
-            color: 0x9fe6ff,
-            node,
-            opacity: 0,
-            radiusScale: node.shape === "diamond" ? 1.13 : 1.2,
-            z: 0.09,
-          });
+          createNodeSweep(node);
 
-          nodeRenders.push({ active, bloom, flash, rim, node, sweep });
+          nodeRenders.push({ active, bloom, flash, rim, node });
         });
 
         const resize = () => {
@@ -673,16 +710,16 @@ export function TonigmaNetworkLogo() {
             ? 6.9
             : (absoluteTime - startedAt) % CYCLE_SECONDS;
           const finalGlow = smoothstep((cycleTime - 6.1) / 0.85);
-          const sweepProgress = clamp((cycleTime - 6.08) / 1.22);
+          const sweepProgress = clamp((cycleTime - 6.18) / 1.22);
           const sweepEnvelope =
-            smoothstep((cycleTime - 6.02) / 0.22) *
-            (1 - smoothstep((cycleTime - 7.32) / 0.28));
-          const sweepCenter = -1.42 + smoothstep(sweepProgress) * 3.08;
+            smoothstep((cycleTime - 6.12) / 0.18) *
+            (1 - smoothstep((cycleTime - 7.42) / 0.28));
+          const sweepCenter = -1.56 + smoothstep(sweepProgress) * 3.28;
           const breathing = reducedMotion.matches
             ? 0
             : (Math.sin(absoluteTime * 2.6) + 1) / 2;
 
-          nodeRenders.forEach(({ active, bloom, flash, rim, node, sweep }) => {
+          nodeRenders.forEach(({ active, bloom, flash, rim, node }) => {
             const activation = smoothstep((cycleTime - node.turnOnAt) / 0.48);
             const emphasize =
               smoothstep((cycleTime - node.turnOnAt) / 0.16) *
@@ -715,14 +752,9 @@ export function TonigmaNetworkLogo() {
               postFillGlow * 0.24 +
               finalGlow * (0.055 + breathing * 0.018);
             rim.scale.setScalar(1 + emphasize * 0.025 + postFillGlow * 0.04);
-            sweep.material.opacity = reducedMotion.matches
-              ? 0
-              : sweepEnvelope *
-                (1 - smoothstep(Math.abs(scenePoint(node.point).x - sweepCenter) / 0.5)) *
-                0.92;
           });
 
-          edgeRenders.forEach(({ active, centerX, edge, sweep, trail }) => {
+          edgeRenders.forEach(({ active, edge, trail }) => {
             const rawProgress = (cycleTime - edge.startAt) / edge.duration;
             const progress = smoothstep(rawProgress);
             const inFlight = rawProgress > 0 && rawProgress < 1;
@@ -732,16 +764,14 @@ export function TonigmaNetworkLogo() {
 
             active.update(progress);
             active.material.opacity = progress;
-            sweep.update(1);
-            sweep.material.opacity = reducedMotion.matches
-              ? 0
-              : sweepEnvelope *
-                (1 - smoothstep(Math.abs(centerX - sweepCenter) / 0.48)) *
-                0.78;
             trail.update(rawProgress, trailOpacity);
           });
 
           root.scale.setScalar(1 + finalGlow * 0.012 + breathing * finalGlow * 0.006);
+          sweepMaterial.uniforms.uSweepCenter.value = sweepCenter;
+          sweepMaterial.uniforms.uOpacity.value = reducedMotion.matches
+            ? 0
+            : sweepEnvelope * 0.78;
           renderer.render(scene, camera);
           animationFrame = requestAnimationFrame(render);
         };
