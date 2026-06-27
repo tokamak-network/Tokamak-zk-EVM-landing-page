@@ -433,10 +433,9 @@ export function EthereumLogoOrbit({
         storyGroup.add(observerGroup);
 
         for (let index = 0; index < observerCount; index++) {
-          const sequence = observerCount > 1 ? index / (observerCount - 1) : 0;
           const angle = (index / observerCount) * Math.PI * 2;
           const radius = 1.66 + (index % 4) * 0.14;
-          const isLowerRow = index % 2 === 0;
+          const strengthRadius = 1.28 + (index % 3) * 0.08;
           const target =
             variant === "strength"
               ? strengthVerificationTarget
@@ -444,9 +443,9 @@ export function EthereumLogoOrbit({
           const home =
             variant === "strength"
               ? new THREE.Vector3(
-                  (sequence - 0.5) * (isLowerRow ? 3.35 : 3.04),
-                  -1.74 - (isLowerRow ? 0.18 : 0) + Math.sin(sequence * Math.PI) * 0.18,
-                  (isLowerRow ? 0.22 : -0.18) + Math.sin(sequence * Math.PI * 2) * 0.1,
+                  target.x + Math.cos(angle) * strengthRadius,
+                  target.y,
+                  target.z + Math.sin(angle) * strengthRadius,
                 )
               : new THREE.Vector3(
                   Math.cos(angle) * radius,
