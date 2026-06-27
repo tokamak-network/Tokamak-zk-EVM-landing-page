@@ -2,7 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export function EthereumLogoOrbit() {
+type EthereumLogoOrbitProps = Readonly<{
+  variant?: "strength" | "tradeoff";
+}>;
+
+export function EthereumLogoOrbit({
+  variant = "tradeoff",
+}: EthereumLogoOrbitProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [showFallback, setShowFallback] = useState(false);
 
@@ -57,7 +63,7 @@ export function EthereumLogoOrbit() {
         viewGroup.add(storyGroup);
 
         const logoGroup = new THREE.Group();
-        logoGroup.scale.setScalar(0.68);
+        logoGroup.scale.setScalar(variant === "strength" ? 0.78 : 0.68);
         storyGroup.add(logoGroup);
         const disposableResources: Array<{ dispose: () => void }> = [];
 
@@ -337,9 +343,11 @@ export function EthereumLogoOrbit() {
 
         scatteringVolumes.forEach(addScatteringVolume);
 
+        const updateStoryLayers: Array<(time: number) => void> = [];
+        const centerPoint = new THREE.Vector3(0, gapCenterY, 0);
+
         const observerGroup = new THREE.Group();
         observerGroup.position.z = -0.14;
-        storyGroup.add(observerGroup);
 
         const personHeadGeometry = trackDisposable(
           new THREE.SphereGeometry(0.056, 18, 12),
@@ -418,9 +426,16 @@ export function EthereumLogoOrbit() {
         }> = [];
 
         const observerCount = 22;
-        const centerPoint = new THREE.Vector3(0, gapCenterY, 0);
 
-        for (let index = 0; index < observerCount; index++) {
+        if (variant === "tradeoff") {
+          storyGroup.add(observerGroup);
+        }
+
+        for (
+          let index = 0;
+          variant === "tradeoff" && index < observerCount;
+          index++
+        ) {
           const angle = (index / observerCount) * Math.PI * 2;
           const radius = 1.66 + (index % 4) * 0.14;
           const depth = Math.sin(angle) * 0.44;
@@ -475,10 +490,39 @@ export function EthereumLogoOrbit() {
           });
         }
 
+        if (variant === "tradeoff") {
+          updateStoryLayers.push((time) => {
+            observerAnimations.forEach(
+              ({ group, home, observePacket, phase, replayPacket }) => {
+                const bob = Math.sin(time * 1.8 + phase) * 0.026;
+                group.position.set(home.x, home.y + bob, home.z);
+
+                const observeProgress =
+                  (Math.sin(time * 0.86 + phase) + 1) / 2;
+                const replayProgress =
+                  (Math.sin(time * 0.86 + phase + Math.PI) + 1) / 2;
+
+                observePacket.position.lerpVectors(
+                  centerPoint,
+                  home,
+                  observeProgress,
+                );
+                replayPacket.position.lerpVectors(
+                  home,
+                  centerPoint,
+                  replayProgress,
+                );
+              },
+            );
+          });
+        }
+
         const securityGroup = new THREE.Group();
         securityGroup.position.set(-1.58, 0.78, 0.18);
         securityGroup.scale.setScalar(0.82);
-        storyGroup.add(securityGroup);
+        if (variant === "strength") {
+          storyGroup.add(securityGroup);
+        }
 
         const shieldShape = new THREE.Shape();
         shieldShape.moveTo(0, 0.32);
@@ -535,10 +579,21 @@ export function EthereumLogoOrbit() {
         const checkLine = new THREE.Line(checkGeometry, iconLineMaterial);
         securityGroup.add(checkLine);
 
+        if (variant === "strength") {
+          updateStoryLayers.push((time) => {
+            const securityPulse = (Math.sin(time * 1.44) + 1) / 2;
+
+            securityGroup.scale.setScalar(0.8 + securityPulse * 0.05);
+            shieldMaterial.opacity = 0.22 + securityPulse * 0.16;
+          });
+        }
+
         const privacyGroup = new THREE.Group();
         privacyGroup.position.set(1.58, -0.72, 0.2);
         privacyGroup.scale.setScalar(0.84);
-        storyGroup.add(privacyGroup);
+        if (variant === "tradeoff") {
+          storyGroup.add(privacyGroup);
+        }
 
         const eyeMaterial = trackDisposable(
           new THREE.LineBasicMaterial({
@@ -601,6 +656,17 @@ export function EthereumLogoOrbit() {
         const privacySlash = new THREE.Line(slashGeometry, slashMaterial);
         privacyGroup.add(privacySlash);
 
+        if (variant === "tradeoff") {
+          updateStoryLayers.push((time) => {
+            const privacyPulse = (Math.sin(time * 1.86 + 1.2) + 1) / 2;
+
+            privacyGroup.scale.setScalar(0.8 + privacyPulse * 0.08);
+            eyeMaterial.opacity = 0.5 + privacyPulse * 0.32;
+            slashMaterial.opacity = 0.72 + privacyPulse * 0.2;
+            pupilMaterial.opacity = 0.38 + privacyPulse * 0.28;
+          });
+        }
+
         const pressureRingGeometry = trackDisposable(
           new THREE.TorusGeometry(1.36, 0.006, 8, 128),
         );
@@ -620,6 +686,15 @@ export function EthereumLogoOrbit() {
         pressureRing.rotation.x = Math.PI / 2;
         pressureRing.scale.y = 0.58;
         storyGroup.add(pressureRing);
+
+        updateStoryLayers.push((time) => {
+          const ringPulse = (Math.sin(time * 1.28) + 1) / 2;
+
+          pressureRingMaterial.opacity =
+            variant === "strength"
+              ? 0.16 + ringPulse * 0.14
+              : 0.08 + ringPulse * 0.1;
+        });
 
         const logoPitch = (31.5 * Math.PI) / 180;
 
@@ -658,44 +733,16 @@ export function EthereumLogoOrbit() {
 
           if (!reducedMotion.matches) {
             logoGroup.rotation.y = 0.58 + time * logoSpinSpeed;
-            observerGroup.rotation.y = Math.sin(time * 0.13) * 0.12;
             pressureRing.rotation.z = time * 0.09;
+
+            if (variant === "tradeoff") {
+              observerGroup.rotation.y = Math.sin(time * 0.13) * 0.12;
+            }
           }
 
-          const securityPulse = (Math.sin(time * 1.44) + 1) / 2;
-          const privacyPulse = (Math.sin(time * 1.86 + 1.2) + 1) / 2;
-
-          securityGroup.scale.setScalar(0.8 + securityPulse * 0.05);
-          privacyGroup.scale.setScalar(0.8 + privacyPulse * 0.08);
-          shieldMaterial.opacity = 0.22 + securityPulse * 0.16;
-          eyeMaterial.opacity = 0.5 + privacyPulse * 0.32;
-          slashMaterial.opacity = 0.72 + privacyPulse * 0.2;
-          pupilMaterial.opacity = 0.38 + privacyPulse * 0.28;
-          pressureRingMaterial.opacity = 0.12 + securityPulse * 0.12;
-
-          observerAnimations.forEach(
-            ({ group, home, observePacket, phase, replayPacket }) => {
-              const bob = Math.sin(time * 1.8 + phase) * 0.026;
-              group.position.set(home.x, home.y + bob, home.z);
-
-              const observeProgress =
-                (Math.sin(time * 0.86 + phase) + 1) / 2;
-              const replayProgress =
-                (Math.sin(time * 0.86 + phase + Math.PI) + 1) / 2;
-
-              observePacket.position.lerpVectors(
-                centerPoint,
-                home,
-                observeProgress,
-              );
-              replayPacket.position.lerpVectors(
-                home,
-                centerPoint,
-                replayProgress,
-              );
-            },
+          updateStoryLayers.forEach((updateStoryLayer) =>
+            updateStoryLayer(time),
           );
-
           updateGlowLayers.forEach((updateGlowLayer) =>
             updateGlowLayer(time),
           );
@@ -722,7 +769,7 @@ export function EthereumLogoOrbit() {
       resizeObserver?.disconnect();
       disposeScene?.();
     };
-  }, []);
+  }, [variant]);
 
   return (
     <div className="ethereum-orbit" aria-hidden="true">

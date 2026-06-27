@@ -1,4 +1,11 @@
-import { ArrowRight, Eye, Repeat2, ShieldCheck } from "lucide-react";
+import {
+  ArrowRight,
+  Eye,
+  LockKeyhole,
+  Network,
+  Repeat2,
+  ShieldCheck,
+} from "lucide-react";
 import Image from "next/image";
 import { EthereumLogoOrbit } from "./ethereum-logo-orbit";
 import { ParallaxBackground } from "./parallax-background";
@@ -85,42 +92,69 @@ export default function Home() {
 
       <section
         className="section-shell compact-section story-section ethereum-orbit-section"
-        aria-labelledby="ethereum-verification-title"
+        aria-labelledby="ethereum-strengths-title"
       >
         <div className="story-copy">
-          <span className="section-kicker">Ethereum verification</span>
-          <h2 id="ethereum-verification-title">
-            Strong security comes from everyone being able to check the same
-            public state.
+          <span className="section-kicker">Ethereum strengths</span>
+          <h2 id="ethereum-strengths-title">
+            Ethereum gives applications a secure, immutable settlement layer.
           </h2>
           <p>
-            Ethereum anchors applications with deep decentralization, security,
-            and immutability. That strength comes from a public verification
-            model: participants can observe activity, re-execute the work, and
-            reject invalid state.
+            Its strength comes from decentralization: many independent
+            participants can agree on the same state without trusting a single
+            operator.
           </p>
-          <p>
-            The tradeoff is privacy. As more independent participants verify
-            the same activity, more of that activity is exposed to the public
-            network.
-          </p>
-          <div className="story-points" aria-label="Ethereum tradeoff signals">
+          <div className="story-points" aria-label="Ethereum strength signals">
+            <div className="story-point">
+              <Network aria-hidden="true" size={20} />
+              <span>Decentralization removes single points of control.</span>
+            </div>
             <div className="story-point">
               <ShieldCheck aria-hidden="true" size={20} />
-              <span>Decentralized verification hardens security.</span>
+              <span>Security is reinforced by broad independent validation.</span>
             </div>
             <div className="story-point">
-              <Repeat2 aria-hidden="true" size={20} />
-              <span>Nodes observe and re-execute public activity.</span>
-            </div>
-            <div className="story-point story-point--warning">
-              <Eye aria-hidden="true" size={20} />
-              <span>More public validation also means more privacy exposure.</span>
+              <LockKeyhole aria-hidden="true" size={20} />
+              <span>Immutability protects settled application state.</span>
             </div>
           </div>
         </div>
         <div className="story-stage" aria-hidden="true">
-          <EthereumLogoOrbit />
+          <EthereumLogoOrbit variant="strength" />
+        </div>
+      </section>
+
+      <section
+        className="section-shell compact-section story-section story-section--tradeoff ethereum-orbit-section"
+        aria-labelledby="ethereum-tradeoff-title"
+      >
+        <div className="story-copy">
+          <span className="section-kicker">Ethereum tradeoff</span>
+          <h2 id="ethereum-tradeoff-title">
+            The same public verification model exposes activity by design.
+          </h2>
+          <p>
+            Ethereum keeps security auditable by letting participants observe
+            activity and re-execute state transitions. The more public the
+            validation path becomes, the more privacy is exposed to the network.
+          </p>
+          <div className="story-points" aria-label="Ethereum tradeoff signals">
+            <div className="story-point">
+              <Eye aria-hidden="true" size={20} />
+              <span>Network participants can see public activity.</span>
+            </div>
+            <div className="story-point">
+              <Repeat2 aria-hidden="true" size={20} />
+              <span>State transitions can be re-executed by observers.</span>
+            </div>
+            <div className="story-point story-point--warning">
+              <Eye aria-hidden="true" size={20} />
+              <span>Stronger public validation increases privacy exposure.</span>
+            </div>
+          </div>
+        </div>
+        <div className="story-stage" aria-hidden="true">
+          <EthereumLogoOrbit variant="tradeoff" />
         </div>
       </section>
 

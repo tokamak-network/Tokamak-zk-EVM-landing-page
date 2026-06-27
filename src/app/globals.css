@@ -324,8 +324,14 @@ main {
   opacity: 0.64;
   background:
     radial-gradient(ellipse at 46% 46%, rgba(85, 180, 255, 0.18), transparent 36%),
-    radial-gradient(ellipse at 62% 62%, rgba(255, 108, 170, 0.1), transparent 34%);
+    radial-gradient(ellipse at 58% 58%, rgba(180, 224, 255, 0.08), transparent 34%);
   filter: blur(18px);
+}
+
+.story-section--tradeoff .story-stage::before {
+  background:
+    radial-gradient(ellipse at 46% 46%, rgba(85, 180, 255, 0.12), transparent 36%),
+    radial-gradient(ellipse at 62% 62%, rgba(255, 108, 170, 0.16), transparent 34%);
 }
 
 .story-points {
