@@ -429,24 +429,32 @@ export function EthereumLogoOrbit({
         const observerCount = 22;
         const strengthVerificationTarget = new THREE.Vector3(0, -1.34, 0.18);
         const tradeoffVerificationTarget = centerPoint;
+        const strengthHomes = Array.from({ length: observerCount }, (_, index) => {
+          const angle = (index / observerCount) * Math.PI * 2;
+          const strengthRadius = 1.28 + (index % 3) * 0.08;
+
+          return new THREE.Vector3(
+            strengthVerificationTarget.x + Math.cos(angle) * strengthRadius,
+            strengthVerificationTarget.y,
+            strengthVerificationTarget.z + Math.sin(angle) * strengthRadius,
+          );
+        });
+        const getStrengthHome = (index: number) => {
+          return strengthHomes[index].clone();
+        };
 
         storyGroup.add(observerGroup);
 
         for (let index = 0; index < observerCount; index++) {
           const angle = (index / observerCount) * Math.PI * 2;
           const radius = 1.66 + (index % 4) * 0.14;
-          const strengthRadius = 1.28 + (index % 3) * 0.08;
           const target =
             variant === "strength"
-              ? strengthVerificationTarget
+              ? getStrengthHome((index * 7 + 5) % observerCount)
               : tradeoffVerificationTarget;
           const home =
             variant === "strength"
-              ? new THREE.Vector3(
-                  target.x + Math.cos(angle) * strengthRadius,
-                  target.y,
-                  target.z + Math.sin(angle) * strengthRadius,
-                )
+              ? getStrengthHome(index)
               : new THREE.Vector3(
                   Math.cos(angle) * radius,
                   Math.sin(angle) * 0.86,
@@ -481,6 +489,28 @@ export function EthereumLogoOrbit({
             index % 2 === 0 ? verificationLineMaterial : replayLineMaterial,
           );
           observerGroup.add(verificationLine);
+
+          if (variant === "strength") {
+            const connectionCount = 1 + ((index * 5 + 3) % 3);
+
+            for (let edge = 0; edge < connectionCount; edge++) {
+              const targetIndex =
+                (index * (edge + 3) + edge * 7 + 5) % observerCount;
+
+              if (targetIndex <= index) {
+                continue;
+              }
+
+              const meshTarget = getStrengthHome(targetIndex);
+              const meshLineGeometry = trackDisposable(
+                new THREE.BufferGeometry().setFromPoints([home, meshTarget]),
+              );
+
+              observerGroup.add(
+                new THREE.Line(meshLineGeometry, replayLineMaterial),
+              );
+            }
+          }
 
           const observePacket = new THREE.Mesh(
             packetGeometry,
@@ -523,77 +553,6 @@ export function EthereumLogoOrbit({
             },
           );
         });
-
-        const securityGroup = new THREE.Group();
-        securityGroup.position.copy(strengthVerificationTarget);
-        securityGroup.scale.setScalar(0.82);
-        if (variant === "strength") {
-          storyGroup.add(securityGroup);
-        }
-
-        const shieldShape = new THREE.Shape();
-        shieldShape.moveTo(0, 0.32);
-        shieldShape.lineTo(0.28, 0.19);
-        shieldShape.lineTo(0.22, -0.16);
-        shieldShape.quadraticCurveTo(0.13, -0.32, 0, -0.42);
-        shieldShape.quadraticCurveTo(-0.13, -0.32, -0.22, -0.16);
-        shieldShape.lineTo(-0.28, 0.19);
-        shieldShape.lineTo(0, 0.32);
-
-        const shieldGeometry = trackDisposable(new THREE.ShapeGeometry(shieldShape));
-        const shieldMaterial = trackDisposable(
-          new THREE.MeshBasicMaterial({
-            blending: THREE.AdditiveBlending,
-            color: "#69c7ff",
-            depthWrite: false,
-            opacity: 0.28,
-            side: THREE.DoubleSide,
-            transparent: true,
-          }),
-        );
-        const shieldMesh = new THREE.Mesh(shieldGeometry, shieldMaterial);
-        securityGroup.add(shieldMesh);
-
-        const shieldOutlineGeometry = trackDisposable(
-          new THREE.BufferGeometry().setFromPoints(
-            shieldShape
-              .getPoints(40)
-              .map((point) => new THREE.Vector3(point.x, point.y, 0.02)),
-          ),
-        );
-        const iconLineMaterial = trackDisposable(
-          new THREE.LineBasicMaterial({
-            blending: THREE.AdditiveBlending,
-            color: "#d8f5ff",
-            depthWrite: false,
-            opacity: 0.78,
-            transparent: true,
-          }),
-        );
-        const shieldOutline = new THREE.LineLoop(
-          shieldOutlineGeometry,
-          iconLineMaterial,
-        );
-        securityGroup.add(shieldOutline);
-
-        const checkGeometry = trackDisposable(
-          new THREE.BufferGeometry().setFromPoints([
-            new THREE.Vector3(-0.12, -0.02, 0.04),
-            new THREE.Vector3(-0.03, -0.12, 0.04),
-            new THREE.Vector3(0.16, 0.11, 0.04),
-          ]),
-        );
-        const checkLine = new THREE.Line(checkGeometry, iconLineMaterial);
-        securityGroup.add(checkLine);
-
-        if (variant === "strength") {
-          updateStoryLayers.push((time) => {
-            const securityPulse = (Math.sin(time * 1.44) + 1) / 2;
-
-            securityGroup.scale.setScalar(0.8 + securityPulse * 0.05);
-            shieldMaterial.opacity = 0.22 + securityPulse * 0.16;
-          });
-        }
 
         const privacyGroup = new THREE.Group();
         privacyGroup.position.set(1.58, -0.72, 0.2);
