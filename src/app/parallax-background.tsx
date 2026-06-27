@@ -13,12 +13,13 @@ export function ParallaxBackground() {
         return;
       }
 
-      const scrollable =
-        document.documentElement.scrollHeight - window.innerHeight || 1;
-      const depth = Math.min(window.scrollY / scrollable, 1);
       document.documentElement.style.setProperty(
         "--scroll-depth",
-        depth.toFixed(4),
+        Math.min(
+          window.scrollY /
+            (document.documentElement.scrollHeight - window.innerHeight || 1),
+          1,
+        ).toFixed(4),
       );
     };
 

@@ -1,7 +1,5 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  transpilePackages: ["@tokamak-zk-evm/synthesizer-web", "tokamak-l2js"],
-};
+const nextConfig: NextConfig = {};
 
 export default nextConfig;

@@ -2,9 +2,7 @@
   --background: #050607;
   --foreground: #f7f7f2;
   --muted: #b4bac4;
-  --subtle: #747d8b;
   --line: rgba(255, 255, 255, 0.14);
-  --line-strong: rgba(255, 255, 255, 0.24);
   --blue: #1f8fff;
   --blue-soft: rgba(31, 143, 255, 0.16);
   --scroll-depth: 0;
@@ -375,82 +373,6 @@ p {
   padding-block: 0;
 }
 
-.flow-diagram {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--content-gap);
-  max-width: 980px;
-  margin: var(--content-gap) 0 0;
-  padding: 0;
-  list-style: none;
-  counter-reset: none;
-}
-
-.flow-diagram::before {
-  position: absolute;
-  top: 27px;
-  right: 11%;
-  left: 11%;
-  height: 1px;
-  content: "";
-  background: linear-gradient(
-    90deg,
-    rgba(31, 143, 255, 0.16),
-    rgba(255, 255, 255, 0.32),
-    rgba(31, 143, 255, 0.16)
-  );
-}
-
-.flow-diagram li {
-  position: relative;
-  display: grid;
-  min-height: 148px;
-  align-content: start;
-  gap: 12px;
-  padding: 0 0 0 2px;
-}
-
-.flow-step__index {
-  position: relative;
-  z-index: 1;
-  display: inline-grid;
-  width: 54px;
-  height: 54px;
-  place-items: center;
-  border: 1px solid rgba(31, 143, 255, 0.38);
-  border-radius: 8px;
-  color: #d9ecff;
-  background:
-    linear-gradient(180deg, rgba(31, 143, 255, 0.18), rgba(31, 143, 255, 0.07)),
-    rgba(5, 6, 7, 0.84);
-  font-family:
-    "Geist Mono",
-    "SFMono-Regular",
-    Consolas,
-    monospace;
-  font-size: 0.78rem;
-  font-weight: 700;
-}
-
-.flow-diagram strong {
-  color: var(--foreground);
-  font-size: 1.18rem;
-  line-height: 1.2;
-}
-
-.flow-diagram li > span:last-child {
-  max-width: 220px;
-  color: var(--muted);
-  font-size: 0.98rem;
-  line-height: 1.58;
-}
-
-.section-note {
-  margin-top: var(--content-gap);
-  max-width: 760px;
-}
-
 .example-section {
   padding-bottom: var(--section-padding-large);
 }
@@ -503,36 +425,6 @@ code {
     margin-top: -16px;
   }
 
-  .flow-diagram {
-    grid-template-columns: 1fr;
-    gap: 28px;
-    max-width: 620px;
-  }
-
-  .flow-diagram::before {
-    top: 26px;
-    bottom: 26px;
-    left: 27px;
-    width: 1px;
-    height: auto;
-    background: linear-gradient(
-      180deg,
-      rgba(31, 143, 255, 0.16),
-      rgba(255, 255, 255, 0.32),
-      rgba(31, 143, 255, 0.16)
-    );
-  }
-
-  .flow-diagram li {
-    min-height: 0;
-    padding-left: 78px;
-  }
-
-  .flow-step__index {
-    position: absolute;
-    left: 0;
-    top: 0;
-  }
 }
 
 @media (max-width: 760px) {

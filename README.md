@@ -11,8 +11,6 @@ The previous implementation has been archived on the `archive-mar26` branch. The
 - TypeScript
 - npm
 
-The app is configured to remain compatible with future use of `@tokamak-zk-evm/synthesizer-web` and `tokamak-l2js`.
-
 ## Scripts
 
 ```bash

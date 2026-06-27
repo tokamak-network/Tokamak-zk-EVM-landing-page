@@ -32,6 +32,14 @@ const TIMELINE_SECONDS = 8.8;
 const ANIMATION_SPEED = 1.2;
 const COMPLETION_HOLD_SECONDS = 3;
 const CYCLE_SECONDS = TIMELINE_SECONDS / ANIMATION_SPEED + COMPLETION_HOLD_SECONDS;
+const UV_PASSTHROUGH_VERTEX_SHADER = `
+  varying vec2 vUv;
+
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
 
 const inputNodes: LogoNode[] = [
   {
@@ -255,7 +263,6 @@ export function TonigmaNetworkLogo() {
           antialias: true,
           canvas,
           powerPreference: "high-performance",
-          preserveDrawingBuffer: true,
         });
         renderer.setClearColor(0x000000, 0);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -272,8 +279,7 @@ export function TonigmaNetworkLogo() {
         root.rotation.z = -0.02;
         scene.add(root);
 
-        const disposableGeometries: Array<{ dispose: () => void }> = [];
-        const disposableMaterials: Array<{ dispose: () => void }> = [];
+        const disposableResources: Array<{ dispose: () => void }> = [];
         const disposableCallbacks: Array<() => void> = [];
         type BasicMesh = InstanceType<typeof THREE.Mesh> & {
           material: InstanceType<typeof THREE.MeshBasicMaterial>;
@@ -297,18 +303,26 @@ export function TonigmaNetworkLogo() {
           trail: ReturnType<typeof createTrail>;
         }> = [];
 
-        function trackGeometry<T extends { dispose: () => void }>(geometry: T) {
-          disposableGeometries.push(geometry);
-          return geometry;
+        function trackDisposable<T extends { dispose: () => void }>(resource: T) {
+          disposableResources.push(resource);
+          return resource;
         }
 
-        function trackMaterial<T extends { dispose: () => void }>(material: T) {
-          disposableMaterials.push(material);
-          return material;
+        function createBasicMaterial(
+          options: ConstructorParameters<typeof THREE.MeshBasicMaterial>[0],
+        ) {
+          return trackDisposable(
+            new THREE.MeshBasicMaterial({
+              transparent: true,
+              ...options,
+            }),
+          );
         }
 
         function createCircleGeometry(radius: number, segments = 80) {
-          return trackGeometry(new THREE.CircleGeometry(sceneLength(radius), segments));
+          return trackDisposable(
+            new THREE.CircleGeometry(sceneLength(radius), segments),
+          );
         }
 
         function createDiamondGeometry(radius: number) {
@@ -321,7 +335,7 @@ export function TonigmaNetworkLogo() {
           shape.lineTo(-halfWidth, 0);
           shape.closePath();
 
-          return trackGeometry(new THREE.ShapeGeometry(shape));
+          return trackDisposable(new THREE.ShapeGeometry(shape));
         }
 
         function createCapsule(
@@ -381,7 +395,7 @@ export function TonigmaNetworkLogo() {
           }
 
           if (node.shape === "ring") {
-            return trackGeometry(
+            return trackDisposable(
               new THREE.TorusGeometry(
                 sceneLength(radius),
                 sceneLength(7.5 * radiusScale),
@@ -422,9 +436,7 @@ export function TonigmaNetworkLogo() {
             materialOptions.blending = blending;
           }
 
-          const material = trackMaterial(
-            new THREE.MeshBasicMaterial(materialOptions),
-          );
+          const material = createBasicMaterial(materialOptions);
           const mesh = new THREE.Mesh(createNodeGeometry(node, radiusScale), material);
           const position = scenePoint(node.point);
 
@@ -435,7 +447,7 @@ export function TonigmaNetworkLogo() {
         }
 
         function createSweepMaterial() {
-          return trackMaterial(
+          return trackDisposable(
             new THREE.ShaderMaterial({
               blending: THREE.AdditiveBlending,
               depthWrite: false,
@@ -490,7 +502,7 @@ export function TonigmaNetworkLogo() {
         }
 
         function createNodeFlash(node: LogoNode) {
-          const material = trackMaterial(
+          const material = trackDisposable(
             new THREE.ShaderMaterial({
               blending: THREE.AdditiveBlending,
               depthWrite: false,
@@ -499,14 +511,7 @@ export function TonigmaNetworkLogo() {
                 uColor: { value: new THREE.Color(0x9bddff) },
                 uOpacity: { value: 0 },
               },
-              vertexShader: `
-                varying vec2 vUv;
-
-                void main() {
-                  vUv = uv;
-                  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                }
-              `,
+              vertexShader: UV_PASSTHROUGH_VERTEX_SHADER,
               fragmentShader: `
                 uniform vec3 uColor;
                 uniform float uOpacity;
@@ -541,7 +546,7 @@ export function TonigmaNetworkLogo() {
         }
 
         function createTrailMaterial() {
-          return trackMaterial(
+          return trackDisposable(
             new THREE.ShaderMaterial({
               blending: THREE.AdditiveBlending,
               depthWrite: false,
@@ -551,14 +556,7 @@ export function TonigmaNetworkLogo() {
                 uPrimary: { value: new THREE.Color(0xf6fbff) },
                 uSecondary: { value: new THREE.Color(0x5fc8ff) },
               },
-              vertexShader: `
-                varying vec2 vUv;
-
-                void main() {
-                  vUv = uv;
-                  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                }
-              `,
+              vertexShader: UV_PASSTHROUGH_VERTEX_SHADER,
               fragmentShader: `
                 uniform float uOpacity;
                 uniform vec3 uPrimary;
@@ -581,7 +579,10 @@ export function TonigmaNetworkLogo() {
 
         function createTrail(from: Point, to: Point) {
           const material = createTrailMaterial();
-          const mesh = new THREE.Mesh(trackGeometry(new THREE.PlaneGeometry(1, 1)), material);
+          const mesh = new THREE.Mesh(
+            trackDisposable(new THREE.PlaneGeometry(1, 1)),
+            material,
+          );
           const fullDx = to.x - from.x;
           const fullDy = to.y - from.y;
           const fullLength = Math.max(Math.hypot(fullDx, fullDy), 0.001);
@@ -612,49 +613,7 @@ export function TonigmaNetworkLogo() {
           return { material, update };
         }
 
-        edges.forEach((edge) => {
-          const { from, to } = edgeSegment(edge);
-          const dimMaterial = trackMaterial(
-            new THREE.MeshBasicMaterial({
-              color: 0x1b2530,
-              opacity: 0.46,
-              transparent: true,
-            }),
-          );
-          const activeMaterial = trackMaterial(
-            new THREE.MeshBasicMaterial({
-              color: 0xffffff,
-              depthWrite: false,
-              opacity: 0,
-              transparent: true,
-            }),
-          );
-
-          createCapsule(from, to, sceneLength(LINE_WIDTH / 2), dimMaterial, 0);
-          const active = createCapsule(
-            from,
-            to,
-            sceneLength(LINE_WIDTH / 2.2),
-            activeMaterial,
-            0.02,
-          );
-          createCapsule(
-            from,
-            to,
-            sceneLength(LINE_WIDTH / 1.35),
-            sweepMaterial,
-            0.085,
-          );
-          const trail = createTrail(from, to);
-
-          edgeRenders.push({
-            active,
-            edge,
-            trail,
-          });
-        });
-
-        allNodes.forEach((node) => {
+        function createNodeRender(node: LogoNode) {
           createNodeMesh({
             color: 0x1d2834,
             node,
@@ -686,8 +645,46 @@ export function TonigmaNetworkLogo() {
           const flash = createNodeFlash(node);
           createNodeSweep(node);
 
-          nodeRenders.push({ active, bloom, flash, rim, node });
+          return { active, bloom, flash, rim, node };
+        }
+
+        edges.forEach((edge) => {
+          const { from, to } = edgeSegment(edge);
+          const dimMaterial = createBasicMaterial({
+            color: 0x1b2530,
+            opacity: 0.46,
+          });
+          const activeMaterial = createBasicMaterial({
+            color: 0xffffff,
+            depthWrite: false,
+            opacity: 0,
+          });
+
+          createCapsule(from, to, sceneLength(LINE_WIDTH / 2), dimMaterial, 0);
+          const active = createCapsule(
+            from,
+            to,
+            sceneLength(LINE_WIDTH / 2.2),
+            activeMaterial,
+            0.02,
+          );
+          createCapsule(
+            from,
+            to,
+            sceneLength(LINE_WIDTH / 1.35),
+            sweepMaterial,
+            0.085,
+          );
+          const trail = createTrail(from, to);
+
+          edgeRenders.push({
+            active,
+            edge,
+            trail,
+          });
         });
+
+        allNodes.forEach((node) => nodeRenders.push(createNodeRender(node)));
 
         const resize = () => {
           const bounds = canvas.getBoundingClientRect();
@@ -791,8 +788,7 @@ export function TonigmaNetworkLogo() {
         render();
 
         disposeScene = () => {
-          disposableGeometries.forEach((geometry) => geometry.dispose());
-          disposableMaterials.forEach((material) => material.dispose());
+          disposableResources.forEach((resource) => resource.dispose());
           disposableCallbacks.forEach((disposeCallback) => disposeCallback());
           renderer.dispose();
         };
@@ -817,7 +813,6 @@ export function TonigmaNetworkLogo() {
       <canvas
         ref={canvasRef}
         className="tonigma-network-logo__canvas"
-        data-testid="tonigma-network-logo-canvas"
       />
       {showFallback ? (
         <img

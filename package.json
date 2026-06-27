@@ -17,13 +17,10 @@
     "three": "^0.185.0"
   },
   "devDependencies": {
-    "@remotion/cli": "^4.0.482",
-    "@remotion/renderer": "^4.0.482",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "@types/three": "^0.185.0",
-    "remotion": "^4.0.482",
     "typescript": "latest"
   },
   "overrides": {

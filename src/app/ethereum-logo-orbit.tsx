@@ -55,8 +55,12 @@ export function EthereumLogoOrbit() {
 
         const logoGroup = new THREE.Group();
         viewGroup.add(logoGroup);
-        const disposableGeometries: Array<{ dispose: () => void }> = [];
-        const disposableMaterials: Array<{ dispose: () => void }> = [];
+        const disposableResources: Array<{ dispose: () => void }> = [];
+
+        function trackDisposable<T extends { dispose: () => void }>(resource: T) {
+          disposableResources.push(resource);
+          return resource;
+        }
 
         const top = new THREE.Vector3(0, 1.5041, 0);
         const bottom = new THREE.Vector3(0, -1.3241, 0);
@@ -109,24 +113,24 @@ export function EthereumLogoOrbit() {
         ];
 
         surfaces.forEach((surface, index) => {
-          const geometry = new THREE.BufferGeometry().setFromPoints([
-            ...surface.points,
-          ]);
+          const geometry = trackDisposable(
+            new THREE.BufferGeometry().setFromPoints([...surface.points]),
+          );
           geometry.setIndex(surface.index ?? [0, 1, 2]);
           geometry.computeVertexNormals();
-          disposableGeometries.push(geometry);
 
-          const material = new THREE.MeshStandardMaterial({
-            color: surface.color,
-            emissive: index % 4 === 0 ? "#12345c" : "#050a16",
-            emissiveIntensity: index % 4 === 0 ? 0.18 : 0.08,
-            metalness: 0.36,
-            opacity: surface.opacity ?? 1,
-            roughness: 0.42,
-            side: THREE.DoubleSide,
-            transparent: surface.opacity !== undefined,
-          });
-          disposableMaterials.push(material);
+          const material = trackDisposable(
+            new THREE.MeshStandardMaterial({
+              color: surface.color,
+              emissive: index % 4 === 0 ? "#12345c" : "#050a16",
+              emissiveIntensity: index % 4 === 0 ? 0.18 : 0.08,
+              metalness: 0.36,
+              opacity: surface.opacity ?? 1,
+              roughness: 0.42,
+              side: THREE.DoubleSide,
+              transparent: surface.opacity !== undefined,
+            }),
+          );
 
           logoGroup.add(new THREE.Mesh(geometry, material));
         });
@@ -149,23 +153,23 @@ export function EthereumLogoOrbit() {
           scalePulse: number;
           verticalScale: number;
         }) => {
-          const geometry = new THREE.SphereGeometry(1, 48, 24);
-          disposableGeometries.push(geometry);
+          const geometry = trackDisposable(new THREE.SphereGeometry(1, 48, 24));
 
-          const material = new THREE.ShaderMaterial({
-            blending: THREE.AdditiveBlending,
-            depthTest: true,
-            depthWrite: false,
-            side: THREE.DoubleSide,
-            toneMapped: false,
-            transparent: true,
-            uniforms: {
-              uCameraLocalPosition: { value: new THREE.Vector3(0, 0, 4) },
-              uColor: { value: new THREE.Color(0xf4fbff) },
-              uOpacity: { value: baseOpacity },
-              uTime: { value: 0 },
-            },
-            vertexShader: `
+          const material = trackDisposable(
+            new THREE.ShaderMaterial({
+              blending: THREE.AdditiveBlending,
+              depthTest: true,
+              depthWrite: false,
+              side: THREE.DoubleSide,
+              toneMapped: false,
+              transparent: true,
+              uniforms: {
+                uCameraLocalPosition: { value: new THREE.Vector3(0, 0, 4) },
+                uColor: { value: new THREE.Color(0xf4fbff) },
+                uOpacity: { value: baseOpacity },
+                uTime: { value: 0 },
+              },
+              vertexShader: `
               varying vec3 vLocalPosition;
 
               void main() {
@@ -173,7 +177,7 @@ export function EthereumLogoOrbit() {
                 gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
               }
             `,
-            fragmentShader: `
+              fragmentShader: `
               uniform vec3 uCameraLocalPosition;
               uniform vec3 uColor;
               uniform float uOpacity;
@@ -267,8 +271,8 @@ export function EthereumLogoOrbit() {
                 gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.92));
               }
             `,
-          });
-          disposableMaterials.push(material);
+            }),
+          );
 
           const volume = new THREE.Mesh(geometry, material);
           volume.position.set(0, gapCenterY, 0);
@@ -292,7 +296,7 @@ export function EthereumLogoOrbit() {
           });
         };
 
-        [
+        const scatteringVolumes = [
           {
             baseOpacity: 0.34,
             baseScale: 0.66,
@@ -325,7 +329,9 @@ export function EthereumLogoOrbit() {
             scalePulse: 0.08,
             verticalScale: 0.076,
           },
-        ].forEach(addScatteringVolume);
+        ];
+
+        scatteringVolumes.forEach(addScatteringVolume);
 
         const logoPitch = (31.5 * Math.PI) / 180;
 
@@ -375,8 +381,7 @@ export function EthereumLogoOrbit() {
 
         render();
         disposeScene = () => {
-          disposableGeometries.forEach((geometry) => geometry.dispose());
-          disposableMaterials.forEach((material) => material.dispose());
+          disposableResources.forEach((resource) => resource.dispose());
           renderer.dispose();
         };
       } catch (error) {

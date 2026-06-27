@@ -10,7 +10,7 @@ function DisabledAction({
   children: React.ReactNode;
 }>) {
   return (
-    <button className="action action--secondary" disabled type="button">
+    <button className="action" disabled type="button">
       {children}
       <ArrowRight aria-hidden="true" size={16} />
     </button>
