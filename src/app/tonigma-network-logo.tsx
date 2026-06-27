@@ -28,7 +28,7 @@ const LOGO_SCALE = 2;
 const LINE_WIDTH = 15;
 const VISIBLE_GAP = 12;
 const ETHEREUM_RATIO = 834 / 512;
-const CYCLE_SECONDS = 8.8;
+const CYCLE_SECONDS = 11.8;
 
 const inputNodes: LogoNode[] = [
   {
