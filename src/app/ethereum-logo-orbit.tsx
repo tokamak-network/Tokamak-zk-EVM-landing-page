@@ -423,23 +423,38 @@ export function EthereumLogoOrbit({
           observePacket: InstanceType<typeof THREE.Mesh>;
           replayPacket: InstanceType<typeof THREE.Mesh>;
           phase: number;
+          target: InstanceType<typeof THREE.Vector3>;
         }> = [];
 
         const observerCount = 22;
+        const strengthVerificationTarget = new THREE.Vector3(0, -1.34, 0.18);
+        const tradeoffVerificationTarget = centerPoint;
 
         storyGroup.add(observerGroup);
 
         for (let index = 0; index < observerCount; index++) {
+          const sequence = observerCount > 1 ? index / (observerCount - 1) : 0;
           const angle = (index / observerCount) * Math.PI * 2;
           const radius = 1.66 + (index % 4) * 0.14;
-          const depth = Math.sin(angle) * 0.44;
-          const home = new THREE.Vector3(
-            Math.cos(angle) * radius,
-            Math.sin(angle) * 0.86,
-            depth,
-          );
+          const isLowerRow = index % 2 === 0;
+          const target =
+            variant === "strength"
+              ? strengthVerificationTarget
+              : tradeoffVerificationTarget;
+          const home =
+            variant === "strength"
+              ? new THREE.Vector3(
+                  (sequence - 0.5) * (isLowerRow ? 3.35 : 3.04),
+                  -1.74 - (isLowerRow ? 0.18 : 0) + Math.sin(sequence * Math.PI) * 0.18,
+                  (isLowerRow ? 0.22 : -0.18) + Math.sin(sequence * Math.PI * 2) * 0.1,
+                )
+              : new THREE.Vector3(
+                  Math.cos(angle) * radius,
+                  Math.sin(angle) * 0.86,
+                  Math.sin(angle) * 0.44,
+                );
           const person = new THREE.Group();
-          const isDistant = depth < -0.08;
+          const isDistant = home.z < -0.08;
           const personScale = isDistant ? 0.78 : 0.94;
 
           person.position.copy(home);
@@ -460,7 +475,7 @@ export function EthereumLogoOrbit({
           person.add(head);
 
           const lineGeometry = trackDisposable(
-            new THREE.BufferGeometry().setFromPoints([home, centerPoint]),
+            new THREE.BufferGeometry().setFromPoints([home, target]),
           );
           const verificationLine = new THREE.Line(
             lineGeometry,
@@ -481,12 +496,13 @@ export function EthereumLogoOrbit({
             observePacket,
             phase: index * 0.43,
             replayPacket,
+            target,
           });
         }
 
         updateStoryLayers.push((time) => {
           observerAnimations.forEach(
-            ({ group, home, observePacket, phase, replayPacket }) => {
+            ({ group, home, observePacket, phase, replayPacket, target }) => {
               const bob = Math.sin(time * 1.8 + phase) * 0.026;
               group.position.set(home.x, home.y + bob, home.z);
 
@@ -496,13 +512,13 @@ export function EthereumLogoOrbit({
                 (Math.sin(time * 0.86 + phase + Math.PI) + 1) / 2;
 
               observePacket.position.lerpVectors(
-                centerPoint,
+                target,
                 home,
                 observeProgress,
               );
               replayPacket.position.lerpVectors(
                 home,
-                centerPoint,
+                target,
                 replayProgress,
               );
             },
@@ -510,7 +526,7 @@ export function EthereumLogoOrbit({
         });
 
         const securityGroup = new THREE.Group();
-        securityGroup.position.set(-1.58, 0.78, 0.18);
+        securityGroup.position.copy(strengthVerificationTarget);
         securityGroup.scale.setScalar(0.82);
         if (variant === "strength") {
           storyGroup.add(securityGroup);
@@ -677,15 +693,14 @@ export function EthereumLogoOrbit({
         );
         pressureRing.rotation.x = Math.PI / 2;
         pressureRing.scale.y = 0.58;
-        storyGroup.add(pressureRing);
+        if (variant === "tradeoff") {
+          storyGroup.add(pressureRing);
+        }
 
         updateStoryLayers.push((time) => {
           const ringPulse = (Math.sin(time * 1.28) + 1) / 2;
 
-          pressureRingMaterial.opacity =
-            variant === "strength"
-              ? 0.16 + ringPulse * 0.14
-              : 0.08 + ringPulse * 0.1;
+          pressureRingMaterial.opacity = 0.08 + ringPulse * 0.1;
         });
 
         const logoPitch = (31.5 * Math.PI) / 180;
