@@ -50,8 +50,11 @@ export function EthereumLogoOrbit() {
         rimLight.position.set(-3.6, -1.2, 4.8);
         scene.add(rimLight);
 
+        const viewGroup = new THREE.Group();
+        scene.add(viewGroup);
+
         const logoGroup = new THREE.Group();
-        scene.add(logoGroup);
+        viewGroup.add(logoGroup);
         const disposableGeometries: Array<{ dispose: () => void }> = [];
         const disposableMaterials: Array<{ dispose: () => void }> = [];
 
@@ -326,9 +329,9 @@ export function EthereumLogoOrbit() {
 
         const logoPitch = (31.5 * Math.PI) / 180;
 
-        logoGroup.rotation.x = logoPitch;
+        viewGroup.rotation.x = logoPitch;
+        viewGroup.rotation.z = -0.08;
         logoGroup.rotation.y = 0.58;
-        logoGroup.rotation.z = -0.08;
 
         const resize = () => {
           const bounds = canvas.getBoundingClientRect();
