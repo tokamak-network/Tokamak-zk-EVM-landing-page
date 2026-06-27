@@ -212,6 +212,36 @@ main {
   max-width: 640px;
 }
 
+.tonigma-network-logo {
+  position: relative;
+  width: min(38vw, 470px);
+  min-width: 320px;
+  aspect-ratio: 1;
+  justify-self: end;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.tonigma-network-logo__canvas,
+.tonigma-network-logo__fallback {
+  position: absolute;
+  inset: -10%;
+  display: block;
+  width: 120%;
+  height: 120%;
+}
+
+.tonigma-network-logo__canvas {
+  z-index: 1;
+}
+
+.tonigma-network-logo__fallback {
+  z-index: 0;
+  object-fit: contain;
+  opacity: 0.86;
+  filter: drop-shadow(0 0 26px rgba(79, 191, 255, 0.2));
+}
+
 .ethereum-orbit {
   --orbit-canvas-size: 112%;
 
@@ -456,6 +486,13 @@ code {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .tonigma-network-logo {
+    width: min(68vw, 380px);
+    min-width: 260px;
+    justify-self: center;
+    margin-top: 10px;
+  }
+
   .ethereum-orbit {
     width: min(54vw, 360px);
     min-width: 260px;
@@ -544,6 +581,11 @@ code {
   .ethereum-orbit {
     width: min(74vw, 320px);
     min-width: 220px;
+  }
+
+  .tonigma-network-logo {
+    width: min(82vw, 340px);
+    min-width: 240px;
   }
 
   .hero-actions {

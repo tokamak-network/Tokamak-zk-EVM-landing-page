@@ -2,6 +2,7 @@ import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { EthereumLogoOrbit } from "./ethereum-logo-orbit";
 import { ParallaxBackground } from "./parallax-background";
+import { TonigmaNetworkLogo } from "./tonigma-network-logo";
 
 function DisabledAction({
   children,
@@ -78,6 +79,7 @@ export default function Home() {
               <DisabledAction>See How It Works</DisabledAction>
             </div>
           </div>
+          <TonigmaNetworkLogo />
         </div>
       </section>
 
