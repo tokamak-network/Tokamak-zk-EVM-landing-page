@@ -233,6 +233,9 @@ main {
 
 .tonigma-network-logo__canvas {
   z-index: 1;
+  filter:
+    drop-shadow(0 0 14px rgba(120, 210, 255, 0.16))
+    drop-shadow(0 0 30px rgba(255, 255, 255, 0.06));
 }
 
 .tonigma-network-logo__fallback {

@@ -256,6 +256,9 @@ export function TonigmaNetworkLogo() {
         });
         renderer.setClearColor(0x000000, 0);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.08;
 
         const scene = new THREE.Scene();
         const camera = new THREE.OrthographicCamera(-2, 2, 2, -2, 0.1, 10);
@@ -268,19 +271,19 @@ export function TonigmaNetworkLogo() {
 
         const disposableGeometries: Array<{ dispose: () => void }> = [];
         const disposableMaterials: Array<{ dispose: () => void }> = [];
+        type BasicMesh = InstanceType<typeof THREE.Mesh> & {
+          material: InstanceType<typeof THREE.MeshBasicMaterial>;
+        };
         const nodeRenders: Array<{
-          active: { material: { opacity: number }; scale: { setScalar: (value: number) => void } };
-          glow: {
-            scale: { setScalar: (value: number) => void };
-            setOpacity: (value: number) => void;
-          };
+          active: BasicMesh;
+          bloom: BasicMesh;
+          rim: BasicMesh;
           node: LogoNode;
         }> = [];
         const edgeRenders: Array<{
           active: ReturnType<typeof createCapsule>;
           edge: LogoEdge;
-          pulse: { material: { opacity: number }; position: { set: (x: number, y: number, z: number) => void } };
-          sparkle: { material: { opacity: number }; position: { set: (x: number, y: number, z: number) => void } };
+          trail: ReturnType<typeof createTrail>;
         }> = [];
 
         function trackGeometry<T extends { dispose: () => void }>(geometry: T) {
@@ -297,9 +300,9 @@ export function TonigmaNetworkLogo() {
           return trackGeometry(new THREE.CircleGeometry(sceneLength(radius), segments));
         }
 
-        function createDiamondGeometry(node: LogoNode) {
-          const halfWidth = sceneLength(node.radius);
-          const halfHeight = sceneLength(node.radius * ETHEREUM_RATIO);
+        function createDiamondGeometry(radius: number) {
+          const halfWidth = sceneLength(radius);
+          const halfHeight = sceneLength(radius * ETHEREUM_RATIO);
           const shape = new THREE.Shape();
           shape.moveTo(0, halfHeight);
           shape.lineTo(halfWidth, 0);
@@ -308,107 +311,6 @@ export function TonigmaNetworkLogo() {
           shape.closePath();
 
           return trackGeometry(new THREE.ShapeGeometry(shape));
-        }
-
-        function createNodeMesh(
-          node: LogoNode,
-          color: number,
-          opacity: number,
-          z: number,
-        ) {
-          const material = trackMaterial(
-            new THREE.MeshBasicMaterial({
-              blending: THREE.AdditiveBlending,
-              color,
-              depthWrite: false,
-              opacity,
-              transparent: true,
-            }),
-          );
-          const geometry =
-            node.shape === "diamond"
-              ? createDiamondGeometry(node)
-              : node.shape === "ring"
-                ? trackGeometry(
-                    new THREE.TorusGeometry(
-                      sceneLength(node.radius),
-                      sceneLength(7.5),
-                      20,
-                      96,
-                    ),
-                  )
-                : createCircleGeometry(node.radius);
-          const mesh = new THREE.Mesh(geometry, material);
-          const position = scenePoint(node.point);
-
-          mesh.position.set(position.x, position.y, z);
-          root.add(mesh);
-
-          return mesh;
-        }
-
-        function createRadialGlowMaterial(color: number) {
-          const material = trackMaterial(
-            new THREE.ShaderMaterial({
-              blending: THREE.AdditiveBlending,
-              depthWrite: false,
-              transparent: true,
-              uniforms: {
-                uColor: { value: new THREE.Color(color) },
-                uOpacity: { value: 0 },
-              },
-              vertexShader: `
-                varying vec2 vUv;
-
-                void main() {
-                  vUv = uv;
-                  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                }
-              `,
-              fragmentShader: `
-                uniform vec3 uColor;
-                uniform float uOpacity;
-                varying vec2 vUv;
-
-                void main() {
-                  float distanceFromCenter = distance(vUv, vec2(0.5));
-                  float alpha = smoothstep(0.5, 0.08, distanceFromCenter) * uOpacity;
-                  gl_FragColor = vec4(uColor, alpha);
-                }
-              `,
-            }),
-          );
-
-          return material;
-        }
-
-        function createGlowMesh(node: LogoNode) {
-          const material = createRadialGlowMaterial(0x66c7ff);
-          const glowRadius =
-            node.shape === "diamond"
-              ? node.radius * 1.72
-              : node.shape === "ring"
-                ? node.radius * 2.15
-                : node.radius * 1.9;
-          const geometry =
-            node.shape === "diamond"
-              ? createDiamondGeometry({
-                  ...node,
-                  radius: node.radius * 1.45,
-                })
-              : createCircleGeometry(glowRadius, 96);
-          const mesh = new THREE.Mesh(geometry, material);
-          const position = scenePoint(node.point);
-
-          mesh.position.set(position.x, position.y, -0.02);
-          root.add(mesh);
-
-          return {
-            scale: mesh.scale,
-            setOpacity: (opacity: number) => {
-              material.uniforms.uOpacity.value = opacity;
-            },
-          };
         }
 
         function createCapsule(
@@ -451,37 +353,145 @@ export function TonigmaNetworkLogo() {
           return { group, material, update };
         }
 
+        function createNodeGeometry(node: LogoNode, radiusScale = 1) {
+          const radius = node.radius * radiusScale;
+
+          if (node.shape === "diamond") {
+            return createDiamondGeometry(radius);
+          }
+
+          if (node.shape === "ring") {
+            return trackGeometry(
+              new THREE.TorusGeometry(
+                sceneLength(radius),
+                sceneLength(7.5 * radiusScale),
+                20,
+                112,
+              ),
+            );
+          }
+
+          return createCircleGeometry(radius, 112);
+        }
+
+        function createNodeMesh({
+          blending,
+          color,
+          node,
+          opacity,
+          radiusScale = 1,
+          z,
+        }: {
+          blending?: typeof THREE.AdditiveBlending;
+          color: number;
+          node: LogoNode;
+          opacity: number;
+          radiusScale?: number;
+          z: number;
+        }) {
+          const material = trackMaterial(
+            new THREE.MeshBasicMaterial({
+              blending,
+              color,
+              depthWrite: false,
+              opacity,
+              transparent: true,
+            }),
+          );
+          const mesh = new THREE.Mesh(createNodeGeometry(node, radiusScale), material);
+          const position = scenePoint(node.point);
+
+          mesh.position.set(position.x, position.y, z);
+          root.add(mesh);
+
+          return mesh as BasicMesh;
+        }
+
+        function createTrailMaterial() {
+          return trackMaterial(
+            new THREE.ShaderMaterial({
+              blending: THREE.AdditiveBlending,
+              depthWrite: false,
+              transparent: true,
+              uniforms: {
+                uOpacity: { value: 0 },
+                uPrimary: { value: new THREE.Color(0xf6fbff) },
+                uSecondary: { value: new THREE.Color(0x5fc8ff) },
+              },
+              vertexShader: `
+                varying vec2 vUv;
+
+                void main() {
+                  vUv = uv;
+                  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+              `,
+              fragmentShader: `
+                uniform float uOpacity;
+                uniform vec3 uPrimary;
+                uniform vec3 uSecondary;
+                varying vec2 vUv;
+
+                void main() {
+                  float center = 1.0 - smoothstep(0.16, 0.5, abs(vUv.y - 0.5));
+                  float taperedTail = smoothstep(0.0, 0.22, vUv.x);
+                  float hotHead = pow(vUv.x, 2.2);
+                  float softEnd = 1.0 - smoothstep(0.97, 1.0, vUv.x);
+                  float alpha = center * taperedTail * (0.2 + hotHead * 0.8) * softEnd * uOpacity;
+                  vec3 color = mix(uSecondary, uPrimary, smoothstep(0.45, 1.0, vUv.x));
+
+                  gl_FragColor = vec4(color, alpha);
+                }
+              `,
+            }),
+          );
+        }
+
+        function createTrail(from: Point, to: Point) {
+          const material = createTrailMaterial();
+          const mesh = new THREE.Mesh(trackGeometry(new THREE.PlaneGeometry(1, 1)), material);
+          const fullDx = to.x - from.x;
+          const fullDy = to.y - from.y;
+          const fullLength = Math.max(Math.hypot(fullDx, fullDy), 0.001);
+          const angle = Math.atan2(fullDy, fullDx);
+          const maxTrailLength = Math.min(fullLength * 0.62, sceneLength(150));
+          const width = sceneLength(LINE_WIDTH * 1.7);
+
+          mesh.rotation.z = angle;
+          mesh.position.set(from.x, from.y, 0.08);
+          root.add(mesh);
+
+          const update = (rawProgress: number, opacity: number) => {
+            const headDistance = fullLength * clamp(rawProgress);
+            const trailLength = Math.min(headDistance, maxTrailLength);
+            const centerDistance = headDistance - trailLength / 2;
+
+            mesh.position.set(
+              from.x + Math.cos(angle) * centerDistance,
+              from.y + Math.sin(angle) * centerDistance,
+              0.08,
+            );
+            mesh.scale.set(Math.max(trailLength, 0.001), width, 1);
+            material.uniforms.uOpacity.value = opacity;
+          };
+
+          update(0, 0);
+
+          return { material, update };
+        }
+
         edges.forEach((edge) => {
           const { from, to } = edgeSegment(edge);
           const dimMaterial = trackMaterial(
             new THREE.MeshBasicMaterial({
-              color: 0x243140,
-              opacity: 0.36,
+              color: 0x1b2530,
+              opacity: 0.46,
               transparent: true,
             }),
           );
           const activeMaterial = trackMaterial(
             new THREE.MeshBasicMaterial({
-              blending: THREE.AdditiveBlending,
-              color: 0xeaf8ff,
-              depthWrite: false,
-              opacity: 0,
-              transparent: true,
-            }),
-          );
-          const pulseMaterial = trackMaterial(
-            new THREE.MeshBasicMaterial({
-              blending: THREE.AdditiveBlending,
-              color: 0x7fd8ff,
-              depthWrite: false,
-              opacity: 0,
-              transparent: true,
-            }),
-          );
-          const sparkleMaterial = trackMaterial(
-            new THREE.MeshBasicMaterial({
-              blending: THREE.AdditiveBlending,
-              color: 0xffffff,
+              color: 0xf3fbff,
               depthWrite: false,
               opacity: 0,
               transparent: true,
@@ -492,39 +502,47 @@ export function TonigmaNetworkLogo() {
           const active = createCapsule(
             from,
             to,
-            sceneLength(LINE_WIDTH / 2),
+            sceneLength(LINE_WIDTH / 2.2),
             activeMaterial,
             0.02,
           );
-          const pulse = new THREE.Mesh(
-            createCircleGeometry(LINE_WIDTH * 1.9, 48),
-            pulseMaterial,
-          );
-          const sparkle = new THREE.Mesh(
-            createCircleGeometry(LINE_WIDTH * 0.8, 32),
-            sparkleMaterial,
-          );
+          const trail = createTrail(from, to);
 
-          root.add(pulse, sparkle);
-          edgeRenders.push({ active, edge, pulse, sparkle });
+          edgeRenders.push({ active, edge, trail });
         });
 
         allNodes.forEach((node) => {
-          createNodeMesh(node, 0x263442, 0.42, 0.01);
-          const active = createNodeMesh(node, 0xffffff, 0, 0.04);
-          const glow = createGlowMesh(node);
+          createNodeMesh({
+            color: 0x1d2834,
+            node,
+            opacity: node.shape === "ring" ? 0.6 : 0.48,
+            z: 0.01,
+          });
+          const rim = createNodeMesh({
+            blending: THREE.AdditiveBlending,
+            color: 0x6fd1ff,
+            node,
+            opacity: 0,
+            radiusScale: node.shape === "diamond" ? 1.035 : 1.08,
+            z: 0.035,
+          });
+          const active = createNodeMesh({
+            color: 0xf8fcff,
+            node,
+            opacity: 0,
+            z: 0.05,
+          });
+          const bloom = createNodeMesh({
+            blending: THREE.AdditiveBlending,
+            color: 0xffffff,
+            node,
+            opacity: 0,
+            radiusScale: 1.015,
+            z: 0.06,
+          });
 
-          nodeRenders.push({ active, glow, node });
+          nodeRenders.push({ active, bloom, rim, node });
         });
-
-        const finalHaloMaterial = createRadialGlowMaterial(0x4fbfff);
-        const finalHalo = new THREE.Mesh(
-          createCircleGeometry(410, 128),
-          finalHaloMaterial,
-        );
-        finalHalo.position.set(0.1, 0, -0.08);
-        finalHalo.scale.set(1.34, 1.02, 1);
-        root.add(finalHalo);
 
         const resize = () => {
           const bounds = canvas.getBoundingClientRect();
@@ -548,52 +566,49 @@ export function TonigmaNetworkLogo() {
         const reducedMotion = window.matchMedia(
           "(prefers-reduced-motion: reduce)",
         );
+        const startedAt = performance.now() * 0.001;
 
         const render = () => {
           const absoluteTime = performance.now() * 0.001;
           const cycleTime = reducedMotion.matches
             ? 6.9
-            : absoluteTime % CYCLE_SECONDS;
+            : (absoluteTime - startedAt) % CYCLE_SECONDS;
           const finalGlow = smoothstep((cycleTime - 6.1) / 0.85);
           const breathing = reducedMotion.matches
             ? 0
             : (Math.sin(absoluteTime * 2.6) + 1) / 2;
 
-          nodeRenders.forEach(({ active, glow, node }) => {
+          nodeRenders.forEach(({ active, bloom, rim, node }) => {
             const activation = smoothstep((cycleTime - node.turnOnAt) / 0.48);
             const emphasize =
               smoothstep((cycleTime - node.turnOnAt) / 0.16) *
               (1 - smoothstep((cycleTime - node.turnOnAt - 0.58) / 0.5));
-            const glowOpacity =
-              activation * 0.055 + emphasize * 0.11 + finalGlow * (0.08 + breathing * 0.04);
-            const scale = 1 + emphasize * 0.13 + finalGlow * (0.03 + breathing * 0.025);
+            const scale =
+              1 + emphasize * 0.09 + finalGlow * (0.012 + breathing * 0.01);
 
-            active.material.opacity = activation * (0.82 + finalGlow * 0.18);
+            active.material.opacity = activation * (0.9 + finalGlow * 0.1);
             active.scale.setScalar(scale);
-            glow.setOpacity(glowOpacity);
-            glow.scale.setScalar(1 + emphasize * 0.18 + finalGlow * 0.12);
+            bloom.material.opacity =
+              activation * 0.11 + emphasize * 0.24 + finalGlow * (0.09 + breathing * 0.025);
+            bloom.scale.setScalar(1 + emphasize * 0.035 + finalGlow * 0.012);
+            rim.material.opacity =
+              activation * 0.08 + emphasize * 0.14 + finalGlow * (0.055 + breathing * 0.018);
+            rim.scale.setScalar(1 + emphasize * 0.025);
           });
 
-          edgeRenders.forEach(({ active, edge, pulse, sparkle }) => {
+          edgeRenders.forEach(({ active, edge, trail }) => {
             const rawProgress = (cycleTime - edge.startAt) / edge.duration;
             const progress = smoothstep(rawProgress);
             const inFlight = rawProgress > 0 && rawProgress < 1;
-            const { from, to } = edgeSegment(edge);
-            const head = {
-              x: from.x + (to.x - from.x) * clamp(rawProgress),
-              y: from.y + (to.y - from.y) * clamp(rawProgress),
-            };
+            const trailOpacity = inFlight
+              ? 0.64 + breathing * 0.08
+              : 0;
 
             active.update(progress);
-            active.material.opacity = progress * (0.74 + finalGlow * 0.22);
-            pulse.position.set(head.x, head.y, 0.07);
-            sparkle.position.set(head.x, head.y, 0.08);
-            pulse.material.opacity = inFlight ? 0.34 + breathing * 0.14 : 0;
-            sparkle.material.opacity = inFlight ? 0.76 : 0;
+            active.material.opacity = progress * (0.8 + finalGlow * 0.18);
+            trail.update(rawProgress, trailOpacity);
           });
 
-          finalHaloMaterial.uniforms.uOpacity.value =
-            finalGlow * (0.055 + breathing * 0.018);
           root.scale.setScalar(1 + finalGlow * 0.012 + breathing * finalGlow * 0.006);
           renderer.render(scene, camera);
           animationFrame = requestAnimationFrame(render);
