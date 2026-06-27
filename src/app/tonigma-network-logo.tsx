@@ -271,6 +271,7 @@ export function TonigmaNetworkLogo() {
 
         const disposableGeometries: Array<{ dispose: () => void }> = [];
         const disposableMaterials: Array<{ dispose: () => void }> = [];
+        const disposableCallbacks: Array<() => void> = [];
         type BasicMesh = InstanceType<typeof THREE.Mesh> & {
           material: InstanceType<typeof THREE.MeshBasicMaterial>;
         };
@@ -320,15 +321,24 @@ export function TonigmaNetworkLogo() {
           material: InstanceType<typeof THREE.MeshBasicMaterial>,
           z: number,
         ) {
-          const group = new THREE.Group();
-          const bodyGeometry = trackGeometry(new THREE.PlaneGeometry(1, 1));
-          const capGeometry = trackGeometry(new THREE.CircleGeometry(radius, 40));
-          const body = new THREE.Mesh(bodyGeometry, material);
-          const startCap = new THREE.Mesh(capGeometry, material);
-          const endCap = new THREE.Mesh(capGeometry, material);
+          const makeGeometry = (length: number) => {
+            const safeLength = Math.max(length, radius * 0.01);
+            const shape = new THREE.Shape();
 
-          group.add(body, startCap, endCap);
-          root.add(group);
+            shape.moveTo(0, radius);
+            shape.lineTo(safeLength, radius);
+            shape.absarc(safeLength, 0, radius, Math.PI / 2, -Math.PI / 2, true);
+            shape.lineTo(0, -radius);
+            shape.absarc(0, 0, radius, -Math.PI / 2, Math.PI / 2, true);
+            shape.closePath();
+
+            return new THREE.ShapeGeometry(shape, 8);
+          };
+          const mesh = new THREE.Mesh(makeGeometry(radius * 0.01), material);
+          let renderedLength = 0;
+
+          root.add(mesh);
+          disposableCallbacks.push(() => mesh.geometry.dispose());
 
           const update = (progress: number) => {
             const dx = to.x - from.x;
@@ -336,21 +346,21 @@ export function TonigmaNetworkLogo() {
             const fullLength = Math.hypot(dx, dy);
             const length = Math.max(fullLength * clamp(progress), radius * 0.01);
             const angle = Math.atan2(dy, dx);
-            const end = {
-              x: from.x + Math.cos(angle) * length,
-              y: from.y + Math.sin(angle) * length,
-            };
 
-            body.position.set((from.x + end.x) / 2, (from.y + end.y) / 2, z);
-            body.rotation.z = angle;
-            body.scale.set(length, radius * 2, 1);
-            startCap.position.set(from.x, from.y, z);
-            endCap.position.set(end.x, end.y, z);
+            if (Math.abs(length - renderedLength) > 0.001) {
+              const previousGeometry = mesh.geometry;
+              mesh.geometry = makeGeometry(length);
+              previousGeometry.dispose();
+              renderedLength = length;
+            }
+
+            mesh.position.set(from.x, from.y, z);
+            mesh.rotation.z = angle;
           };
 
           update(1);
 
-          return { group, material, update };
+          return { material, update };
         }
 
         function createNodeGeometry(node: LogoNode, radiusScale = 1) {
@@ -583,17 +593,31 @@ export function TonigmaNetworkLogo() {
             const emphasize =
               smoothstep((cycleTime - node.turnOnAt) / 0.16) *
               (1 - smoothstep((cycleTime - node.turnOnAt - 0.58) / 0.5));
+            const postFillGlow =
+              smoothstep((cycleTime - node.turnOnAt - 0.42) / 0.14) *
+              (1 - smoothstep((cycleTime - node.turnOnAt - 0.88) / 0.36));
             const scale =
-              1 + emphasize * 0.09 + finalGlow * (0.012 + breathing * 0.01);
+              1 +
+              emphasize * 0.09 +
+              postFillGlow * 0.045 +
+              finalGlow * (0.012 + breathing * 0.01);
 
             active.material.opacity = activation * (0.9 + finalGlow * 0.1);
             active.scale.setScalar(scale);
             bloom.material.opacity =
-              activation * 0.11 + emphasize * 0.24 + finalGlow * (0.09 + breathing * 0.025);
-            bloom.scale.setScalar(1 + emphasize * 0.035 + finalGlow * 0.012);
+              activation * 0.11 +
+              emphasize * 0.24 +
+              postFillGlow * 0.32 +
+              finalGlow * (0.09 + breathing * 0.025);
+            bloom.scale.setScalar(
+              1 + emphasize * 0.035 + postFillGlow * 0.07 + finalGlow * 0.012,
+            );
             rim.material.opacity =
-              activation * 0.08 + emphasize * 0.14 + finalGlow * (0.055 + breathing * 0.018);
-            rim.scale.setScalar(1 + emphasize * 0.025);
+              activation * 0.08 +
+              emphasize * 0.14 +
+              postFillGlow * 0.18 +
+              finalGlow * (0.055 + breathing * 0.018);
+            rim.scale.setScalar(1 + emphasize * 0.025 + postFillGlow * 0.04);
           });
 
           edgeRenders.forEach(({ active, edge, trail }) => {
@@ -619,6 +643,7 @@ export function TonigmaNetworkLogo() {
         disposeScene = () => {
           disposableGeometries.forEach((geometry) => geometry.dispose());
           disposableMaterials.forEach((material) => material.dispose());
+          disposableCallbacks.forEach((disposeCallback) => disposeCallback());
           renderer.dispose();
         };
       } catch (error) {
