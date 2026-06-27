@@ -64,7 +64,7 @@ export default function Home() {
                 height={571}
                 priority
                 sizes="(max-width: 760px) calc(100vw - 32px), 620px"
-                src="/brand/tonigma-letter-logo.png"
+                src="/brand/tonigma-letter-logo-transparent.png"
                 width={2757}
               />
             </h1>
