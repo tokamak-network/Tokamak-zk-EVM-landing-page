@@ -53,8 +53,12 @@ export function EthereumLogoOrbit() {
         const viewGroup = new THREE.Group();
         scene.add(viewGroup);
 
+        const storyGroup = new THREE.Group();
+        viewGroup.add(storyGroup);
+
         const logoGroup = new THREE.Group();
-        viewGroup.add(logoGroup);
+        logoGroup.scale.setScalar(0.68);
+        storyGroup.add(logoGroup);
         const disposableResources: Array<{ dispose: () => void }> = [];
 
         function trackDisposable<T extends { dispose: () => void }>(resource: T) {
@@ -333,6 +337,290 @@ export function EthereumLogoOrbit() {
 
         scatteringVolumes.forEach(addScatteringVolume);
 
+        const observerGroup = new THREE.Group();
+        observerGroup.position.z = -0.14;
+        storyGroup.add(observerGroup);
+
+        const personHeadGeometry = trackDisposable(
+          new THREE.SphereGeometry(0.056, 18, 12),
+        );
+        const personBodyGeometry = trackDisposable(
+          new THREE.CylinderGeometry(0.052, 0.07, 0.16, 18, 1),
+        );
+        const personMaterial = trackDisposable(
+          new THREE.MeshStandardMaterial({
+            color: "#dceaff",
+            emissive: "#184c92",
+            emissiveIntensity: 0.46,
+            metalness: 0.08,
+            opacity: 0.82,
+            roughness: 0.54,
+            transparent: true,
+          }),
+        );
+        const distantPersonMaterial = trackDisposable(
+          new THREE.MeshStandardMaterial({
+            color: "#8fbfff",
+            emissive: "#0a2f63",
+            emissiveIntensity: 0.32,
+            metalness: 0.04,
+            opacity: 0.52,
+            roughness: 0.62,
+            transparent: true,
+          }),
+        );
+        const verificationLineMaterial = trackDisposable(
+          new THREE.LineBasicMaterial({
+            blending: THREE.AdditiveBlending,
+            color: "#8fd7ff",
+            depthWrite: false,
+            opacity: 0.18,
+            transparent: true,
+          }),
+        );
+        const replayLineMaterial = trackDisposable(
+          new THREE.LineBasicMaterial({
+            blending: THREE.AdditiveBlending,
+            color: "#d7f3ff",
+            depthWrite: false,
+            opacity: 0.11,
+            transparent: true,
+          }),
+        );
+        const packetGeometry = trackDisposable(
+          new THREE.SphereGeometry(0.022, 12, 8),
+        );
+        const observePacketMaterial = trackDisposable(
+          new THREE.MeshBasicMaterial({
+            blending: THREE.AdditiveBlending,
+            color: "#dff7ff",
+            depthWrite: false,
+            opacity: 0.78,
+            transparent: true,
+          }),
+        );
+        const replayPacketMaterial = trackDisposable(
+          new THREE.MeshBasicMaterial({
+            blending: THREE.AdditiveBlending,
+            color: "#5fb7ff",
+            depthWrite: false,
+            opacity: 0.72,
+            transparent: true,
+          }),
+        );
+
+        const observerAnimations: Array<{
+          group: InstanceType<typeof THREE.Group>;
+          home: InstanceType<typeof THREE.Vector3>;
+          observePacket: InstanceType<typeof THREE.Mesh>;
+          replayPacket: InstanceType<typeof THREE.Mesh>;
+          phase: number;
+        }> = [];
+
+        const observerCount = 22;
+        const centerPoint = new THREE.Vector3(0, gapCenterY, 0);
+
+        for (let index = 0; index < observerCount; index++) {
+          const angle = (index / observerCount) * Math.PI * 2;
+          const radius = 1.66 + (index % 4) * 0.14;
+          const depth = Math.sin(angle) * 0.44;
+          const home = new THREE.Vector3(
+            Math.cos(angle) * radius,
+            Math.sin(angle) * 0.86,
+            depth,
+          );
+          const person = new THREE.Group();
+          const isDistant = depth < -0.08;
+          const personScale = isDistant ? 0.78 : 0.94;
+
+          person.position.copy(home);
+          person.scale.setScalar(personScale);
+
+          const body = new THREE.Mesh(
+            personBodyGeometry,
+            isDistant ? distantPersonMaterial : personMaterial,
+          );
+          body.position.y = -0.078;
+          person.add(body);
+
+          const head = new THREE.Mesh(
+            personHeadGeometry,
+            isDistant ? distantPersonMaterial : personMaterial,
+          );
+          head.position.y = 0.052;
+          person.add(head);
+
+          const lineGeometry = trackDisposable(
+            new THREE.BufferGeometry().setFromPoints([home, centerPoint]),
+          );
+          const verificationLine = new THREE.Line(
+            lineGeometry,
+            index % 2 === 0 ? verificationLineMaterial : replayLineMaterial,
+          );
+          observerGroup.add(verificationLine);
+
+          const observePacket = new THREE.Mesh(
+            packetGeometry,
+            observePacketMaterial,
+          );
+          const replayPacket = new THREE.Mesh(packetGeometry, replayPacketMaterial);
+          observerGroup.add(observePacket, replayPacket, person);
+
+          observerAnimations.push({
+            group: person,
+            home,
+            observePacket,
+            phase: index * 0.43,
+            replayPacket,
+          });
+        }
+
+        const securityGroup = new THREE.Group();
+        securityGroup.position.set(-1.58, 0.78, 0.18);
+        securityGroup.scale.setScalar(0.82);
+        storyGroup.add(securityGroup);
+
+        const shieldShape = new THREE.Shape();
+        shieldShape.moveTo(0, 0.32);
+        shieldShape.lineTo(0.28, 0.19);
+        shieldShape.lineTo(0.22, -0.16);
+        shieldShape.quadraticCurveTo(0.13, -0.32, 0, -0.42);
+        shieldShape.quadraticCurveTo(-0.13, -0.32, -0.22, -0.16);
+        shieldShape.lineTo(-0.28, 0.19);
+        shieldShape.lineTo(0, 0.32);
+
+        const shieldGeometry = trackDisposable(new THREE.ShapeGeometry(shieldShape));
+        const shieldMaterial = trackDisposable(
+          new THREE.MeshBasicMaterial({
+            blending: THREE.AdditiveBlending,
+            color: "#69c7ff",
+            depthWrite: false,
+            opacity: 0.28,
+            side: THREE.DoubleSide,
+            transparent: true,
+          }),
+        );
+        const shieldMesh = new THREE.Mesh(shieldGeometry, shieldMaterial);
+        securityGroup.add(shieldMesh);
+
+        const shieldOutlineGeometry = trackDisposable(
+          new THREE.BufferGeometry().setFromPoints(
+            shieldShape
+              .getPoints(40)
+              .map((point) => new THREE.Vector3(point.x, point.y, 0.02)),
+          ),
+        );
+        const iconLineMaterial = trackDisposable(
+          new THREE.LineBasicMaterial({
+            blending: THREE.AdditiveBlending,
+            color: "#d8f5ff",
+            depthWrite: false,
+            opacity: 0.78,
+            transparent: true,
+          }),
+        );
+        const shieldOutline = new THREE.LineLoop(
+          shieldOutlineGeometry,
+          iconLineMaterial,
+        );
+        securityGroup.add(shieldOutline);
+
+        const checkGeometry = trackDisposable(
+          new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(-0.12, -0.02, 0.04),
+            new THREE.Vector3(-0.03, -0.12, 0.04),
+            new THREE.Vector3(0.16, 0.11, 0.04),
+          ]),
+        );
+        const checkLine = new THREE.Line(checkGeometry, iconLineMaterial);
+        securityGroup.add(checkLine);
+
+        const privacyGroup = new THREE.Group();
+        privacyGroup.position.set(1.58, -0.72, 0.2);
+        privacyGroup.scale.setScalar(0.84);
+        storyGroup.add(privacyGroup);
+
+        const eyeMaterial = trackDisposable(
+          new THREE.LineBasicMaterial({
+            blending: THREE.AdditiveBlending,
+            color: "#ff9ac7",
+            depthWrite: false,
+            opacity: 0.72,
+            transparent: true,
+          }),
+        );
+        const upperEye = new THREE.EllipseCurve(0, 0, 0.32, 0.16, 0, Math.PI);
+        const lowerEye = new THREE.EllipseCurve(
+          0,
+          0,
+          0.32,
+          0.16,
+          Math.PI,
+          Math.PI * 2,
+        );
+        const eyeGeometry = trackDisposable(
+          new THREE.BufferGeometry().setFromPoints([
+            ...upperEye.getPoints(36),
+            ...lowerEye.getPoints(36),
+          ].map((point) => new THREE.Vector3(point.x, point.y, 0.02))),
+        );
+        const eyeLine = new THREE.Line(eyeGeometry, eyeMaterial);
+        privacyGroup.add(eyeLine);
+
+        const pupilMaterial = trackDisposable(
+          new THREE.MeshBasicMaterial({
+            blending: THREE.AdditiveBlending,
+            color: "#ffd1e4",
+            depthWrite: false,
+            opacity: 0.54,
+            transparent: true,
+          }),
+        );
+        const pupil = new THREE.Mesh(
+          trackDisposable(new THREE.SphereGeometry(0.055, 18, 12)),
+          pupilMaterial,
+        );
+        pupil.position.z = 0.04;
+        privacyGroup.add(pupil);
+
+        const slashGeometry = trackDisposable(
+          new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(-0.34, -0.23, 0.06),
+            new THREE.Vector3(0.34, 0.23, 0.06),
+          ]),
+        );
+        const slashMaterial = trackDisposable(
+          new THREE.LineBasicMaterial({
+            blending: THREE.AdditiveBlending,
+            color: "#ff5d97",
+            depthWrite: false,
+            opacity: 0.86,
+            transparent: true,
+          }),
+        );
+        const privacySlash = new THREE.Line(slashGeometry, slashMaterial);
+        privacyGroup.add(privacySlash);
+
+        const pressureRingGeometry = trackDisposable(
+          new THREE.TorusGeometry(1.36, 0.006, 8, 128),
+        );
+        const pressureRingMaterial = trackDisposable(
+          new THREE.MeshBasicMaterial({
+            blending: THREE.AdditiveBlending,
+            color: "#4bbaff",
+            depthWrite: false,
+            opacity: 0.22,
+            transparent: true,
+          }),
+        );
+        const pressureRing = new THREE.Mesh(
+          pressureRingGeometry,
+          pressureRingMaterial,
+        );
+        pressureRing.rotation.x = Math.PI / 2;
+        pressureRing.scale.y = 0.58;
+        storyGroup.add(pressureRing);
+
         const logoPitch = (31.5 * Math.PI) / 180;
 
         viewGroup.rotation.x = logoPitch;
@@ -345,7 +633,7 @@ export function EthereumLogoOrbit() {
           const aspect = width / height;
           const hostHeight = canvas.parentElement?.getBoundingClientRect().height;
           const canvasScale = hostHeight && hostHeight > 0 ? height / hostHeight : 1.24;
-          const verticalSize = 3.9 * canvasScale;
+          const verticalSize = 4.65 * canvasScale;
 
           camera.left = (-verticalSize * aspect) / 2;
           camera.right = (verticalSize * aspect) / 2;
@@ -370,7 +658,43 @@ export function EthereumLogoOrbit() {
 
           if (!reducedMotion.matches) {
             logoGroup.rotation.y = 0.58 + time * logoSpinSpeed;
+            observerGroup.rotation.y = Math.sin(time * 0.13) * 0.12;
+            pressureRing.rotation.z = time * 0.09;
           }
+
+          const securityPulse = (Math.sin(time * 1.44) + 1) / 2;
+          const privacyPulse = (Math.sin(time * 1.86 + 1.2) + 1) / 2;
+
+          securityGroup.scale.setScalar(0.8 + securityPulse * 0.05);
+          privacyGroup.scale.setScalar(0.8 + privacyPulse * 0.08);
+          shieldMaterial.opacity = 0.22 + securityPulse * 0.16;
+          eyeMaterial.opacity = 0.5 + privacyPulse * 0.32;
+          slashMaterial.opacity = 0.72 + privacyPulse * 0.2;
+          pupilMaterial.opacity = 0.38 + privacyPulse * 0.28;
+          pressureRingMaterial.opacity = 0.12 + securityPulse * 0.12;
+
+          observerAnimations.forEach(
+            ({ group, home, observePacket, phase, replayPacket }) => {
+              const bob = Math.sin(time * 1.8 + phase) * 0.026;
+              group.position.set(home.x, home.y + bob, home.z);
+
+              const observeProgress =
+                (Math.sin(time * 0.86 + phase) + 1) / 2;
+              const replayProgress =
+                (Math.sin(time * 0.86 + phase + Math.PI) + 1) / 2;
+
+              observePacket.position.lerpVectors(
+                centerPoint,
+                home,
+                observeProgress,
+              );
+              replayPacket.position.lerpVectors(
+                home,
+                centerPoint,
+                replayProgress,
+              );
+            },
+          );
 
           updateGlowLayers.forEach((updateGlowLayer) =>
             updateGlowLayer(time),

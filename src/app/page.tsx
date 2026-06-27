@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Eye, Repeat2, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import { EthereumLogoOrbit } from "./ethereum-logo-orbit";
 import { ParallaxBackground } from "./parallax-background";
@@ -84,10 +84,44 @@ export default function Home() {
       </section>
 
       <section
-        className="section-shell compact-section ethereum-orbit-section"
-        aria-label="Ethereum logo orbit animation"
+        className="section-shell compact-section story-section ethereum-orbit-section"
+        aria-labelledby="ethereum-verification-title"
       >
-        <EthereumLogoOrbit />
+        <div className="story-copy">
+          <span className="section-kicker">Ethereum verification</span>
+          <h2 id="ethereum-verification-title">
+            Strong security comes from everyone being able to check the same
+            public state.
+          </h2>
+          <p>
+            Ethereum anchors applications with deep decentralization, security,
+            and immutability. That strength comes from a public verification
+            model: participants can observe activity, re-execute the work, and
+            reject invalid state.
+          </p>
+          <p>
+            The tradeoff is privacy. As more independent participants verify
+            the same activity, more of that activity is exposed to the public
+            network.
+          </p>
+          <div className="story-points" aria-label="Ethereum tradeoff signals">
+            <div className="story-point">
+              <ShieldCheck aria-hidden="true" size={20} />
+              <span>Decentralized verification hardens security.</span>
+            </div>
+            <div className="story-point">
+              <Repeat2 aria-hidden="true" size={20} />
+              <span>Nodes observe and re-execute public activity.</span>
+            </div>
+            <div className="story-point story-point--warning">
+              <Eye aria-hidden="true" size={20} />
+              <span>More public validation also means more privacy exposure.</span>
+            </div>
+          </div>
+        </div>
+        <div className="story-stage" aria-hidden="true">
+          <EthereumLogoOrbit />
+        </div>
       </section>
 
       <section className="section-shell compact-section example-section">
