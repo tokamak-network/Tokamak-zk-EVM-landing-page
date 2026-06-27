@@ -763,7 +763,7 @@ export function TonigmaNetworkLogo() {
 
             active.update(fillProgress);
             active.material.opacity = fillProgress > 0.001 ? 1 : 0;
-            trail.update(fillProgress, trailOpacity);
+            trail.update(fillProgress + 0.1, trailOpacity);
           });
 
           root.scale.setScalar(1 + finalGlow * 0.012 + breathing * finalGlow * 0.006);
