@@ -61,11 +61,11 @@ export default function Home() {
               <Image
                 alt=""
                 aria-hidden="true"
-                height={371}
+                height={571}
                 priority
                 sizes="(max-width: 760px) calc(100vw - 32px), 620px"
-                src="/brand/tonigma-wordmark-white.svg"
-                width={2558}
+                src="/brand/tonigma-letter-logo.png"
+                width={2757}
               />
             </h1>
             <p className="hero-lines">
