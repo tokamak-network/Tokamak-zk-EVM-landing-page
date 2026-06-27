@@ -284,10 +284,13 @@ export function TonigmaNetworkLogo() {
           };
           rim: BasicMesh;
           node: LogoNode;
+          sweep: BasicMesh;
         }> = [];
         const edgeRenders: Array<{
           active: ReturnType<typeof createCapsule>;
+          centerX: number;
           edge: LogoEdge;
+          sweep: ReturnType<typeof createCapsule>;
           trail: ReturnType<typeof createTrail>;
         }> = [];
 
@@ -571,9 +574,31 @@ export function TonigmaNetworkLogo() {
             activeMaterial,
             0.02,
           );
+          const sweepMaterial = trackMaterial(
+            new THREE.MeshBasicMaterial({
+              blending: THREE.AdditiveBlending,
+              color: 0x9fe6ff,
+              depthWrite: false,
+              opacity: 0,
+              transparent: true,
+            }),
+          );
+          const sweep = createCapsule(
+            from,
+            to,
+            sceneLength(LINE_WIDTH / 1.35),
+            sweepMaterial,
+            0.085,
+          );
           const trail = createTrail(from, to);
 
-          edgeRenders.push({ active, edge, trail });
+          edgeRenders.push({
+            active,
+            centerX: (from.x + to.x) / 2,
+            edge,
+            sweep,
+            trail,
+          });
         });
 
         allNodes.forEach((node) => {
@@ -606,8 +631,16 @@ export function TonigmaNetworkLogo() {
             z: 0.06,
           });
           const flash = createNodeFlash(node);
+          const sweep = createNodeMesh({
+            blending: THREE.AdditiveBlending,
+            color: 0x9fe6ff,
+            node,
+            opacity: 0,
+            radiusScale: node.shape === "diamond" ? 1.13 : 1.2,
+            z: 0.09,
+          });
 
-          nodeRenders.push({ active, bloom, flash, rim, node });
+          nodeRenders.push({ active, bloom, flash, rim, node, sweep });
         });
 
         const resize = () => {
@@ -640,11 +673,16 @@ export function TonigmaNetworkLogo() {
             ? 6.9
             : (absoluteTime - startedAt) % CYCLE_SECONDS;
           const finalGlow = smoothstep((cycleTime - 6.1) / 0.85);
+          const sweepProgress = clamp((cycleTime - 6.08) / 1.22);
+          const sweepEnvelope =
+            smoothstep((cycleTime - 6.02) / 0.22) *
+            (1 - smoothstep((cycleTime - 7.32) / 0.28));
+          const sweepCenter = -1.42 + smoothstep(sweepProgress) * 3.08;
           const breathing = reducedMotion.matches
             ? 0
             : (Math.sin(absoluteTime * 2.6) + 1) / 2;
 
-          nodeRenders.forEach(({ active, bloom, flash, rim, node }) => {
+          nodeRenders.forEach(({ active, bloom, flash, rim, node, sweep }) => {
             const activation = smoothstep((cycleTime - node.turnOnAt) / 0.48);
             const emphasize =
               smoothstep((cycleTime - node.turnOnAt) / 0.16) *
@@ -677,9 +715,14 @@ export function TonigmaNetworkLogo() {
               postFillGlow * 0.24 +
               finalGlow * (0.055 + breathing * 0.018);
             rim.scale.setScalar(1 + emphasize * 0.025 + postFillGlow * 0.04);
+            sweep.material.opacity = reducedMotion.matches
+              ? 0
+              : sweepEnvelope *
+                (1 - smoothstep(Math.abs(scenePoint(node.point).x - sweepCenter) / 0.5)) *
+                0.92;
           });
 
-          edgeRenders.forEach(({ active, edge, trail }) => {
+          edgeRenders.forEach(({ active, centerX, edge, sweep, trail }) => {
             const rawProgress = (cycleTime - edge.startAt) / edge.duration;
             const progress = smoothstep(rawProgress);
             const inFlight = rawProgress > 0 && rawProgress < 1;
@@ -689,6 +732,12 @@ export function TonigmaNetworkLogo() {
 
             active.update(progress);
             active.material.opacity = progress;
+            sweep.update(1);
+            sweep.material.opacity = reducedMotion.matches
+              ? 0
+              : sweepEnvelope *
+                (1 - smoothstep(Math.abs(centerX - sweepCenter) / 0.48)) *
+                0.78;
             trail.update(rawProgress, trailOpacity);
           });
 
