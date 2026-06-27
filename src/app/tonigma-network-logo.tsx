@@ -577,8 +577,8 @@ export function TonigmaNetworkLogo() {
           const fullDy = to.y - from.y;
           const fullLength = Math.max(Math.hypot(fullDx, fullDy), 0.001);
           const angle = Math.atan2(fullDy, fullDx);
-          const maxTrailLength = Math.min(fullLength * 0.62, sceneLength(150));
-          const width = sceneLength(LINE_WIDTH * 1.7);
+          const maxTrailLength = Math.min(fullLength * 0.24, sceneLength(62));
+          const width = sceneLength(LINE_WIDTH * 1.25);
 
           mesh.rotation.z = angle;
           mesh.position.set(from.x, from.y, 0.08);
@@ -759,12 +759,12 @@ export function TonigmaNetworkLogo() {
             const progress = smoothstep(rawProgress);
             const inFlight = rawProgress > 0 && rawProgress < 1;
             const trailOpacity = inFlight
-              ? 0.64 + breathing * 0.08
+              ? 0.42 + breathing * 0.06
               : 0;
 
             active.update(progress);
-            active.material.opacity = progress;
-            trail.update(rawProgress, trailOpacity);
+            active.material.opacity = progress > 0.001 ? 1 : 0;
+            trail.update(progress, trailOpacity);
           });
 
           root.scale.setScalar(1 + finalGlow * 0.012 + breathing * finalGlow * 0.006);
