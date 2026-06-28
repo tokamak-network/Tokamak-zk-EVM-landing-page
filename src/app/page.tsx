@@ -97,7 +97,7 @@ export default function Home() {
         <div className="story-copy">
           <span className="section-kicker">Why Ethereum?</span>
           <h2 id="ethereum-strengths-title">
-            Ethereum is secure because it is decentralized.
+            Security by Decentralization
           </h2>
           <p>
             Its strength comes from decentralization: many independent
