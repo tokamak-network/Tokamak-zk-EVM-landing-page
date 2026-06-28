@@ -355,14 +355,35 @@ export function EthereumLogoOrbit({
         const personBodyGeometry = trackDisposable(
           new THREE.CylinderGeometry(0.052, 0.07, 0.16, 18, 1),
         );
-        const personTorsoGeometry = trackDisposable(
-          new THREE.CapsuleGeometry(0.044, 0.12, 6, 16),
+        const humanHeadGeometry = trackDisposable(
+          new THREE.SphereGeometry(0.064, 16, 12),
         );
-        const personShoulderGeometry = trackDisposable(
-          new THREE.CylinderGeometry(0.014, 0.014, 0.16, 10, 1),
+        const humanNeckGeometry = trackDisposable(
+          new THREE.CylinderGeometry(0.018, 0.022, 0.038, 8, 1),
         );
-        const personLimbGeometry = trackDisposable(
-          new THREE.CylinderGeometry(0.012, 0.012, 0.12, 10, 1),
+        const humanChestGeometry = trackDisposable(
+          new THREE.CylinderGeometry(0.07, 0.052, 0.15, 8, 1),
+        );
+        const humanPelvisGeometry = trackDisposable(
+          new THREE.CylinderGeometry(0.052, 0.064, 0.068, 8, 1),
+        );
+        const humanShoulderGeometry = trackDisposable(
+          new THREE.CylinderGeometry(0.016, 0.016, 0.18, 8, 1),
+        );
+        const humanUpperLimbGeometry = trackDisposable(
+          new THREE.CylinderGeometry(0.016, 0.018, 0.104, 8, 1),
+        );
+        const humanLowerLimbGeometry = trackDisposable(
+          new THREE.CylinderGeometry(0.012, 0.015, 0.104, 8, 1),
+        );
+        const humanHandGeometry = trackDisposable(
+          new THREE.SphereGeometry(0.019, 10, 8),
+        );
+        const humanFootGeometry = trackDisposable(
+          new THREE.BoxGeometry(0.052, 0.024, 0.068),
+        );
+        const humanFaceGeometry = trackDisposable(
+          new THREE.SphereGeometry(0.012, 8, 6),
         );
         const personMaterial = trackDisposable(
           new THREE.MeshStandardMaterial({
@@ -488,45 +509,122 @@ export function EthereumLogoOrbit({
             : personMaterial;
 
           if (variant === "strength") {
-            const head = new THREE.Mesh(personHeadGeometry, personPartMaterial);
-            head.position.y = 0.088;
+            const head = new THREE.Mesh(humanHeadGeometry, personPartMaterial);
+            head.position.y = 0.142;
+            head.scale.set(0.92, 1.05, 0.86);
             person.add(head);
 
-            const torso = new THREE.Mesh(
-              personTorsoGeometry,
+            const face = new THREE.Mesh(humanFaceGeometry, observePacketMaterial);
+            face.position.set(0, 0.15, 0.055);
+            person.add(face);
+
+            const neck = new THREE.Mesh(humanNeckGeometry, personPartMaterial);
+            neck.position.y = 0.072;
+            person.add(neck);
+
+            const chest = new THREE.Mesh(
+              humanChestGeometry,
               personPartMaterial,
             );
-            torso.position.y = -0.05;
-            torso.scale.set(0.86, 1.02, 0.72);
-            person.add(torso);
+            chest.position.y = -0.005;
+            chest.scale.z = 0.62;
+            person.add(chest);
+
+            const pelvis = new THREE.Mesh(
+              humanPelvisGeometry,
+              personPartMaterial,
+            );
+            pelvis.position.y = -0.118;
+            pelvis.scale.z = 0.62;
+            person.add(pelvis);
 
             const shoulders = new THREE.Mesh(
-              personShoulderGeometry,
+              humanShoulderGeometry,
               personPartMaterial,
             );
-            shoulders.position.y = -0.014;
+            shoulders.position.y = 0.036;
             shoulders.rotation.z = Math.PI / 2;
             person.add(shoulders);
 
-            const leftArm = new THREE.Mesh(personLimbGeometry, personPartMaterial);
-            leftArm.position.set(-0.078, -0.082, 0);
-            leftArm.rotation.z = -0.12;
-            person.add(leftArm);
+            const leftUpperArm = new THREE.Mesh(
+              humanUpperLimbGeometry,
+              personPartMaterial,
+            );
+            leftUpperArm.position.set(-0.095, -0.022, 0);
+            leftUpperArm.rotation.z = -0.36;
+            person.add(leftUpperArm);
 
-            const rightArm = new THREE.Mesh(personLimbGeometry, personPartMaterial);
-            rightArm.position.set(0.078, -0.082, 0);
-            rightArm.rotation.z = 0.12;
-            person.add(rightArm);
+            const leftForearm = new THREE.Mesh(
+              humanLowerLimbGeometry,
+              personPartMaterial,
+            );
+            leftForearm.position.set(-0.125, -0.102, 0);
+            leftForearm.rotation.z = -0.14;
+            person.add(leftForearm);
 
-            const leftLeg = new THREE.Mesh(personLimbGeometry, personPartMaterial);
-            leftLeg.position.set(-0.03, -0.185, 0);
-            leftLeg.rotation.z = -0.08;
-            person.add(leftLeg);
+            const leftHand = new THREE.Mesh(humanHandGeometry, personPartMaterial);
+            leftHand.position.set(-0.135, -0.17, 0);
+            person.add(leftHand);
 
-            const rightLeg = new THREE.Mesh(personLimbGeometry, personPartMaterial);
-            rightLeg.position.set(0.03, -0.185, 0);
-            rightLeg.rotation.z = 0.08;
-            person.add(rightLeg);
+            const rightUpperArm = new THREE.Mesh(
+              humanUpperLimbGeometry,
+              personPartMaterial,
+            );
+            rightUpperArm.position.set(0.095, -0.022, 0);
+            rightUpperArm.rotation.z = 0.36;
+            person.add(rightUpperArm);
+
+            const rightForearm = new THREE.Mesh(
+              humanLowerLimbGeometry,
+              personPartMaterial,
+            );
+            rightForearm.position.set(0.125, -0.102, 0);
+            rightForearm.rotation.z = 0.14;
+            person.add(rightForearm);
+
+            const rightHand = new THREE.Mesh(humanHandGeometry, personPartMaterial);
+            rightHand.position.set(0.135, -0.17, 0);
+            person.add(rightHand);
+
+            const leftThigh = new THREE.Mesh(
+              humanUpperLimbGeometry,
+              personPartMaterial,
+            );
+            leftThigh.position.set(-0.034, -0.205, 0);
+            leftThigh.rotation.z = -0.08;
+            person.add(leftThigh);
+
+            const leftShin = new THREE.Mesh(
+              humanLowerLimbGeometry,
+              personPartMaterial,
+            );
+            leftShin.position.set(-0.04, -0.298, 0);
+            leftShin.rotation.z = -0.02;
+            person.add(leftShin);
+
+            const leftFoot = new THREE.Mesh(humanFootGeometry, personPartMaterial);
+            leftFoot.position.set(-0.044, -0.36, 0.026);
+            person.add(leftFoot);
+
+            const rightThigh = new THREE.Mesh(
+              humanUpperLimbGeometry,
+              personPartMaterial,
+            );
+            rightThigh.position.set(0.034, -0.205, 0);
+            rightThigh.rotation.z = 0.08;
+            person.add(rightThigh);
+
+            const rightShin = new THREE.Mesh(
+              humanLowerLimbGeometry,
+              personPartMaterial,
+            );
+            rightShin.position.set(0.04, -0.298, 0);
+            rightShin.rotation.z = 0.02;
+            person.add(rightShin);
+
+            const rightFoot = new THREE.Mesh(humanFootGeometry, personPartMaterial);
+            rightFoot.position.set(0.044, -0.36, 0.026);
+            person.add(rightFoot);
           } else {
             const body = new THREE.Mesh(personBodyGeometry, personPartMaterial);
             body.position.y = -0.078;
