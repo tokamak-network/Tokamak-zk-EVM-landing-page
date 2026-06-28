@@ -100,9 +100,9 @@ export default function Home() {
             Security by Decentralization
           </h2>
           <p>
-            Its strength comes from decentralization: many independent
-            participants can agree on the same state without trusting a single
-            operator.
+            Ethereum has no centralized single operator. It runs on a
+            decentralized network of independent nodes. The more nodes verify
+            the same state, the harder the network is to corrupt.
           </p>
           <div className="story-points" aria-label="Ethereum strength signals">
             <div className="story-point">
