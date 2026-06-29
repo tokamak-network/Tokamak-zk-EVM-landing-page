@@ -127,22 +127,118 @@ export function EyeModelLab() {
         const irisTexture = trackDisposable(new THREE.CanvasTexture(irisCanvas));
         irisTexture.colorSpace = THREE.SRGBColorSpace;
 
+        const skinMaterial = trackDisposable(
+          new THREE.MeshStandardMaterial({
+            color: "#8b625d",
+            emissive: "#1c0f12",
+            emissiveIntensity: 0.1,
+            metalness: 0.02,
+            roughness: 0.5,
+            side: THREE.DoubleSide,
+          }),
+        );
+        const rimMaterial = trackDisposable(
+          new THREE.MeshStandardMaterial({
+            color: "#171113",
+            emissive: "#020101",
+            emissiveIntensity: 0.04,
+            metalness: 0.02,
+            roughness: 0.42,
+          }),
+        );
+        const wetlineMaterial = trackDisposable(
+          new THREE.MeshPhysicalMaterial({
+            clearcoat: 1,
+            clearcoatRoughness: 0.05,
+            color: "#d2a69e",
+            emissive: "#2d1418",
+            emissiveIntensity: 0.12,
+            metalness: 0,
+            roughness: 0.12,
+          }),
+        );
+
+        const eyeWidth = 2.22;
+        const lidPoint = (t: number, upper: boolean, z = 0.69) => {
+          const x = -eyeWidth / 2 + t * eyeWidth;
+          const arch = Math.sin(t * Math.PI);
+          const canthusSlope = (t - 0.5) * 0.018;
+          const y = upper
+            ? -0.006 + arch * 0.31 + canthusSlope
+            : -0.006 - arch * 0.265 + canthusSlope * 0.6;
+
+          return new THREE.Vector3(x, y, z);
+        };
+
+        const createScleraGeometry = () => {
+          const rows = 28;
+          const columns = 68;
+          const positions: number[] = [];
+          const uvs: number[] = [];
+          const indices: number[] = [];
+
+          for (let row = 0; row <= rows; row++) {
+            const v = row / rows;
+
+            for (let column = 0; column <= columns; column++) {
+              const t = column / columns;
+              const upper = lidPoint(t, true);
+              const lower = lidPoint(t, false);
+              const x = upper.x;
+              const y = lower.y + (upper.y - lower.y) * v;
+              const normalizedX = x / (eyeWidth / 2);
+              const normalizedY = y / 0.36;
+              const curvature =
+                0.048 *
+                Math.max(
+                  0,
+                  1 - normalizedX * normalizedX * 0.72 - normalizedY * normalizedY * 0.42,
+                );
+
+              positions.push(x, y, 0.632 + curvature);
+              uvs.push(t, v);
+            }
+          }
+
+          for (let row = 0; row < rows; row++) {
+            for (let column = 0; column < columns; column++) {
+              const a = row * (columns + 1) + column;
+              const b = a + 1;
+              const c = a + columns + 1;
+              const d = c + 1;
+
+              indices.push(a, c, b, b, c, d);
+            }
+          }
+
+          const geometry = new THREE.BufferGeometry();
+          geometry.setAttribute(
+            "position",
+            new THREE.Float32BufferAttribute(positions, 3),
+          );
+          geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+          geometry.setIndex(indices);
+          geometry.computeVertexNormals();
+
+          return geometry;
+        };
+
         const scleraMaterial = trackDisposable(
           new THREE.MeshPhysicalMaterial({
-            clearcoat: 0.38,
-            clearcoatRoughness: 0.18,
-            color: "#f0eee5",
-            emissive: "#17191a",
-            emissiveIntensity: 0.08,
+            clearcoat: 0.34,
+            clearcoatRoughness: 0.22,
+            color: "#f2efe7",
+            emissive: "#111315",
+            emissiveIntensity: 0.05,
             metalness: 0,
-            roughness: 0.32,
+            roughness: 0.36,
+            side: THREE.DoubleSide,
           }),
         );
         const sclera = new THREE.Mesh(
-          trackDisposable(new THREE.SphereGeometry(0.88, 96, 48)),
+          trackDisposable(createScleraGeometry()),
           scleraMaterial,
         );
-        sclera.scale.set(1.12, 0.78, 0.66);
         eyeRig.add(sclera);
 
         const irisMaterial = trackDisposable(
@@ -153,68 +249,30 @@ export function EyeModelLab() {
           }),
         );
         const iris = new THREE.Mesh(
-          trackDisposable(new THREE.CircleGeometry(0.34, 96)),
+          trackDisposable(new THREE.CircleGeometry(0.305, 128)),
           irisMaterial,
         );
-        iris.position.z = 0.595;
+        iris.position.set(0.01, 0.004, 0.695);
         eyeRig.add(iris);
 
         const cornea = new THREE.Mesh(
-          trackDisposable(new THREE.SphereGeometry(0.895, 96, 48)),
+          trackDisposable(new THREE.CircleGeometry(0.332, 128)),
           trackDisposable(
             new THREE.MeshPhysicalMaterial({
               clearcoat: 1,
               clearcoatRoughness: 0.02,
               color: "#ffffff",
               metalness: 0,
-              opacity: 0.2,
+              opacity: 0.18,
               roughness: 0.02,
+              side: THREE.DoubleSide,
               transparent: true,
-              transmission: 0.86,
+              transmission: 0.68,
             }),
           ),
         );
-        cornea.scale.set(1.12, 0.78, 0.69);
+        cornea.position.set(0.01, 0.004, 0.704);
         eyeRig.add(cornea);
-
-        const skinMaterial = trackDisposable(
-          new THREE.MeshStandardMaterial({
-            color: "#9b6d63",
-            emissive: "#1c0f12",
-            emissiveIntensity: 0.1,
-            metalness: 0.02,
-            roughness: 0.5,
-            side: THREE.DoubleSide,
-          }),
-        );
-        const rimMaterial = trackDisposable(
-          new THREE.MeshStandardMaterial({
-            color: "#c49084",
-            emissive: "#27151a",
-            emissiveIntensity: 0.08,
-            metalness: 0.02,
-            roughness: 0.34,
-          }),
-        );
-        const wetlineMaterial = trackDisposable(
-          new THREE.MeshPhysicalMaterial({
-            clearcoat: 1,
-            clearcoatRoughness: 0.05,
-            color: "#f2c8bd",
-            emissive: "#2d1418",
-            emissiveIntensity: 0.12,
-            metalness: 0,
-            roughness: 0.12,
-          }),
-        );
-        const lashMaterial = trackDisposable(
-          new THREE.MeshStandardMaterial({
-            color: "#090708",
-            emissive: "#000000",
-            metalness: 0,
-            roughness: 0.64,
-          }),
-        );
 
         const createShapeMesh = (
           points: Array<[number, number]>,
@@ -241,30 +299,19 @@ export function EyeModelLab() {
           return mesh;
         };
 
-        const lidPoint = (t: number, upper: boolean) => {
-          const x = -1.15 + t * 2.3;
-          const arch = Math.sin(t * Math.PI);
-          const skew = (t - 0.5) * 0.08;
-          const y = upper
-            ? 0.04 + arch * 0.48 + skew
-            : -0.1 - arch * 0.34 + skew * 0.32;
-
-          return new THREE.Vector3(x, y, 0.68);
-        };
-
-        const upperOpening = Array.from({ length: 42 }, (_, index) =>
-          lidPoint(index / 41, true),
+        const upperOpening = Array.from({ length: 60 }, (_, index) =>
+          lidPoint(index / 59, true, 0.705),
         );
-        const lowerOpening = Array.from({ length: 42 }, (_, index) =>
-          lidPoint(index / 41, false),
+        const lowerOpening = Array.from({ length: 60 }, (_, index) =>
+          lidPoint(index / 59, false, 0.703),
         );
         const upperSkin = [
-          ...Array.from({ length: 42 }, (_, index) => {
-            const t = index / 41;
-            const x = -1.32 + t * 2.64;
-            const y = 0.16 + Math.sin(t * Math.PI) * 0.82 + (t - 0.5) * 0.08;
+          ...Array.from({ length: 60 }, (_, index) => {
+            const t = index / 59;
+            const inner = lidPoint(t, true, 0.705);
+            const y = inner.y + 0.07 + Math.sin(t * Math.PI) * 0.075;
 
-            return [x, y] as [number, number];
+            return [inner.x + (t - 0.5) * 0.05, y] as [number, number];
           }),
           ...upperOpening
             .slice()
@@ -273,17 +320,17 @@ export function EyeModelLab() {
         ];
         const lowerSkin = [
           ...lowerOpening.map((point) => [point.x, point.y] as [number, number]),
-          ...Array.from({ length: 42 }, (_, index) => {
-            const t = 1 - index / 41;
-            const x = -1.28 + t * 2.56;
-            const y = -0.18 - Math.sin(t * Math.PI) * 0.58 + (t - 0.5) * 0.04;
+          ...Array.from({ length: 60 }, (_, index) => {
+            const t = 1 - index / 59;
+            const inner = lidPoint(t, false, 0.703);
+            const y = inner.y - 0.055 - Math.sin(t * Math.PI) * 0.045;
 
-            return [x, y] as [number, number];
+            return [inner.x + (t - 0.5) * 0.035, y] as [number, number];
           }),
         ];
 
-        eyeRig.add(createShapeMesh(upperSkin, skinMaterial, 0.66));
-        eyeRig.add(createShapeMesh(lowerSkin, skinMaterial, 0.65));
+        eyeRig.add(createShapeMesh(upperSkin, skinMaterial, 0.718));
+        eyeRig.add(createShapeMesh(lowerSkin, skinMaterial, 0.716));
 
         const makeTube = (
           points: Array<InstanceType<typeof THREE.Vector3>>,
@@ -305,70 +352,35 @@ export function EyeModelLab() {
           );
         };
 
-        eyeRig.add(makeTube(upperOpening, 0.04, rimMaterial, 72));
-        eyeRig.add(makeTube(lowerOpening, 0.032, wetlineMaterial, 72));
+        eyeRig.add(makeTube(upperOpening, 0.026, rimMaterial, 96));
+        eyeRig.add(makeTube(lowerOpening, 0.018, wetlineMaterial, 96));
+
+        const upperCrease = Array.from({ length: 56 }, (_, index) => {
+          const t = index / 55;
+          const point = lidPoint(t, true, 0.674);
+          point.y += 0.135 + Math.sin(t * Math.PI) * 0.035;
+          point.x += (t - 0.5) * 0.05;
+
+          return point;
+        });
+        eyeRig.add(makeTube(upperCrease, 0.012, wetlineMaterial, 80));
 
         const highlightMaterial = trackDisposable(
           new THREE.MeshBasicMaterial({
             blending: THREE.AdditiveBlending,
             color: "#ffffff",
-            opacity: 0.72,
+            opacity: 0.42,
             side: THREE.DoubleSide,
             transparent: true,
           }),
         );
         const highlight = new THREE.Mesh(
-          trackDisposable(new THREE.CircleGeometry(0.095, 24)),
+          trackDisposable(new THREE.CircleGeometry(0.064, 24)),
           highlightMaterial,
         );
-        highlight.position.set(0.18, 0.2, 0.715);
-        highlight.scale.y = 0.48;
+        highlight.position.set(0.13, 0.145, 0.716);
+        highlight.scale.y = 0.42;
         eyeRig.add(highlight);
-
-        for (let index = 0; index < 42; index++) {
-          const t = index / 41;
-          const base = lidPoint(t, true);
-          const length = 0.22 + Math.sin(t * Math.PI) * 0.18;
-          const side = (t - 0.5) * 0.6;
-          const tip = new THREE.Vector3(
-            base.x + side,
-            base.y + length,
-            0.77 - Math.abs(t - 0.5) * 0.16,
-          );
-          const control = new THREE.Vector3(
-            (base.x + tip.x) / 2,
-            base.y + length * 0.62,
-            0.85,
-          );
-
-          eyeRig.add(makeTube([base, control, tip], 0.006, lashMaterial, 12));
-        }
-
-        for (let index = 0; index < 22; index++) {
-          const t = index / 21;
-          const base = lidPoint(t, false);
-          const length = 0.11 + Math.sin(t * Math.PI) * 0.06;
-          const tip = new THREE.Vector3(
-            base.x + (t - 0.5) * 0.18,
-            base.y - length,
-            0.72,
-          );
-
-          eyeRig.add(makeTube([base, tip], 0.004, lashMaterial, 8));
-        }
-
-        const backing = new THREE.Mesh(
-          trackDisposable(new THREE.PlaneGeometry(3.3, 2.1)),
-          trackDisposable(
-            new THREE.MeshBasicMaterial({
-              color: "#071019",
-              opacity: 0.36,
-              transparent: true,
-            }),
-          ),
-        );
-        backing.position.z = -0.82;
-        eyeRig.add(backing);
 
         const state = {
           dragging: false,
