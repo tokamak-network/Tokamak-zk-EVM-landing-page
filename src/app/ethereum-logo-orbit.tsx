@@ -1383,6 +1383,8 @@ export function EthereumLogoOrbit({
                 transparent: true,
               }),
             );
+          const binaryGlyphSpacing = 0.085;
+          const binaryGlyphDelay = 0.055;
           const binaryStreams = Array.from({ length: 44 }, (_, streamIndex) => {
             const sample =
               projectedLandPoints[
@@ -1397,7 +1399,7 @@ export function EthereumLogoOrbit({
 
               mesh.position.set(
                 sample.x,
-                0.15 + sample.height + glyphIndex * 0.13,
+                0.15 + sample.height + glyphIndex * binaryGlyphSpacing,
                 sample.z,
               );
               mesh.rotation.y = (Math.random() - 0.5) * 0.28;
@@ -1406,9 +1408,10 @@ export function EthereumLogoOrbit({
               worldMapGroup.add(mesh);
 
               return {
+                delay: glyphIndex * binaryGlyphDelay,
                 material,
                 mesh,
-                offset: glyphIndex / glyphCount,
+                verticalOffset: glyphIndex * binaryGlyphSpacing,
               };
             });
 
@@ -1465,24 +1468,29 @@ export function EthereumLogoOrbit({
                 return;
               }
 
-              streamState.glyphs.forEach(({ material, mesh, offset }) => {
-                const glyphProgress = Math.max(
-                  0,
-                  Math.min(1, progress * 1.32 - offset * 0.32),
-                );
-                const fadeIn = Math.min(glyphProgress / 0.18, 1);
-                const fadeOut = Math.min((1 - glyphProgress) / 0.26, 1);
-                const visibility = Math.min(fadeIn, fadeOut);
+              streamState.glyphs.forEach(
+                ({ delay, material, mesh, verticalOffset }) => {
+                  const glyphProgress = Math.max(
+                    0,
+                    Math.min(1, progress * 1.32 - delay),
+                  );
+                  const fadeIn = Math.min(glyphProgress / 0.18, 1);
+                  const fadeOut = Math.min((1 - glyphProgress) / 0.26, 1);
+                  const visibility = Math.min(fadeIn, fadeOut);
 
-                mesh.visible = visibility > 0.01;
-                mesh.position.set(
-                  streamState.baseX,
-                  0.165 + streamState.baseHeight + offset * 0.62 + progress * 0.2,
-                  streamState.baseZ,
-                );
-                mesh.scale.setScalar(0.94 + visibility * 0.24);
-                material.opacity = visibility * 0.96;
-              });
+                  mesh.visible = visibility > 0.01;
+                  mesh.position.set(
+                    streamState.baseX,
+                    0.165 +
+                      streamState.baseHeight +
+                      verticalOffset +
+                      progress * 0.2,
+                    streamState.baseZ,
+                  );
+                  mesh.scale.setScalar(0.94 + visibility * 0.24);
+                  material.opacity = visibility * 0.96;
+                },
+              );
             });
           });
         }
