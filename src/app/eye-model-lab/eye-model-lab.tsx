@@ -32,14 +32,14 @@ export function EyeModelLab() {
       context.fillRect(0, 0, width, height);
 
       const eyeWidth = Math.min(width * 0.52, 620);
-      const eyeHeight = eyeWidth / 3.25;
+      const eyeHeight = eyeWidth / 3.18;
       const centerX = width / 2;
       const centerY = height / 2;
       const leftX = centerX - eyeWidth / 2;
       const rightX = centerX + eyeWidth / 2;
-      const upperY = centerY - eyeHeight * 0.52;
-      const lowerY = centerY + eyeHeight * 0.34;
-      const cornerY = centerY + eyeHeight * 0.02;
+      const upperY = centerY - eyeHeight * 0.49;
+      const lowerY = centerY + eyeHeight * 0.51;
+      const cornerY = centerY + eyeHeight * 0.03;
 
       context.lineCap = "round";
       context.lineJoin = "round";
@@ -49,17 +49,17 @@ export function EyeModelLab() {
       context.beginPath();
       context.moveTo(leftX, cornerY);
       context.bezierCurveTo(
-        centerX - eyeWidth * 0.31,
+        centerX - eyeWidth * 0.32,
         upperY,
-        centerX + eyeWidth * 0.31,
+        centerX + eyeWidth * 0.32,
         upperY,
         rightX,
         cornerY,
       );
       context.bezierCurveTo(
-        centerX + eyeWidth * 0.28,
+        centerX + eyeWidth * 0.3,
         lowerY,
-        centerX - eyeWidth * 0.28,
+        centerX - eyeWidth * 0.3,
         lowerY,
         leftX,
         cornerY,
