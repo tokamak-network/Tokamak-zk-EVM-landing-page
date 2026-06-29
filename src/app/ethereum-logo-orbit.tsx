@@ -1435,7 +1435,7 @@ export function EthereumLogoOrbit({
           }
 
           const binaryStreams = binaryStreamAnchors.map((sample, streamIndex) => {
-            const glyphCount = 4 + (streamIndex % 3);
+            const glyphCount = 6 + (streamIndex % 10);
             const glyphs = Array.from({ length: glyphCount }, (_, glyphIndex) => {
               const glyph =
                 (streamIndex * 17 + glyphIndex * 7) % 3 === 0 ? "0" : "1";
