@@ -440,34 +440,153 @@ export function EthereumLogoOrbit({
             transparent: true,
           }),
         );
-        const packetGeometry = trackDisposable(
-          new THREE.SphereGeometry(0.022, 12, 8),
-        );
-        const observePacketMaterial = trackDisposable(
-          new THREE.MeshBasicMaterial({
-            blending: THREE.AdditiveBlending,
-            color: "#dff7ff",
+        const meshEdgeMaterial = trackDisposable(
+          new THREE.LineBasicMaterial({
+            color: "#203142",
             depthWrite: false,
-            opacity: 0.78,
+            opacity: 0.34,
             transparent: true,
           }),
         );
-        const replayPacketMaterial = trackDisposable(
+        const lightTrailCanvas = document.createElement("canvas");
+        lightTrailCanvas.width = 192;
+        lightTrailCanvas.height = 48;
+        const lightTrailContext = lightTrailCanvas.getContext("2d");
+
+        if (lightTrailContext) {
+          const horizontalGlow = lightTrailContext.createLinearGradient(
+            0,
+            0,
+            lightTrailCanvas.width,
+            0,
+          );
+          horizontalGlow.addColorStop(0, "rgba(255,255,255,0)");
+          horizontalGlow.addColorStop(0.32, "rgba(255,255,255,0.16)");
+          horizontalGlow.addColorStop(0.5, "rgba(255,255,255,1)");
+          horizontalGlow.addColorStop(0.68, "rgba(255,255,255,0.16)");
+          horizontalGlow.addColorStop(1, "rgba(255,255,255,0)");
+
+          const verticalGlow = lightTrailContext.createRadialGradient(
+            lightTrailCanvas.width / 2,
+            lightTrailCanvas.height / 2,
+            0,
+            lightTrailCanvas.width / 2,
+            lightTrailCanvas.height / 2,
+            lightTrailCanvas.height / 2,
+          );
+          verticalGlow.addColorStop(0, "rgba(255,255,255,1)");
+          verticalGlow.addColorStop(0.72, "rgba(255,255,255,0.38)");
+          verticalGlow.addColorStop(1, "rgba(255,255,255,0)");
+
+          lightTrailContext.fillStyle = horizontalGlow;
+          lightTrailContext.fillRect(
+            0,
+            0,
+            lightTrailCanvas.width,
+            lightTrailCanvas.height,
+          );
+          lightTrailContext.globalCompositeOperation = "destination-in";
+          lightTrailContext.fillStyle = verticalGlow;
+          lightTrailContext.fillRect(
+            0,
+            0,
+            lightTrailCanvas.width,
+            lightTrailCanvas.height,
+          );
+        }
+
+        const lightTrailTexture = trackDisposable(
+          new THREE.CanvasTexture(lightTrailCanvas),
+        );
+        lightTrailTexture.colorSpace = THREE.SRGBColorSpace;
+        const lightTrailGeometry = trackDisposable(
+          new THREE.PlaneGeometry(1, 1),
+        );
+        const lightTrailBaseMaterial = trackDisposable(
           new THREE.MeshBasicMaterial({
             blending: THREE.AdditiveBlending,
-            color: "#5fb7ff",
+            color: "#8ee7ff",
             depthWrite: false,
+            map: lightTrailTexture,
             opacity: 0.72,
+            side: THREE.DoubleSide,
+            toneMapped: false,
             transparent: true,
           }),
         );
+        const lightTrailGlowBaseMaterial = trackDisposable(
+          lightTrailBaseMaterial.clone(),
+        );
+        lightTrailGlowBaseMaterial.color.set("#48a8ff");
+        lightTrailGlowBaseMaterial.opacity = 0.34;
+
+        const createLightTrail = () => {
+          const glowMaterial = trackDisposable(
+            lightTrailGlowBaseMaterial.clone(),
+          );
+          const coreMaterial = trackDisposable(lightTrailBaseMaterial.clone());
+          const glowLineGeometry = trackDisposable(new THREE.BufferGeometry());
+          const coreLineGeometry = trackDisposable(new THREE.BufferGeometry());
+          const glowLineMaterial = trackDisposable(
+            new THREE.LineBasicMaterial({
+              blending: THREE.AdditiveBlending,
+              color: "#4aaeff",
+              depthWrite: false,
+              opacity: 0,
+              transparent: true,
+            }),
+          );
+          const coreLineMaterial = trackDisposable(
+            new THREE.LineBasicMaterial({
+              blending: THREE.AdditiveBlending,
+              color: "#e8fbff",
+              depthWrite: false,
+              opacity: 0,
+              transparent: true,
+            }),
+          );
+          const glow = new THREE.Mesh(lightTrailGeometry, glowMaterial);
+          const core = new THREE.Mesh(lightTrailGeometry, coreMaterial);
+          const glowLine = new THREE.Line(glowLineGeometry, glowLineMaterial);
+          const coreLine = new THREE.Line(coreLineGeometry, coreLineMaterial);
+
+          glowLineGeometry.setAttribute(
+            "position",
+            new THREE.BufferAttribute(new Float32Array(6), 3),
+          );
+          coreLineGeometry.setAttribute(
+            "position",
+            new THREE.BufferAttribute(new Float32Array(6), 3),
+          );
+
+          glow.renderOrder = 2;
+          core.renderOrder = 3;
+          glowLine.renderOrder = 4;
+          coreLine.renderOrder = 5;
+          glow.visible = false;
+          core.visible = false;
+          glowLine.visible = false;
+          coreLine.visible = false;
+          observerGroup.add(glow, core, glowLine, coreLine);
+
+          return {
+            core,
+            coreLine,
+            coreLineMaterial,
+            coreMaterial,
+            glow,
+            glowLine,
+            glowLineMaterial,
+            glowMaterial,
+          };
+        };
 
         const observerAnimations: Array<{
           group: InstanceType<typeof THREE.Group>;
           home: InstanceType<typeof THREE.Vector3>;
-          observePacket: InstanceType<typeof THREE.Mesh>;
-          replayPacket: InstanceType<typeof THREE.Mesh>;
+          observeTrail: ReturnType<typeof createLightTrail>;
           phase: number;
+          replayTrail: ReturnType<typeof createLightTrail>;
           target: InstanceType<typeof THREE.Vector3>;
           targetIndex: number | null;
           sourceIndex: number;
@@ -475,12 +594,12 @@ export function EthereumLogoOrbit({
         const meshPacketAnimations: Array<{
           from: InstanceType<typeof THREE.Vector3>;
           fromIndex: number;
-          packet: InstanceType<typeof THREE.Mesh>;
           phase: number;
-          speed: number;
           to: InstanceType<typeof THREE.Vector3>;
           toIndex: number;
+          trail: ReturnType<typeof createLightTrail>;
         }> = [];
+        const packetTravelSpeed = 0.46;
         const nodeLedMaterials: Array<
           Array<InstanceType<typeof THREE.MeshBasicMaterial>>
         > = [];
@@ -630,7 +749,11 @@ export function EthereumLogoOrbit({
           );
           const verificationLine = new THREE.Line(
             lineGeometry,
-            index % 2 === 0 ? verificationLineMaterial : replayLineMaterial,
+            variant === "strength"
+              ? meshEdgeMaterial
+              : index % 2 === 0
+                ? verificationLineMaterial
+                : replayLineMaterial,
           );
           observerGroup.add(verificationLine);
 
@@ -650,55 +773,140 @@ export function EthereumLogoOrbit({
                 new THREE.BufferGeometry().setFromPoints([home, meshTarget]),
               );
 
-              observerGroup.add(
-                new THREE.Line(meshLineGeometry, replayLineMaterial),
-              );
-
-              const meshPacketMaterial = trackDisposable(
-                (index % 2 === 0
-                  ? replayPacketMaterial
-                  : observePacketMaterial
-                ).clone(),
-              );
-              meshPacketMaterial.opacity = 0.18;
-              const meshPacket = new THREE.Mesh(
-                packetGeometry,
-                meshPacketMaterial,
-              );
-              observerGroup.add(meshPacket);
+              observerGroup.add(new THREE.Line(meshLineGeometry, meshEdgeMaterial));
 
               meshPacketAnimations.push({
                 from: home,
                 fromIndex: index,
-                packet: meshPacket,
                 phase: ((index * 13 + edge * 17) % 29) / 29,
-                speed: 0.08 + ((index * 7 + edge * 11) % 5) * 0.012,
                 to: meshTarget,
                 toIndex: targetIndex,
+                trail: createLightTrail(),
               });
             }
           }
 
-          const observePacket = new THREE.Mesh(
-            packetGeometry,
-            observePacketMaterial,
-          );
-          const replayPacket = new THREE.Mesh(packetGeometry, replayPacketMaterial);
-          observerGroup.add(observePacket, replayPacket, person);
+          const observeTrail = createLightTrail();
+          const replayTrail = createLightTrail();
+          observerGroup.add(person);
 
           observerAnimations.push({
             group: person,
             home,
-            observePacket,
+            observeTrail,
             phase: index * 0.43,
-            replayPacket,
+            replayTrail,
             target,
             targetIndex: variant === "strength" ? strengthTargetIndex : null,
             sourceIndex: index,
           });
         }
 
+        const lightTrailPosition = new THREE.Vector3();
+        const lightTrailDirection = new THREE.Vector3();
+        const lightTrailNormal = new THREE.Vector3();
+        const lightTrailSide = new THREE.Vector3();
+        const lightTrailPlaneNormal = new THREE.Vector3();
+        const lightTrailMatrix = new THREE.Matrix4();
+        const cameraInObserverSpace = new THREE.Vector3();
+        const lightTrailStart = new THREE.Vector3();
+        const lightTrailEnd = new THREE.Vector3();
+
+        const updateLightTrail = (
+          trail: ReturnType<typeof createLightTrail>,
+          from: InstanceType<typeof THREE.Vector3>,
+          to: InstanceType<typeof THREE.Vector3>,
+          progress: number,
+          intensity: number,
+        ) => {
+          const visible = intensity > 0.025;
+
+          trail.core.visible = visible;
+          trail.glow.visible = visible;
+          trail.coreLine.visible = visible;
+          trail.glowLine.visible = visible;
+
+          if (!visible) {
+            return;
+          }
+
+          lightTrailPosition.lerpVectors(from, to, progress);
+          lightTrailDirection.subVectors(to, from);
+          const distance = lightTrailDirection.length();
+
+          if (distance <= 0.001) {
+            trail.core.visible = false;
+            trail.glow.visible = false;
+            trail.coreLine.visible = false;
+            trail.glowLine.visible = false;
+            return;
+          }
+
+          lightTrailDirection.divideScalar(distance);
+          lightTrailNormal
+            .subVectors(cameraInObserverSpace, lightTrailPosition)
+            .normalize();
+          lightTrailSide.crossVectors(lightTrailNormal, lightTrailDirection);
+
+          if (lightTrailSide.lengthSq() < 0.0001) {
+            lightTrailSide.set(0, 1, 0);
+          } else {
+            lightTrailSide.normalize();
+          }
+
+          lightTrailPlaneNormal
+            .crossVectors(lightTrailDirection, lightTrailSide)
+            .normalize();
+          lightTrailMatrix.makeBasis(
+            lightTrailDirection,
+            lightTrailSide,
+            lightTrailPlaneNormal,
+          );
+
+          trail.core.position.copy(lightTrailPosition);
+          trail.glow.position.copy(lightTrailPosition);
+          trail.core.quaternion.setFromRotationMatrix(lightTrailMatrix);
+          trail.glow.quaternion.copy(trail.core.quaternion);
+          trail.core.scale.set(Math.min(distance * 0.32, 0.46), 0.03, 1);
+          trail.glow.scale.set(Math.min(distance * 0.44, 0.62), 0.12, 1);
+          trail.coreMaterial.opacity = 0.28 + intensity * 0.58;
+          trail.glowMaterial.opacity = intensity * 0.42;
+
+          const segmentOffset = Math.min(0.16, 0.18 / distance);
+          const segmentStart = Math.max(0, progress - segmentOffset);
+          const segmentEnd = Math.min(1, progress + segmentOffset);
+
+          lightTrailStart.lerpVectors(from, to, segmentStart);
+          lightTrailEnd.lerpVectors(from, to, segmentEnd);
+
+          [trail.coreLine, trail.glowLine].forEach((line) => {
+            const positionAttribute = line.geometry.getAttribute(
+              "position",
+            ) as InstanceType<typeof THREE.BufferAttribute>;
+
+            positionAttribute.setXYZ(
+              0,
+              lightTrailStart.x,
+              lightTrailStart.y,
+              lightTrailStart.z,
+            );
+            positionAttribute.setXYZ(
+              1,
+              lightTrailEnd.x,
+              lightTrailEnd.y,
+              lightTrailEnd.z,
+            );
+            positionAttribute.needsUpdate = true;
+          });
+          trail.coreLineMaterial.opacity = 0.26 + intensity * 0.62;
+          trail.glowLineMaterial.opacity = intensity * 0.32;
+        };
+
         updateStoryLayers.push((time) => {
+          observerGroup.updateWorldMatrix(true, false);
+          cameraInObserverSpace.copy(camera.position);
+          observerGroup.worldToLocal(cameraInObserverSpace);
+
           const ledActivity = Array.from({ length: observerCount }, () => [
             0,
             0,
@@ -720,15 +928,11 @@ export function EthereumLogoOrbit({
           };
 
           meshPacketAnimations.forEach(
-            ({ from, fromIndex, packet, phase, speed, to, toIndex }) => {
-              const progress = (time * speed + phase) % 1;
+            ({ from, fromIndex, phase, to, toIndex, trail }) => {
+              const progress = (time * packetTravelSpeed + phase) % 1;
               const visibility = Math.sin(progress * Math.PI);
 
-              packet.position.lerpVectors(from, to, progress);
-              packet.scale.setScalar(0.72 + visibility * 0.32);
-              (
-                packet.material as InstanceType<typeof THREE.MeshBasicMaterial>
-              ).opacity = 0.12 + visibility * 0.3;
+              updateLightTrail(trail, from, to, progress, visibility);
               markNodeActivity(fromIndex, 0, 1 - Math.min(progress / 0.2, 1));
               markNodeActivity(toIndex, 2, Math.max((progress - 0.8) / 0.2, 0));
               markNodeActivity(fromIndex, 1, visibility * 0.22);
@@ -740,9 +944,9 @@ export function EthereumLogoOrbit({
             ({
               group,
               home,
-              observePacket,
+              observeTrail,
               phase,
-              replayPacket,
+              replayTrail,
               sourceIndex,
               target,
               targetIndex,
@@ -750,20 +954,24 @@ export function EthereumLogoOrbit({
               const bob = Math.sin(time * 1.8 + phase) * 0.026;
               group.position.set(home.x, home.y + bob, home.z);
 
-              const observeProgress =
-                (Math.sin(time * 0.86 + phase) + 1) / 2;
-              const replayProgress =
-                (Math.sin(time * 0.86 + phase + Math.PI) + 1) / 2;
+              const observeProgress = (time * packetTravelSpeed + phase) % 1;
+              const replayProgress = (observeProgress + 0.5) % 1;
+              const observeVisibility = Math.sin(observeProgress * Math.PI);
+              const replayVisibility = Math.sin(replayProgress * Math.PI);
 
-              observePacket.position.lerpVectors(
+              updateLightTrail(
+                observeTrail,
                 target,
                 home,
                 observeProgress,
+                observeVisibility,
               );
-              replayPacket.position.lerpVectors(
+              updateLightTrail(
+                replayTrail,
                 home,
                 target,
                 replayProgress,
+                replayVisibility,
               );
               markNodeActivity(
                 targetIndex,
@@ -788,12 +996,12 @@ export function EthereumLogoOrbit({
               markNodeActivity(
                 sourceIndex,
                 1,
-                Math.sin(replayProgress * Math.PI) * 0.18,
+                replayVisibility * 0.18,
               );
               markNodeActivity(
                 targetIndex,
                 1,
-                Math.sin(observeProgress * Math.PI) * 0.18,
+                observeVisibility * 0.18,
               );
             },
           );
