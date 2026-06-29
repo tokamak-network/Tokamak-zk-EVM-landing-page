@@ -1070,7 +1070,7 @@ export function EthereumLogoOrbit({
           faceEyeTexture.colorSpace = THREE.SRGBColorSpace;
           faceEyeTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
           const faceEyeGeometry = trackDisposable(
-            new THREE.PlaneGeometry(0.82, 0.4),
+            new THREE.PlaneGeometry(0.62, 0.3),
           );
           const faceEyeMaterial = trackDisposable(
             new THREE.MeshBasicMaterial({
@@ -1113,7 +1113,7 @@ export function EthereumLogoOrbit({
 
             eyeGroup.position.copy(centroid).addScaledVector(normal, 0.018);
             eyeGroup.quaternion.setFromRotationMatrix(eyeBasis);
-            eyeGroup.scale.setScalar(1.12);
+            eyeGroup.scale.setScalar(0.96);
 
             const eye = new THREE.Mesh(faceEyeGeometry, faceEyeMaterial);
             eye.renderOrder = 10;
