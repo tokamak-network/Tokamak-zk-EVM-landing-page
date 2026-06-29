@@ -36,8 +36,8 @@ export function EyeModelLab() {
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
-        camera.position.set(0, 0, 6);
+        const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
+        camera.position.set(0, 0.02, 5.2);
         camera.lookAt(0, 0, 0);
 
         const disposableResources: Array<{ dispose: () => void }> = [];
@@ -48,157 +48,254 @@ export function EyeModelLab() {
           return resource;
         };
 
-        scene.add(new THREE.AmbientLight(0xffffff, 1.8));
+        scene.add(new THREE.AmbientLight(0xeef6ff, 1.18));
+
+        const keyLight = new THREE.DirectionalLight(0xffffff, 3.2);
+        keyLight.position.set(2.4, 2.8, 4.2);
+        scene.add(keyLight);
+
+        const softLight = new THREE.DirectionalLight(0x8fd7ff, 1.4);
+        softLight.position.set(-2.8, -0.4, 3.2);
+        scene.add(softLight);
+
+        const rimLight = new THREE.DirectionalLight(0x6cb8ff, 2.1);
+        rimLight.position.set(-2.2, 1.8, -2.4);
+        scene.add(rimLight);
 
         const eyeRig = new THREE.Group();
+        eyeRig.rotation.set(0, 0, 0);
         scene.add(eyeRig);
 
-        const eyeTextureCanvas = document.createElement("canvas");
-        eyeTextureCanvas.width = 2400;
-        eyeTextureCanvas.height = 1200;
-        const context = eyeTextureCanvas.getContext("2d");
+        const irisCanvas = document.createElement("canvas");
+        irisCanvas.width = 1024;
+        irisCanvas.height = 1024;
+        const irisContext = irisCanvas.getContext("2d");
 
-        if (!context) {
-          throw new Error("Could not create eye texture canvas.");
+        if (irisContext) {
+          const center = irisCanvas.width / 2;
+
+          irisContext.fillStyle = "#f7f4ed";
+          irisContext.fillRect(0, 0, irisCanvas.width, irisCanvas.height);
+
+          for (let index = 0; index < 96; index++) {
+            const angle = (index / 96) * Math.PI * 2;
+            const inner = 150;
+            const outer = 430;
+
+            irisContext.beginPath();
+            irisContext.moveTo(
+              center + Math.cos(angle) * inner,
+              center + Math.sin(angle) * inner,
+            );
+            irisContext.lineTo(
+              center + Math.cos(angle) * outer,
+              center + Math.sin(angle) * outer,
+            );
+            irisContext.strokeStyle =
+              index % 3 === 0
+                ? "rgba(10, 10, 10, 0.62)"
+                : "rgba(10, 10, 10, 0.34)";
+            irisContext.lineWidth = index % 4 === 0 ? 7 : 4;
+            irisContext.stroke();
+          }
+
+          irisContext.beginPath();
+          irisContext.arc(center, center, 452, 0, Math.PI * 2);
+          irisContext.strokeStyle = "#050505";
+          irisContext.lineWidth = 72;
+          irisContext.stroke();
+
+          irisContext.beginPath();
+          irisContext.arc(center, center, 165, 0, Math.PI * 2);
+          irisContext.fillStyle = "#050505";
+          irisContext.fill();
+
+          irisContext.beginPath();
+          irisContext.ellipse(
+            center + 118,
+            center - 124,
+            70,
+            36,
+            -0.18,
+            0,
+            Math.PI * 2,
+          );
+          irisContext.fillStyle = "rgba(255, 255, 255, 0.9)";
+          irisContext.fill();
         }
 
-        const centerX = eyeTextureCanvas.width / 2;
-        const centerY = eyeTextureCanvas.height / 2;
-        const ink = "#070707";
-        const paper = "#f9f7ef";
+        const irisTexture = trackDisposable(new THREE.CanvasTexture(irisCanvas));
+        irisTexture.colorSpace = THREE.SRGBColorSpace;
 
-        context.clearRect(0, 0, eyeTextureCanvas.width, eyeTextureCanvas.height);
-        context.lineCap = "round";
-        context.lineJoin = "round";
+        const inkMaterial = trackDisposable(
+          new THREE.MeshBasicMaterial({
+            color: "#050505",
+            side: THREE.DoubleSide,
+          }),
+        );
 
-        const drawEyePath = () => {
-          context.beginPath();
-          context.moveTo(centerX - 770, centerY + 18);
-          context.bezierCurveTo(
-            centerX - 430,
-            centerY - 255,
-            centerX + 430,
-            centerY - 255,
-            centerX + 770,
-            centerY + 18,
-          );
-          context.bezierCurveTo(
-            centerX + 430,
-            centerY + 205,
-            centerX - 430,
-            centerY + 205,
-            centerX - 770,
-            centerY + 18,
-          );
-          context.closePath();
+        const eyeWidth = 2.08;
+        const lidPoint = (t: number, upper: boolean, z = 0.69) => {
+          const x = -eyeWidth / 2 + t * eyeWidth;
+          const arch = Math.sin(t * Math.PI);
+          const base = -0.006 + (t - 0.5) * 0.014;
+          const y = upper ? base + arch * 0.425 : base - arch * 0.34;
+
+          return new THREE.Vector3(x, y, z);
         };
 
-        drawEyePath();
-        context.fillStyle = paper;
-        context.fill();
-        context.strokeStyle = ink;
-        context.lineWidth = 20;
-        context.stroke();
+        const createScleraGeometry = () => {
+          const rows = 28;
+          const columns = 68;
+          const positions: number[] = [];
+          const uvs: number[] = [];
+          const indices: number[] = [];
 
-        context.beginPath();
-        context.moveTo(centerX - 650, centerY + 2);
-        context.bezierCurveTo(
-          centerX - 355,
-          centerY - 168,
-          centerX + 345,
-          centerY - 168,
-          centerX + 650,
-          centerY + 2,
-        );
-        context.strokeStyle = ink;
-        context.lineWidth = 26;
-        context.stroke();
+          for (let row = 0; row <= rows; row++) {
+            const v = row / rows;
 
-        context.beginPath();
-        context.moveTo(centerX - 560, centerY + 82);
-        context.bezierCurveTo(
-          centerX - 260,
-          centerY + 155,
-          centerX + 270,
-          centerY + 155,
-          centerX + 560,
-          centerY + 82,
-        );
-        context.strokeStyle = ink;
-        context.lineWidth = 10;
-        context.stroke();
+            for (let column = 0; column <= columns; column++) {
+              const t = column / columns;
+              const upper = lidPoint(t, true);
+              const lower = lidPoint(t, false);
+              const x = upper.x;
+              const y = lower.y + (upper.y - lower.y) * v;
+              const normalizedX = x / (eyeWidth / 2);
+              const normalizedY = y / 0.36;
+              const curvature =
+                0.048 *
+                Math.max(
+                  0,
+                  1 - normalizedX * normalizedX * 0.72 - normalizedY * normalizedY * 0.42,
+                );
 
-        const irisX = centerX;
-        const irisY = centerY + 54;
-        const irisRadius = 145;
+              positions.push(x, y, 0.632 + curvature);
+              uvs.push(t, v);
+            }
+          }
 
-        context.beginPath();
-        context.arc(irisX, irisY, irisRadius, 0, Math.PI * 2);
-        context.fillStyle = paper;
-        context.fill();
-        context.strokeStyle = ink;
-        context.lineWidth = 24;
-        context.stroke();
+          for (let row = 0; row < rows; row++) {
+            for (let column = 0; column < columns; column++) {
+              const a = row * (columns + 1) + column;
+              const b = a + 1;
+              const c = a + columns + 1;
+              const d = c + 1;
 
-        for (let index = 0; index < 64; index++) {
-          const angle = (index / 64) * Math.PI * 2;
-          const inner = 54;
-          const outer = 128;
+              indices.push(a, c, b, b, c, d);
+            }
+          }
 
-          context.beginPath();
-          context.moveTo(
-            irisX + Math.cos(angle) * inner,
-            irisY + Math.sin(angle) * inner,
+          const geometry = new THREE.BufferGeometry();
+          geometry.setAttribute(
+            "position",
+            new THREE.Float32BufferAttribute(positions, 3),
           );
-          context.lineTo(
-            irisX + Math.cos(angle) * outer,
-            irisY + Math.sin(angle) * outer,
-          );
-          context.strokeStyle =
-            index % 4 === 0 ? "rgba(7, 7, 7, 0.72)" : "rgba(7, 7, 7, 0.42)";
-          context.lineWidth = index % 4 === 0 ? 5 : 3;
-          context.stroke();
-        }
+          geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+          geometry.setIndex(indices);
+          geometry.computeVertexNormals();
 
-        context.beginPath();
-        context.arc(irisX, irisY, 72, 0, Math.PI * 2);
-        context.fillStyle = ink;
-        context.fill();
+          return geometry;
+        };
 
-        context.beginPath();
-        context.ellipse(irisX + 54, irisY - 58, 43, 21, -0.2, 0, Math.PI * 2);
-        context.fillStyle = "#ffffff";
-        context.fill();
-
-        for (let index = 0; index < 9; index++) {
-          const x = centerX - 300 + index * 75;
-
-          context.beginPath();
-          context.moveTo(x, centerY + 132);
-          context.lineTo(x + 34, centerY + 228);
-          context.strokeStyle = "rgba(7, 7, 7, 0.72)";
-          context.lineWidth = 6;
-          context.stroke();
-        }
-
-        const eyeTexture = trackDisposable(
-          new THREE.CanvasTexture(eyeTextureCanvas),
-        );
-        eyeTexture.colorSpace = THREE.SRGBColorSpace;
-
-        const faceMaterial = trackDisposable(
+        const scleraMaterial = trackDisposable(
           new THREE.MeshBasicMaterial({
-            map: eyeTexture,
-            transparent: true,
+            color: "#f8f6ef",
+            side: THREE.DoubleSide,
+          }),
+        );
+        const sclera = new THREE.Mesh(
+          trackDisposable(createScleraGeometry()),
+          scleraMaterial,
+        );
+        eyeRig.add(sclera);
+
+        const irisMaterial = trackDisposable(
+          new THREE.MeshBasicMaterial({
+            map: irisTexture,
+            side: THREE.DoubleSide,
             toneMapped: false,
           }),
         );
-        const face = new THREE.Mesh(
-          trackDisposable(new THREE.PlaneGeometry(3.8, 1.9)),
-          faceMaterial,
+        const iris = new THREE.Mesh(
+          trackDisposable(new THREE.CircleGeometry(0.255, 128)),
+          irisMaterial,
         );
-        face.position.z = 0.04;
-        eyeRig.add(face);
+        iris.position.set(0, -0.045, 0.695);
+        eyeRig.add(iris);
+
+        const cornea = new THREE.Mesh(
+          trackDisposable(new THREE.CircleGeometry(0.276, 128)),
+          trackDisposable(
+            new THREE.MeshPhysicalMaterial({
+              clearcoat: 1,
+              clearcoatRoughness: 0.02,
+              color: "#ffffff",
+              metalness: 0,
+              opacity: 0.18,
+              roughness: 0.02,
+              side: THREE.DoubleSide,
+              transparent: true,
+              transmission: 0.68,
+            }),
+          ),
+        );
+        cornea.position.set(0, -0.045, 0.704);
+        eyeRig.add(cornea);
+
+        const createShapeMesh = (
+          points: Array<[number, number]>,
+          material: InstanceType<typeof THREE.Material>,
+          z: number,
+        ) => {
+          const shape = new THREE.Shape();
+
+          points.forEach(([x, y], index) => {
+            if (index === 0) {
+              shape.moveTo(x, y);
+            } else {
+              shape.lineTo(x, y);
+            }
+          });
+          shape.closePath();
+
+          const mesh = new THREE.Mesh(
+            trackDisposable(new THREE.ShapeGeometry(shape, 32)),
+            material,
+          );
+          mesh.position.z = z;
+
+          return mesh;
+        };
+
+        const createLidLine = (
+          upper: boolean,
+          radius: number,
+        ) => {
+          const points = Array.from({ length: 68 }, (_, index) => {
+            const t = 0.025 + (index / 67) * 0.95;
+            const point = lidPoint(t, upper, 0.736);
+
+            point.y += upper ? -0.026 : 0.022;
+
+            return point;
+          });
+
+          return new THREE.Mesh(
+            trackDisposable(
+              new THREE.TubeGeometry(
+                new THREE.CatmullRomCurve3(points),
+                96,
+                radius,
+                8,
+                false,
+              ),
+            ),
+            inkMaterial,
+          );
+        };
+
+        eyeRig.add(createLidLine(true, 0.011));
+        eyeRig.add(createLidLine(false, 0.008));
 
         const state = {
           dragging: false,
@@ -223,10 +320,10 @@ export function EyeModelLab() {
           const deltaY = event.clientY - state.lastY;
           state.lastX = event.clientX;
           state.lastY = event.clientY;
-          state.targetRotationY += deltaX * 0.006;
+          state.targetRotationY += deltaX * 0.008;
           state.targetRotationX = Math.max(
-            -0.34,
-            Math.min(0.3, state.targetRotationX + deltaY * 0.005),
+            -0.55,
+            Math.min(0.38, state.targetRotationX + deltaY * 0.006),
           );
         };
         const onPointerUp = (event: PointerEvent) => {
