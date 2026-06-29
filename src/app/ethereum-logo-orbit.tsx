@@ -1342,7 +1342,7 @@ export function EthereumLogoOrbit({
           worldMapGroup.add(flatMap);
 
           const binaryGlyphGeometry = trackDisposable(
-            new THREE.PlaneGeometry(0.066, 0.086),
+            new THREE.PlaneGeometry(0.03, 0.04),
           );
           const createBinaryGlyphTexture = (glyph: "0" | "1") => {
             const glyphCanvas = document.createElement("canvas");
@@ -1392,12 +1392,12 @@ export function EthereumLogoOrbit({
                 transparent: true,
               }),
             );
-          const binaryStreams = Array.from({ length: 82 }, (_, streamIndex) => {
+          const binaryStreams = Array.from({ length: 260 }, (_, streamIndex) => {
             const sample =
               projectedLandPoints[
                 Math.floor(Math.random() * projectedLandPoints.length)
               ] ?? { height: 0, x: 0, z: 0 };
-            const glyphCount = 3 + (streamIndex % 3);
+            const glyphCount = 6 + (streamIndex % 4);
             const color =
               binaryStreamPalette[streamIndex % binaryStreamPalette.length];
             const glyphs = Array.from({ length: glyphCount }, (_, glyphIndex) => {
@@ -1408,7 +1408,7 @@ export function EthereumLogoOrbit({
 
               mesh.position.set(
                 sample.x,
-                0.13 + sample.height + glyphIndex * 0.09,
+                0.096 + sample.height + glyphIndex * 0.028,
                 sample.z,
               );
               mesh.rotation.y = (Math.random() - 0.5) * 0.28;
@@ -1437,7 +1437,7 @@ export function EthereumLogoOrbit({
           updateStoryLayers.push((time) => {
             storyStartedAt ??= time;
             const storyTime = time - storyStartedAt;
-            const activeStreamLimit = 31;
+            const activeStreamLimit = 128;
             let activeStreamCount = binaryStreams.reduce(
               (count, streamState) =>
                 streamState.startedAt === null ? count : count + 1,
@@ -1488,11 +1488,11 @@ export function EthereumLogoOrbit({
                 mesh.visible = visibility > 0.01;
                 mesh.position.set(
                   streamState.baseX,
-                  0.145 + streamState.baseHeight + offset * 0.48 + progress * 0.16,
+                  0.1 + streamState.baseHeight + offset * 0.18 + progress * 0.085,
                   streamState.baseZ,
                 );
-                mesh.scale.setScalar(0.68 + visibility * 0.18);
-                material.opacity = visibility * 0.88;
+                mesh.scale.setScalar(0.36 + visibility * 0.08);
+                material.opacity = visibility * 0.96;
               });
             });
           });
