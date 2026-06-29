@@ -1342,7 +1342,7 @@ export function EthereumLogoOrbit({
           worldMapGroup.add(flatMap);
 
           const binaryGlyphGeometry = trackDisposable(
-            new THREE.PlaneGeometry(0.102, 0.132),
+            new THREE.PlaneGeometry(0.051, 0.066),
           );
           const createBinaryGlyphTexture = (glyph: "0" | "1") => {
             const glyphCanvas = document.createElement("canvas");
