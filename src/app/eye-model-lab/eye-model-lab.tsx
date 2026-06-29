@@ -158,12 +158,12 @@ export function EyeModelLab() {
           }),
         );
 
-        const eyeWidth = 2.22;
+        const eyeWidth = 2.08;
         const lidPoint = (t: number, upper: boolean, z = 0.69) => {
           const x = -eyeWidth / 2 + t * eyeWidth;
           const arch = Math.sin(t * Math.PI);
           const base = -0.006 + (t - 0.5) * 0.014;
-          const y = upper ? base + arch * 0.335 : base - arch * 0.285;
+          const y = upper ? base + arch * 0.425 : base - arch * 0.34;
 
           return new THREE.Vector3(x, y, z);
         };
@@ -247,14 +247,14 @@ export function EyeModelLab() {
           }),
         );
         const iris = new THREE.Mesh(
-          trackDisposable(new THREE.CircleGeometry(0.265, 128)),
+          trackDisposable(new THREE.CircleGeometry(0.255, 128)),
           irisMaterial,
         );
-        iris.position.set(0, 0, 0.695);
+        iris.position.set(0, -0.045, 0.695);
         eyeRig.add(iris);
 
         const cornea = new THREE.Mesh(
-          trackDisposable(new THREE.CircleGeometry(0.288, 128)),
+          trackDisposable(new THREE.CircleGeometry(0.276, 128)),
           trackDisposable(
             new THREE.MeshPhysicalMaterial({
               clearcoat: 1,
@@ -269,7 +269,7 @@ export function EyeModelLab() {
             }),
           ),
         );
-        cornea.position.set(0, 0, 0.704);
+        cornea.position.set(0, -0.045, 0.704);
         eyeRig.add(cornea);
 
         const createShapeMesh = (
