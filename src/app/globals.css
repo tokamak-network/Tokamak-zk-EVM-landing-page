@@ -63,28 +63,6 @@ main {
   overflow: hidden;
 }
 
-.world-map-lab {
-  position: fixed;
-  inset: 0;
-  min-height: 100vh;
-  overflow: hidden;
-  background:
-    radial-gradient(ellipse at 50% 44%, rgba(62, 178, 225, 0.14), transparent 44%),
-    linear-gradient(180deg, #080b0f 0%, #020304 100%);
-}
-
-.world-map-lab__canvas {
-  display: block;
-  width: 100vw;
-  height: 100vh;
-  cursor: grab;
-  touch-action: none;
-}
-
-.world-map-lab__canvas:active {
-  cursor: grabbing;
-}
-
 .site-background {
   position: fixed;
   inset: 0;

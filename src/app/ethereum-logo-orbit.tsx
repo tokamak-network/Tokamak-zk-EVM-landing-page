@@ -1115,7 +1115,7 @@ export function EthereumLogoOrbit({
 
           const worldMapGroup = new THREE.Group();
           worldMapGroup.position.set(0, -1.68, 0.18);
-          worldMapGroup.rotation.x = -0.18;
+          worldMapGroup.rotation.x = 0;
           worldMapGroup.scale.setScalar(1.08);
           storyGroup.add(worldMapGroup);
 
@@ -1134,30 +1134,6 @@ export function EthereumLogoOrbit({
           mapColorTexture.colorSpace = THREE.SRGBColorSpace;
           mapColorTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
-          const heightImageData = await new Promise<ImageData>((resolve, reject) => {
-            const image = new Image();
-
-            image.onload = () => {
-              const heightCanvas = document.createElement("canvas");
-              heightCanvas.width = image.naturalWidth;
-              heightCanvas.height = image.naturalHeight;
-              const context = heightCanvas.getContext("2d");
-
-              if (!context) {
-                reject(new Error("Height map canvas context is unavailable."));
-                return;
-              }
-
-              context.drawImage(image, 0, 0);
-              resolve(
-                context.getImageData(0, 0, heightCanvas.width, heightCanvas.height),
-              );
-            };
-            image.onerror = () => {
-              reject(new Error("Unable to load Natural Earth height map."));
-            };
-            image.src = "/textures/maps/world-relief-height.png?v=finer-relief-patches";
-          });
           const colorImageData = await new Promise<ImageData>((resolve, reject) => {
             const image = new Image();
 
@@ -1185,7 +1161,6 @@ export function EthereumLogoOrbit({
 
           const mapRadiusX = 1.76;
           const mapRadiusZ = 0.82;
-          const reliefHeight = 0.15;
           const mapSegmentsX = 164;
           const mapSegmentsZ = 82;
           const mapPositions: number[] = [];
@@ -1270,53 +1245,6 @@ export function EthereumLogoOrbit({
               raised: !blue && (green || ochre || white || neutralLand),
             };
           };
-          const landMaskCanvas = document.createElement("canvas");
-          landMaskCanvas.width = 1024;
-          landMaskCanvas.height = 512;
-          const landMaskContext = landMaskCanvas.getContext("2d");
-
-          if (!landMaskContext) {
-            throw new Error("Land mask canvas context is unavailable.");
-          }
-
-          const landMaskImage = landMaskContext.createImageData(
-            landMaskCanvas.width,
-            landMaskCanvas.height,
-          );
-
-          for (let y = 0; y < landMaskCanvas.height; y += 1) {
-            for (let x = 0; x < landMaskCanvas.width; x += 1) {
-              const u = x / (landMaskCanvas.width - 1);
-              const v = y / (landMaskCanvas.height - 1);
-              const value = classifyMapColor(u, v).raised ? 255 : 0;
-              const index = (y * landMaskCanvas.width + x) * 4;
-
-              landMaskImage.data[index] = value;
-              landMaskImage.data[index + 1] = value;
-              landMaskImage.data[index + 2] = value;
-              landMaskImage.data[index + 3] = 255;
-            }
-          }
-
-          landMaskContext.putImageData(landMaskImage, 0, 0);
-          const landMaskTexture = trackDisposable(
-            new THREE.CanvasTexture(landMaskCanvas),
-          );
-          landMaskTexture.minFilter = THREE.LinearFilter;
-          landMaskTexture.magFilter = THREE.LinearFilter;
-          landMaskTexture.needsUpdate = true;
-          const sampleRelief = (u: number, v: number) => {
-            const x = Math.max(
-              0,
-              Math.min(heightImageData.width - 1, Math.round(u * (heightImageData.width - 1))),
-            );
-            const y = Math.max(
-              0,
-              Math.min(heightImageData.height - 1, Math.round(v * (heightImageData.height - 1))),
-            );
-            const index = (y * heightImageData.width + x) * 4;
-            return heightImageData.data[index] / 255;
-          };
           const projectMapPoint = (u: number, v: number) => {
             const latitude = 1 - v * 2;
             const longitude = u * 2 - 1;
@@ -1327,8 +1255,6 @@ export function EthereumLogoOrbit({
               z: latitude * mapRadiusZ,
             };
           };
-          const reliefToHeight = (relief: number) =>
-            Math.pow(relief, 1.12) * reliefHeight;
 
           for (let zIndex = 0; zIndex <= mapSegmentsZ; zIndex += 1) {
             const v = zIndex / mapSegmentsZ;
@@ -1336,8 +1262,7 @@ export function EthereumLogoOrbit({
             for (let xIndex = 0; xIndex <= mapSegmentsX; xIndex += 1) {
               const u = xIndex / mapSegmentsX;
               const projected = projectMapPoint(u, v);
-              const relief = sampleRelief(u, v);
-              const height = relief > 0 ? reliefToHeight(relief) : 0;
+              const height = 0;
 
               mapPositions.push(projected.x, height, projected.z);
               mapUvs.push(u, v);
@@ -1345,7 +1270,6 @@ export function EthereumLogoOrbit({
               if (
                 zIndex % 4 === 0 &&
                 xIndex % 4 === 0 &&
-                height > 0.016 &&
                 classifyMapColor(u, v).raised &&
                 v > 0.08 &&
                 v < 0.9
@@ -1372,25 +1296,10 @@ export function EthereumLogoOrbit({
             }
           }
 
-          const reliefMapGeometry = trackDisposable(new THREE.BufferGeometry());
-          reliefMapGeometry.setAttribute(
-            "position",
-            new THREE.Float32BufferAttribute(mapPositions, 3),
-          );
-          reliefMapGeometry.setAttribute(
-            "uv",
-            new THREE.Float32BufferAttribute(mapUvs, 2),
-          );
-          reliefMapGeometry.setIndex(mapIndices);
-          reliefMapGeometry.computeVertexNormals();
-
-          const flatMapPositions = mapPositions.map((value, index) =>
-            index % 3 === 1 ? 0 : value,
-          );
           const flatMapGeometry = trackDisposable(new THREE.BufferGeometry());
           flatMapGeometry.setAttribute(
             "position",
-            new THREE.Float32BufferAttribute(flatMapPositions, 3),
+            new THREE.Float32BufferAttribute(mapPositions, 3),
           );
           flatMapGeometry.setAttribute(
             "uv",
@@ -1417,19 +1326,6 @@ export function EthereumLogoOrbit({
           reliefBase.renderOrder = 3;
           worldMapGroup.add(reliefBase);
 
-          const reliefMapMaterial = trackDisposable(
-            new THREE.MeshStandardMaterial({
-              alphaMap: landMaskTexture,
-              alphaTest: 0.45,
-              color: "#b9cfd8",
-              emissive: "#0a1f2a",
-              emissiveIntensity: 0.1,
-              map: mapColorTexture,
-              metalness: 0.08,
-              roughness: 0.62,
-              side: THREE.DoubleSide,
-            }),
-          );
           const flatMapMaterial = trackDisposable(
             new THREE.MeshStandardMaterial({
               color: "#d3e1e3",
@@ -1444,30 +1340,6 @@ export function EthereumLogoOrbit({
           const flatMap = new THREE.Mesh(flatMapGeometry, flatMapMaterial);
           flatMap.renderOrder = 4;
           worldMapGroup.add(flatMap);
-
-          const reliefMap = new THREE.Mesh(reliefMapGeometry, reliefMapMaterial);
-          reliefMap.renderOrder = 5;
-          worldMapGroup.add(reliefMap);
-
-          const reliefRimMaterial = trackDisposable(
-            new THREE.MeshBasicMaterial({
-              blending: THREE.AdditiveBlending,
-              color: "#54d7ff",
-              depthWrite: false,
-              opacity: 0.18,
-              side: THREE.DoubleSide,
-              transparent: true,
-            }),
-          );
-          const reliefRimGeometry = trackDisposable(
-            new THREE.RingGeometry(0.985, 1, 192),
-          );
-          reliefRimGeometry.scale(mapRadiusX * 1.022, mapRadiusZ * 1.062, 1);
-          reliefRimGeometry.rotateX(-Math.PI / 2);
-          const reliefRim = new THREE.Mesh(reliefRimGeometry, reliefRimMaterial);
-          reliefRim.position.y = 0.012;
-          reliefRim.renderOrder = 6;
-          worldMapGroup.add(reliefRim);
 
           const binaryGlyphGeometry = trackDisposable(
             new THREE.PlaneGeometry(0.102, 0.132),
