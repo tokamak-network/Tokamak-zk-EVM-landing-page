@@ -1063,44 +1063,88 @@ export function EthereumLogoOrbit({
             const width = faceEyeCanvas.width;
             const height = faceEyeCanvas.height;
             const centerX = width / 2;
-            const centerY = height / 2 + 8;
+            const centerY = height / 2 + 18;
+            const makeEyePath = () => {
+              faceEyeContext.beginPath();
+              faceEyeContext.moveTo(96, centerY + 4);
+              faceEyeContext.bezierCurveTo(254, 106, 728, 76, 930, centerY + 4);
+              faceEyeContext.bezierCurveTo(732, 424, 262, 408, 96, centerY + 4);
+              faceEyeContext.closePath();
+            };
 
             faceEyeContext.clearRect(0, 0, width, height);
             faceEyeContext.save();
+            faceEyeContext.shadowColor = "rgba(0, 0, 0, 0.5)";
+            faceEyeContext.shadowBlur = 26;
+
+            const upperLidGradient = faceEyeContext.createLinearGradient(
+              0,
+              52,
+              0,
+              260,
+            );
+            upperLidGradient.addColorStop(0, "rgba(13, 25, 38, 0.92)");
+            upperLidGradient.addColorStop(0.46, "rgba(111, 87, 83, 0.88)");
+            upperLidGradient.addColorStop(1, "rgba(32, 44, 58, 0.48)");
             faceEyeContext.beginPath();
-            faceEyeContext.moveTo(112, centerY + 6);
-            faceEyeContext.bezierCurveTo(255, 92, 725, 72, 912, centerY + 8);
-            faceEyeContext.bezierCurveTo(722, 425, 284, 412, 112, centerY + 6);
+            faceEyeContext.moveTo(62, centerY - 14);
+            faceEyeContext.bezierCurveTo(258, 14, 752, 8, 966, centerY - 10);
+            faceEyeContext.bezierCurveTo(788, 144, 274, 166, 62, centerY - 14);
             faceEyeContext.closePath();
+            faceEyeContext.fillStyle = upperLidGradient;
+            faceEyeContext.fill();
+
+            const lowerLidGradient = faceEyeContext.createLinearGradient(
+              0,
+              260,
+              0,
+              472,
+            );
+            lowerLidGradient.addColorStop(0, "rgba(171, 134, 122, 0.72)");
+            lowerLidGradient.addColorStop(0.62, "rgba(56, 55, 65, 0.62)");
+            lowerLidGradient.addColorStop(1, "rgba(4, 9, 16, 0.1)");
+            faceEyeContext.beginPath();
+            faceEyeContext.moveTo(88, centerY + 14);
+            faceEyeContext.bezierCurveTo(280, 444, 742, 440, 940, centerY + 16);
+            faceEyeContext.bezierCurveTo(746, 360, 282, 356, 88, centerY + 14);
+            faceEyeContext.closePath();
+            faceEyeContext.fillStyle = lowerLidGradient;
+            faceEyeContext.fill();
+            faceEyeContext.restore();
+
+            faceEyeContext.save();
+            makeEyePath();
             faceEyeContext.clip();
 
             const scleraGradient = faceEyeContext.createRadialGradient(
+              centerX - 34,
+              centerY - 16,
+              54,
               centerX,
-              centerY,
-              72,
-              centerX,
-              centerY,
-              430,
+              centerY + 4,
+              454,
             );
-            scleraGradient.addColorStop(0, "rgba(246, 253, 255, 0.96)");
-            scleraGradient.addColorStop(0.48, "rgba(170, 229, 244, 0.82)");
-            scleraGradient.addColorStop(1, "rgba(25, 77, 104, 0.18)");
+            scleraGradient.addColorStop(0, "rgba(250, 252, 247, 0.98)");
+            scleraGradient.addColorStop(0.34, "rgba(229, 237, 232, 0.94)");
+            scleraGradient.addColorStop(0.72, "rgba(164, 178, 184, 0.78)");
+            scleraGradient.addColorStop(1, "rgba(56, 68, 80, 0.46)");
             faceEyeContext.fillStyle = scleraGradient;
             faceEyeContext.fillRect(0, 0, width, height);
 
             const lidShadow = faceEyeContext.createLinearGradient(
               0,
-              92,
+              78,
               0,
-              330,
+              352,
             );
-            lidShadow.addColorStop(0, "rgba(1, 8, 16, 0.76)");
-            lidShadow.addColorStop(0.42, "rgba(7, 39, 61, 0.12)");
-            lidShadow.addColorStop(1, "rgba(255, 255, 255, 0.04)");
+            lidShadow.addColorStop(0, "rgba(3, 8, 13, 0.5)");
+            lidShadow.addColorStop(0.32, "rgba(20, 32, 42, 0.1)");
+            lidShadow.addColorStop(0.78, "rgba(255, 255, 255, 0.02)");
+            lidShadow.addColorStop(1, "rgba(18, 12, 14, 0.18)");
             faceEyeContext.fillStyle = lidShadow;
             faceEyeContext.fillRect(0, 0, width, height);
 
-            const irisRadius = 116;
+            const irisRadius = 128;
             const irisGradient = faceEyeContext.createRadialGradient(
               centerX,
               centerY,
@@ -1109,10 +1153,10 @@ export function EthereumLogoOrbit({
               centerY,
               irisRadius,
             );
-            irisGradient.addColorStop(0, "rgba(187, 250, 255, 0.96)");
-            irisGradient.addColorStop(0.34, "rgba(58, 196, 232, 0.88)");
-            irisGradient.addColorStop(0.72, "rgba(10, 92, 143, 0.9)");
-            irisGradient.addColorStop(1, "rgba(4, 29, 54, 0.98)");
+            irisGradient.addColorStop(0, "rgba(185, 229, 219, 0.98)");
+            irisGradient.addColorStop(0.28, "rgba(84, 151, 147, 0.96)");
+            irisGradient.addColorStop(0.66, "rgba(34, 85, 99, 0.98)");
+            irisGradient.addColorStop(1, "rgba(8, 25, 38, 1)");
             faceEyeContext.beginPath();
             faceEyeContext.arc(centerX, centerY, irisRadius, 0, Math.PI * 2);
             faceEyeContext.fillStyle = irisGradient;
@@ -1134,16 +1178,16 @@ export function EthereumLogoOrbit({
               );
               faceEyeContext.strokeStyle =
                 rayIndex % 3 === 0
-                  ? "rgba(213, 255, 255, 0.42)"
-                  : "rgba(0, 34, 62, 0.28)";
+                  ? "rgba(220, 248, 230, 0.36)"
+                  : "rgba(4, 35, 44, 0.42)";
               faceEyeContext.lineWidth = rayIndex % 4 === 0 ? 3.8 : 2;
               faceEyeContext.stroke();
             }
 
             faceEyeContext.beginPath();
-            faceEyeContext.arc(centerX, centerY, 126, 0, Math.PI * 2);
-            faceEyeContext.strokeStyle = "rgba(175, 246, 255, 0.72)";
-            faceEyeContext.lineWidth = 8;
+            faceEyeContext.arc(centerX, centerY, 138, 0, Math.PI * 2);
+            faceEyeContext.strokeStyle = "rgba(16, 35, 42, 0.72)";
+            faceEyeContext.lineWidth = 10;
             faceEyeContext.stroke();
 
             const pupilGradient = faceEyeContext.createRadialGradient(
@@ -1154,42 +1198,96 @@ export function EthereumLogoOrbit({
               centerY,
               58,
             );
-            pupilGradient.addColorStop(0, "rgba(17, 37, 53, 1)");
-            pupilGradient.addColorStop(0.42, "rgba(0, 5, 12, 1)");
+            pupilGradient.addColorStop(0, "rgba(22, 28, 32, 1)");
+            pupilGradient.addColorStop(0.44, "rgba(1, 3, 5, 1)");
             pupilGradient.addColorStop(1, "rgba(0, 0, 0, 1)");
             faceEyeContext.beginPath();
-            faceEyeContext.arc(centerX, centerY, 58, 0, Math.PI * 2);
+            faceEyeContext.arc(centerX, centerY, 62, 0, Math.PI * 2);
             faceEyeContext.fillStyle = pupilGradient;
             faceEyeContext.fill();
 
             faceEyeContext.beginPath();
-            faceEyeContext.ellipse(centerX + 38, centerY - 48, 28, 17, -0.35, 0, Math.PI * 2);
+            faceEyeContext.ellipse(
+              centerX + 42,
+              centerY - 54,
+              34,
+              20,
+              -0.35,
+              0,
+              Math.PI * 2,
+            );
             faceEyeContext.fillStyle = "rgba(255, 255, 255, 0.9)";
             faceEyeContext.fill();
             faceEyeContext.beginPath();
-            faceEyeContext.ellipse(centerX - 30, centerY + 42, 18, 9, 0.2, 0, Math.PI * 2);
-            faceEyeContext.fillStyle = "rgba(150, 238, 255, 0.38)";
+            faceEyeContext.ellipse(
+              centerX - 35,
+              centerY + 47,
+              20,
+              10,
+              0.2,
+              0,
+              Math.PI * 2,
+            );
+            faceEyeContext.fillStyle = "rgba(205, 243, 255, 0.38)";
             faceEyeContext.fill();
             faceEyeContext.restore();
 
-            faceEyeContext.beginPath();
-            faceEyeContext.moveTo(112, centerY + 6);
-            faceEyeContext.bezierCurveTo(255, 92, 725, 72, 912, centerY + 8);
-            faceEyeContext.bezierCurveTo(722, 425, 284, 412, 112, centerY + 6);
-            faceEyeContext.closePath();
-            faceEyeContext.strokeStyle = "rgba(232, 252, 255, 0.94)";
-            faceEyeContext.lineWidth = 16;
-            faceEyeContext.shadowColor = "rgba(89, 212, 255, 0.9)";
-            faceEyeContext.shadowBlur = 24;
+            faceEyeContext.save();
+            makeEyePath();
+            faceEyeContext.strokeStyle = "rgba(21, 13, 15, 0.95)";
+            faceEyeContext.lineWidth = 22;
+            faceEyeContext.shadowColor = "rgba(0, 0, 0, 0.72)";
+            faceEyeContext.shadowBlur = 18;
             faceEyeContext.stroke();
 
             faceEyeContext.beginPath();
-            faceEyeContext.moveTo(138, centerY - 2);
-            faceEyeContext.bezierCurveTo(286, 78, 714, 66, 890, centerY + 2);
-            faceEyeContext.strokeStyle = "rgba(255, 255, 255, 0.56)";
-            faceEyeContext.lineWidth = 7;
-            faceEyeContext.shadowBlur = 10;
+            faceEyeContext.moveTo(116, centerY - 4);
+            faceEyeContext.bezierCurveTo(270, 82, 720, 64, 914, centerY - 2);
+            faceEyeContext.strokeStyle = "rgba(223, 194, 182, 0.78)";
+            faceEyeContext.lineWidth = 8;
+            faceEyeContext.shadowBlur = 8;
             faceEyeContext.stroke();
+
+            for (let lashIndex = 0; lashIndex < 42; lashIndex++) {
+              const t = lashIndex / 41;
+              const x = 138 + t * 760;
+              const lidY =
+                centerY -
+                4 -
+                Math.sin(t * Math.PI) * 150 +
+                Math.sin(t * Math.PI * 2) * 6;
+              const lashLength = 42 + Math.sin(t * Math.PI) * 36;
+              const outward = (t - 0.5) * 0.85;
+
+              faceEyeContext.beginPath();
+              faceEyeContext.moveTo(x, lidY);
+              faceEyeContext.bezierCurveTo(
+                x + outward * 34,
+                lidY - lashLength * 0.36,
+                x + outward * 62,
+                lidY - lashLength * 0.78,
+                x + outward * 88,
+                lidY - lashLength,
+              );
+              faceEyeContext.strokeStyle = "rgba(10, 8, 10, 0.9)";
+              faceEyeContext.lineWidth = 5 - Math.abs(t - 0.5) * 3;
+              faceEyeContext.stroke();
+            }
+
+            for (let lashIndex = 0; lashIndex < 20; lashIndex++) {
+              const t = lashIndex / 19;
+              const x = 190 + t * 650;
+              const lidY = centerY + 76 + Math.sin(t * Math.PI) * 88;
+              const lashLength = 16 + Math.sin(t * Math.PI) * 18;
+
+              faceEyeContext.beginPath();
+              faceEyeContext.moveTo(x, lidY);
+              faceEyeContext.lineTo(x + (t - 0.5) * 28, lidY + lashLength);
+              faceEyeContext.strokeStyle = "rgba(12, 8, 10, 0.5)";
+              faceEyeContext.lineWidth = 2.5;
+              faceEyeContext.stroke();
+            }
+            faceEyeContext.restore();
           }
 
           const faceEyeTexture = trackDisposable(
