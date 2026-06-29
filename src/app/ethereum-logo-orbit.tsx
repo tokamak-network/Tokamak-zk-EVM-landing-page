@@ -1385,8 +1385,8 @@ export function EthereumLogoOrbit({
             );
           const binaryGlyphSpacing = 0.0425;
           const binaryGlyphDelay = 0.0275;
-          const binaryStreamCount = 44;
-          const binaryStreamActiveSpacing = 0.32;
+          const binaryStreamCount = 96;
+          const binaryStreamActiveSpacing = 0.24;
           const binaryStreamActiveSpacingSq =
             binaryStreamActiveSpacing * binaryStreamActiveSpacing;
           const binaryStreamAnchors: Array<{
@@ -1466,7 +1466,7 @@ export function EthereumLogoOrbit({
               baseZ: sample.z,
               duration: randomBetween(0.9, 1.7),
               glyphs,
-              nextStartAt: randomBetween(0, 1.8),
+              nextStartAt: randomBetween(0, 0.65),
               startedAt: null as number | null,
             };
           });
@@ -1474,7 +1474,7 @@ export function EthereumLogoOrbit({
           updateStoryLayers.push((time) => {
             storyStartedAt ??= time;
             const storyTime = time - storyStartedAt;
-            const activeStreamLimit = 17;
+            const activeStreamLimit = 32;
             const hasNearbyActiveStream = (baseX: number, baseZ: number) =>
               binaryStreams.some((streamState) => {
                 if (streamState.startedAt === null) {
@@ -1506,7 +1506,7 @@ export function EthereumLogoOrbit({
                 streamState.startedAt === null &&
                 storyTime >= streamState.nextStartAt
               ) {
-                streamState.nextStartAt = storyTime + randomBetween(0.12, 0.4);
+                streamState.nextStartAt = storyTime + randomBetween(0.04, 0.16);
               }
 
               if (streamState.startedAt === null) {
@@ -1522,7 +1522,7 @@ export function EthereumLogoOrbit({
 
               if (progress >= 1) {
                 streamState.startedAt = null;
-                streamState.nextStartAt = storyTime + randomBetween(0.08, 1.1);
+                streamState.nextStartAt = storyTime + randomBetween(0.02, 0.35);
                 streamState.glyphs.forEach(({ material, mesh }) => {
                   material.opacity = 0;
                   mesh.visible = false;
