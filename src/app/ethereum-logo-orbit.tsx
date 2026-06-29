@@ -361,14 +361,8 @@ export function EthereumLogoOrbit({
         const validatorFaceGeometry = trackDisposable(
           new THREE.BoxGeometry(0.11, 0.19, 0.012),
         );
-        const validatorStateGeometry = trackDisposable(
-          new THREE.OctahedronGeometry(0.045, 0),
-        );
-        const validatorPortGeometry = trackDisposable(
-          new THREE.BoxGeometry(0.074, 0.01, 0.012),
-        );
-        const validatorLightGeometry = trackDisposable(
-          new THREE.SphereGeometry(0.011, 10, 8),
+        const validatorSlotGeometry = trackDisposable(
+          new THREE.BoxGeometry(0.074, 0.006, 0.004),
         );
         const personMaterial = trackDisposable(
           new THREE.MeshStandardMaterial({
@@ -398,9 +392,7 @@ export function EthereumLogoOrbit({
             emissive: "#0e2c5a",
             emissiveIntensity: 0.36,
             metalness: 0.24,
-            opacity: 0.88,
             roughness: 0.42,
-            transparent: true,
           }),
         );
         const validatorPanelMaterial = trackDisposable(
@@ -409,18 +401,16 @@ export function EthereumLogoOrbit({
             emissive: "#1a5f9d",
             emissiveIntensity: 0.28,
             metalness: 0.1,
-            opacity: 0.72,
             roughness: 0.34,
-            transparent: true,
           }),
         );
-        const validatorSignalMaterial = trackDisposable(
-          new THREE.MeshBasicMaterial({
-            blending: THREE.AdditiveBlending,
-            color: "#dff7ff",
-            depthWrite: false,
-            opacity: 0.86,
-            transparent: true,
+        const validatorSlotMaterial = trackDisposable(
+          new THREE.MeshStandardMaterial({
+            color: "#9fe4ff",
+            emissive: "#35a8ff",
+            emissiveIntensity: 0.82,
+            metalness: 0,
+            roughness: 0.28,
           }),
         );
         const verificationLineMaterial = trackDisposable(
@@ -525,7 +515,7 @@ export function EthereumLogoOrbit({
             : personMaterial;
 
           if (variant === "strength") {
-            const nodeRotation = angle + Math.PI;
+            const nodeRotation = -angle - Math.PI / 2;
             const heightOffset = (index % 4) * 0.012;
 
             person.rotation.y = nodeRotation;
@@ -545,39 +535,17 @@ export function EthereumLogoOrbit({
             face.position.set(0, -0.016 + heightOffset, 0.072);
             person.add(face);
 
-            const stateShard = new THREE.Mesh(
-              validatorStateGeometry,
-              validatorSignalMaterial,
-            );
-            stateShard.position.y = 0.15 + heightOffset;
-            stateShard.rotation.y = Math.PI / 4;
-            stateShard.rotation.z = Math.PI / 8;
-            person.add(stateShard);
-
             for (let layerIndex = 0; layerIndex < 3; layerIndex++) {
-              const clientLayer = new THREE.Mesh(
-                validatorPortGeometry,
-                validatorPanelMaterial,
+              const clientSlot = new THREE.Mesh(
+                validatorSlotGeometry,
+                validatorSlotMaterial,
               );
-              clientLayer.position.set(
-                -0.016,
+              clientSlot.position.set(
+                0,
                 0.046 - layerIndex * 0.055 + heightOffset,
                 0.082,
               );
-              person.add(clientLayer);
-            }
-
-            for (let lightIndex = 0; lightIndex < 4; lightIndex++) {
-              const light = new THREE.Mesh(
-                validatorLightGeometry,
-                validatorSignalMaterial,
-              );
-              light.position.set(
-                0.048,
-                0.066 - lightIndex * 0.038 + heightOffset,
-                0.086,
-              );
-              person.add(light);
+              person.add(clientSlot);
             }
           } else {
             const body = new THREE.Mesh(personBodyGeometry, personPartMaterial);
