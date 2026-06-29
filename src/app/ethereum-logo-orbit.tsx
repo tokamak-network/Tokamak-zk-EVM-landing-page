@@ -1054,78 +1054,160 @@ export function EthereumLogoOrbit({
         });
 
         if (variant === "tradeoff") {
-          const faceEyeLineMaterial = trackDisposable(
-            new THREE.LineBasicMaterial({
-              blending: THREE.AdditiveBlending,
-              color: "#dff8ff",
-              depthWrite: false,
-              opacity: 0.86,
-              transparent: true,
-            }),
-          );
-          const faceEyeWhiteMaterial = trackDisposable(
-            new THREE.MeshBasicMaterial({
-              blending: THREE.AdditiveBlending,
-              color: "#d8f8ff",
-              depthWrite: false,
-              opacity: 0.2,
-              side: THREE.DoubleSide,
-              transparent: true,
-            }),
-          );
-          const faceEyeIrisMaterial = trackDisposable(
-            new THREE.MeshBasicMaterial({
-              blending: THREE.AdditiveBlending,
-              color: "#70c8ff",
-              depthWrite: false,
-              opacity: 0.34,
-              side: THREE.DoubleSide,
-              transparent: true,
-            }),
-          );
-          const faceEyePupilMaterial = trackDisposable(
-            new THREE.MeshBasicMaterial({
-              color: "#050a12",
-              depthWrite: false,
-              opacity: 0.92,
-              side: THREE.DoubleSide,
-              transparent: true,
-            }),
-          );
-          const faceEyeHighlightMaterial = trackDisposable(
-            new THREE.MeshBasicMaterial({
-              blending: THREE.AdditiveBlending,
-              color: "#ffffff",
-              depthWrite: false,
-              opacity: 0.52,
-              side: THREE.DoubleSide,
-              transparent: true,
-            }),
-          );
-          const faceEyeOutlineGeometry = trackDisposable(
-            new THREE.BufferGeometry().setFromPoints(
-              Array.from({ length: 81 }, (_, pointIndex) => {
-                const angle = (pointIndex / 80) * Math.PI * 2;
+          const faceEyeCanvas = document.createElement("canvas");
+          faceEyeCanvas.width = 1024;
+          faceEyeCanvas.height = 512;
+          const faceEyeContext = faceEyeCanvas.getContext("2d");
 
-                return new THREE.Vector3(
-                  Math.cos(angle) * 0.27,
-                  Math.sin(angle) * 0.122,
-                  0,
-                );
-              }),
-            ),
+          if (faceEyeContext) {
+            const width = faceEyeCanvas.width;
+            const height = faceEyeCanvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2 + 8;
+
+            faceEyeContext.clearRect(0, 0, width, height);
+            faceEyeContext.save();
+            faceEyeContext.beginPath();
+            faceEyeContext.moveTo(112, centerY + 6);
+            faceEyeContext.bezierCurveTo(255, 92, 725, 72, 912, centerY + 8);
+            faceEyeContext.bezierCurveTo(722, 425, 284, 412, 112, centerY + 6);
+            faceEyeContext.closePath();
+            faceEyeContext.clip();
+
+            const scleraGradient = faceEyeContext.createRadialGradient(
+              centerX,
+              centerY,
+              72,
+              centerX,
+              centerY,
+              430,
+            );
+            scleraGradient.addColorStop(0, "rgba(246, 253, 255, 0.96)");
+            scleraGradient.addColorStop(0.48, "rgba(170, 229, 244, 0.82)");
+            scleraGradient.addColorStop(1, "rgba(25, 77, 104, 0.18)");
+            faceEyeContext.fillStyle = scleraGradient;
+            faceEyeContext.fillRect(0, 0, width, height);
+
+            const lidShadow = faceEyeContext.createLinearGradient(
+              0,
+              92,
+              0,
+              330,
+            );
+            lidShadow.addColorStop(0, "rgba(1, 8, 16, 0.76)");
+            lidShadow.addColorStop(0.42, "rgba(7, 39, 61, 0.12)");
+            lidShadow.addColorStop(1, "rgba(255, 255, 255, 0.04)");
+            faceEyeContext.fillStyle = lidShadow;
+            faceEyeContext.fillRect(0, 0, width, height);
+
+            const irisRadius = 116;
+            const irisGradient = faceEyeContext.createRadialGradient(
+              centerX,
+              centerY,
+              18,
+              centerX,
+              centerY,
+              irisRadius,
+            );
+            irisGradient.addColorStop(0, "rgba(187, 250, 255, 0.96)");
+            irisGradient.addColorStop(0.34, "rgba(58, 196, 232, 0.88)");
+            irisGradient.addColorStop(0.72, "rgba(10, 92, 143, 0.9)");
+            irisGradient.addColorStop(1, "rgba(4, 29, 54, 0.98)");
+            faceEyeContext.beginPath();
+            faceEyeContext.arc(centerX, centerY, irisRadius, 0, Math.PI * 2);
+            faceEyeContext.fillStyle = irisGradient;
+            faceEyeContext.fill();
+
+            for (let rayIndex = 0; rayIndex < 72; rayIndex++) {
+              const angle = (rayIndex / 72) * Math.PI * 2;
+              const innerRadius = 34 + (rayIndex % 5) * 4;
+              const outerRadius = irisRadius - 8 - (rayIndex % 7) * 3;
+
+              faceEyeContext.beginPath();
+              faceEyeContext.moveTo(
+                centerX + Math.cos(angle) * innerRadius,
+                centerY + Math.sin(angle) * innerRadius,
+              );
+              faceEyeContext.lineTo(
+                centerX + Math.cos(angle) * outerRadius,
+                centerY + Math.sin(angle) * outerRadius,
+              );
+              faceEyeContext.strokeStyle =
+                rayIndex % 3 === 0
+                  ? "rgba(213, 255, 255, 0.42)"
+                  : "rgba(0, 34, 62, 0.28)";
+              faceEyeContext.lineWidth = rayIndex % 4 === 0 ? 3.8 : 2;
+              faceEyeContext.stroke();
+            }
+
+            faceEyeContext.beginPath();
+            faceEyeContext.arc(centerX, centerY, 126, 0, Math.PI * 2);
+            faceEyeContext.strokeStyle = "rgba(175, 246, 255, 0.72)";
+            faceEyeContext.lineWidth = 8;
+            faceEyeContext.stroke();
+
+            const pupilGradient = faceEyeContext.createRadialGradient(
+              centerX - 10,
+              centerY - 12,
+              8,
+              centerX,
+              centerY,
+              58,
+            );
+            pupilGradient.addColorStop(0, "rgba(17, 37, 53, 1)");
+            pupilGradient.addColorStop(0.42, "rgba(0, 5, 12, 1)");
+            pupilGradient.addColorStop(1, "rgba(0, 0, 0, 1)");
+            faceEyeContext.beginPath();
+            faceEyeContext.arc(centerX, centerY, 58, 0, Math.PI * 2);
+            faceEyeContext.fillStyle = pupilGradient;
+            faceEyeContext.fill();
+
+            faceEyeContext.beginPath();
+            faceEyeContext.ellipse(centerX + 38, centerY - 48, 28, 17, -0.35, 0, Math.PI * 2);
+            faceEyeContext.fillStyle = "rgba(255, 255, 255, 0.9)";
+            faceEyeContext.fill();
+            faceEyeContext.beginPath();
+            faceEyeContext.ellipse(centerX - 30, centerY + 42, 18, 9, 0.2, 0, Math.PI * 2);
+            faceEyeContext.fillStyle = "rgba(150, 238, 255, 0.38)";
+            faceEyeContext.fill();
+            faceEyeContext.restore();
+
+            faceEyeContext.beginPath();
+            faceEyeContext.moveTo(112, centerY + 6);
+            faceEyeContext.bezierCurveTo(255, 92, 725, 72, 912, centerY + 8);
+            faceEyeContext.bezierCurveTo(722, 425, 284, 412, 112, centerY + 6);
+            faceEyeContext.closePath();
+            faceEyeContext.strokeStyle = "rgba(232, 252, 255, 0.94)";
+            faceEyeContext.lineWidth = 16;
+            faceEyeContext.shadowColor = "rgba(89, 212, 255, 0.9)";
+            faceEyeContext.shadowBlur = 24;
+            faceEyeContext.stroke();
+
+            faceEyeContext.beginPath();
+            faceEyeContext.moveTo(138, centerY - 2);
+            faceEyeContext.bezierCurveTo(286, 78, 714, 66, 890, centerY + 2);
+            faceEyeContext.strokeStyle = "rgba(255, 255, 255, 0.56)";
+            faceEyeContext.lineWidth = 7;
+            faceEyeContext.shadowBlur = 10;
+            faceEyeContext.stroke();
+          }
+
+          const faceEyeTexture = trackDisposable(
+            new THREE.CanvasTexture(faceEyeCanvas),
           );
-          const faceEyeWhiteGeometry = trackDisposable(
-            new THREE.CircleGeometry(0.125, 36),
+          faceEyeTexture.colorSpace = THREE.SRGBColorSpace;
+          const faceEyeGeometry = trackDisposable(
+            new THREE.PlaneGeometry(0.82, 0.4),
           );
-          const faceEyeIrisGeometry = trackDisposable(
-            new THREE.CircleGeometry(0.082, 32),
-          );
-          const faceEyePupilGeometry = trackDisposable(
-            new THREE.CircleGeometry(0.04, 24),
-          );
-          const faceEyeHighlightGeometry = trackDisposable(
-            new THREE.CircleGeometry(0.014, 12),
+          const faceEyeMaterial = trackDisposable(
+            new THREE.MeshBasicMaterial({
+              depthWrite: false,
+              map: faceEyeTexture,
+              opacity: 0.98,
+              side: THREE.DoubleSide,
+              toneMapped: false,
+              transparent: true,
+            }),
           );
           const lowerFaceTriples = [
             [bottom, lowerFront, lowerLeft],
@@ -1158,49 +1240,11 @@ export function EthereumLogoOrbit({
 
             eyeGroup.position.copy(centroid).addScaledVector(normal, 0.018);
             eyeGroup.quaternion.setFromRotationMatrix(eyeBasis);
-            eyeGroup.scale.setScalar(1.08);
+            eyeGroup.scale.setScalar(1.12);
 
-            const outline = new THREE.Line(
-              faceEyeOutlineGeometry,
-              faceEyeLineMaterial,
-            );
-            outline.renderOrder = 6;
-            eyeGroup.add(outline);
-
-            const white = new THREE.Mesh(
-              faceEyeWhiteGeometry,
-              faceEyeWhiteMaterial,
-            );
-            white.scale.y = 0.48;
-            white.position.z = 0.002;
-            white.renderOrder = 7;
-            eyeGroup.add(white);
-
-            const iris = new THREE.Mesh(
-              faceEyeIrisGeometry,
-              faceEyeIrisMaterial,
-            );
-            iris.position.z = 0.005;
-            iris.scale.y = 0.62;
-            iris.renderOrder = 8;
-            eyeGroup.add(iris);
-
-            const pupil = new THREE.Mesh(
-              faceEyePupilGeometry,
-              faceEyePupilMaterial,
-            );
-            pupil.position.z = 0.008;
-            pupil.scale.y = 0.84;
-            pupil.renderOrder = 9;
-            eyeGroup.add(pupil);
-
-            const highlight = new THREE.Mesh(
-              faceEyeHighlightGeometry,
-              faceEyeHighlightMaterial,
-            );
-            highlight.position.set(0.024, 0.022, 0.011);
-            highlight.renderOrder = 10;
-            eyeGroup.add(highlight);
+            const eye = new THREE.Mesh(faceEyeGeometry, faceEyeMaterial);
+            eye.renderOrder = 10;
+            eyeGroup.add(eye);
 
             logoGroup.add(eyeGroup);
           });
