@@ -1185,7 +1185,7 @@ export function EthereumLogoOrbit({
 
           const mapRadiusX = 1.76;
           const mapRadiusZ = 0.82;
-          const reliefHeight = 0.14;
+          const reliefHeight = 0.08;
           const mapSegmentsX = 164;
           const mapSegmentsZ = 82;
           const mapPositions: number[] = [];
@@ -1252,18 +1252,18 @@ export function EthereumLogoOrbit({
               saturation >= 0.16;
             const white = lightness >= 0.72 && saturation <= 0.3;
             const green =
-              hue >= 62 &&
-              hue <= 172 &&
-              color.g >= color.b - 24 &&
-              lightness >= 0.3;
+              hue >= 58 &&
+              hue <= 174 &&
+              color.g >= color.b - 30 &&
+              lightness >= 0.28;
             const ochre =
-              hue >= 24 &&
-              hue < 78 &&
-              color.r >= color.b - 2 &&
-              color.g >= color.b - 4 &&
-              lightness >= 0.32;
+              hue >= 20 &&
+              hue < 82 &&
+              color.r >= color.b - 4 &&
+              color.g >= color.b - 8 &&
+              lightness >= 0.3;
             const neutralLand =
-              lightness >= 0.43 && saturation <= 0.26 && color.b < 205;
+              lightness >= 0.4 && saturation <= 0.32 && color.b < 210;
 
             return {
               blue,

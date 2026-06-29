@@ -131,7 +131,7 @@ export function WorldMapLab() {
 
       const mapRadiusX = 1.9;
       const mapRadiusZ = 0.88;
-      const reliefHeight = 0.19;
+      const reliefHeight = 0.11;
       const mapSegmentsX = 192;
       const mapSegmentsZ = 96;
       const positions: number[] = [];
@@ -202,18 +202,18 @@ export function WorldMapLab() {
           saturation >= 0.16;
         const white = lightness >= 0.72 && saturation <= 0.3;
         const green =
-          hue >= 62 &&
-          hue <= 172 &&
-          color.g >= color.b - 24 &&
-          lightness >= 0.3;
+          hue >= 58 &&
+          hue <= 174 &&
+          color.g >= color.b - 30 &&
+          lightness >= 0.28;
         const ochre =
-          hue >= 24 &&
-          hue < 78 &&
-          color.r >= color.b - 2 &&
-          color.g >= color.b - 4 &&
-          lightness >= 0.32;
+          hue >= 20 &&
+          hue < 82 &&
+          color.r >= color.b - 4 &&
+          color.g >= color.b - 8 &&
+          lightness >= 0.3;
         const neutralLand =
-          lightness >= 0.43 && saturation <= 0.26 && color.b < 205;
+          lightness >= 0.4 && saturation <= 0.32 && color.b < 210;
 
         return {
           blue,
