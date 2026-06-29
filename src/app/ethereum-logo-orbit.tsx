@@ -1116,6 +1116,7 @@ export function EthereumLogoOrbit({
             eyeGroup.scale.setScalar(0.96);
 
             const eye = new THREE.Mesh(faceEyeGeometry, faceEyeMaterial);
+            eye.rotation.z = Math.PI;
             eye.renderOrder = 10;
             eyeGroup.add(eye);
 
