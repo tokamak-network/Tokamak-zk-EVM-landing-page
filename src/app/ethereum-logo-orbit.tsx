@@ -581,25 +581,67 @@ export function EthereumLogoOrbit({
           };
         };
 
+        const randomBetween = (min: number, max: number) =>
+          min + Math.random() * (max - min);
+
         const observerAnimations: Array<{
           group: InstanceType<typeof THREE.Group>;
           home: InstanceType<typeof THREE.Vector3>;
-          observeTrail: ReturnType<typeof createLightTrail>;
           phase: number;
-          replayTrail: ReturnType<typeof createLightTrail>;
-          target: InstanceType<typeof THREE.Vector3>;
-          targetIndex: number | null;
-          sourceIndex: number;
         }> = [];
         const meshPacketAnimations: Array<{
+          activeStartedAt: number | null;
+          duration: number;
+          forward: boolean;
           from: InstanceType<typeof THREE.Vector3>;
           fromIndex: number;
-          phase: number;
+          nextStartAt: number;
           to: InstanceType<typeof THREE.Vector3>;
-          toIndex: number;
+          toIndex: number | null;
           trail: ReturnType<typeof createLightTrail>;
         }> = [];
-        const packetTravelSpeed = 0.46;
+        const packetEdgeKeys = new Set<string>();
+        const packetTravelDurationRange = { max: 0.92, min: 0.58 };
+        const packetIdleDelayRange = { max: 1.4, min: 0.18 };
+        const addPacketEdgeAnimation = ({
+          edgeKey,
+          from,
+          fromIndex,
+          to,
+          toIndex,
+        }: {
+          edgeKey: string;
+          from: InstanceType<typeof THREE.Vector3>;
+          fromIndex: number;
+          to: InstanceType<typeof THREE.Vector3>;
+          toIndex: number | null;
+        }) => {
+          if (packetEdgeKeys.has(edgeKey)) {
+            return;
+          }
+
+          packetEdgeKeys.add(edgeKey);
+          meshPacketAnimations.push({
+            activeStartedAt: null,
+            duration: randomBetween(
+              packetTravelDurationRange.min,
+              packetTravelDurationRange.max,
+            ),
+            forward: Math.random() >= 0.5,
+            from,
+            fromIndex,
+            nextStartAt: randomBetween(0, 0.95),
+            to,
+            toIndex,
+            trail: createLightTrail(),
+          });
+        };
+        const getNodePairEdgeKey = (firstIndex: number, secondIndex: number) => {
+          const lowIndex = Math.min(firstIndex, secondIndex);
+          const highIndex = Math.max(firstIndex, secondIndex);
+
+          return `${lowIndex}:${highIndex}`;
+        };
         const nodeLedMaterials: Array<
           Array<InstanceType<typeof THREE.MeshBasicMaterial>>
         > = [];
@@ -756,6 +798,16 @@ export function EthereumLogoOrbit({
                 : replayLineMaterial,
           );
           observerGroup.add(verificationLine);
+          addPacketEdgeAnimation({
+            edgeKey:
+              variant === "strength"
+                ? getNodePairEdgeKey(index, strengthTargetIndex)
+                : `tradeoff:${index}`,
+            from: home,
+            fromIndex: index,
+            to: target,
+            toIndex: variant === "strength" ? strengthTargetIndex : null,
+          });
 
           if (variant === "strength") {
             const connectionCount = 1 + ((index * 5 + 3) % 3);
@@ -775,30 +827,22 @@ export function EthereumLogoOrbit({
 
               observerGroup.add(new THREE.Line(meshLineGeometry, meshEdgeMaterial));
 
-              meshPacketAnimations.push({
+              addPacketEdgeAnimation({
+                edgeKey: getNodePairEdgeKey(index, targetIndex),
                 from: home,
                 fromIndex: index,
-                phase: ((index * 13 + edge * 17) % 29) / 29,
                 to: meshTarget,
                 toIndex: targetIndex,
-                trail: createLightTrail(),
               });
             }
           }
 
-          const observeTrail = createLightTrail();
-          const replayTrail = createLightTrail();
           observerGroup.add(person);
 
           observerAnimations.push({
             group: person,
             home,
-            observeTrail,
             phase: index * 0.43,
-            replayTrail,
-            target,
-            targetIndex: variant === "strength" ? strengthTargetIndex : null,
-            sourceIndex: index,
           });
         }
 
@@ -811,6 +855,7 @@ export function EthereumLogoOrbit({
         const cameraInObserverSpace = new THREE.Vector3();
         const lightTrailStart = new THREE.Vector3();
         const lightTrailEnd = new THREE.Vector3();
+        let storyStartedAt: number | null = null;
 
         const updateLightTrail = (
           trail: ReturnType<typeof createLightTrail>,
@@ -903,6 +948,9 @@ export function EthereumLogoOrbit({
         };
 
         updateStoryLayers.push((time) => {
+          storyStartedAt ??= time;
+          const storyTime = time - storyStartedAt;
+
           observerGroup.updateWorldMatrix(true, false);
           cameraInObserverSpace.copy(camera.position);
           observerGroup.worldToLocal(cameraInObserverSpace);
@@ -927,84 +975,57 @@ export function EthereumLogoOrbit({
             );
           };
 
-          meshPacketAnimations.forEach(
-            ({ from, fromIndex, phase, to, toIndex, trail }) => {
-              const progress = (time * packetTravelSpeed + phase) % 1;
-              const visibility = Math.sin(progress * Math.PI);
+          meshPacketAnimations.forEach((animation) => {
+            if (
+              animation.activeStartedAt === null &&
+              storyTime >= animation.nextStartAt
+            ) {
+              animation.activeStartedAt = storyTime;
+              animation.duration = randomBetween(
+                packetTravelDurationRange.min,
+                packetTravelDurationRange.max,
+              );
+              animation.forward = Math.random() >= 0.5;
+            }
 
-              updateLightTrail(trail, from, to, progress, visibility);
-              markNodeActivity(fromIndex, 0, 1 - Math.min(progress / 0.2, 1));
-              markNodeActivity(toIndex, 2, Math.max((progress - 0.8) / 0.2, 0));
-              markNodeActivity(fromIndex, 1, visibility * 0.22);
-              markNodeActivity(toIndex, 1, visibility * 0.22);
-            },
-          );
+            if (animation.activeStartedAt === null) {
+              updateLightTrail(animation.trail, animation.from, animation.to, 0, 0);
+              return;
+            }
 
-          observerAnimations.forEach(
-            ({
-              group,
-              home,
-              observeTrail,
-              phase,
-              replayTrail,
-              sourceIndex,
-              target,
-              targetIndex,
-            }) => {
-              const bob = Math.sin(time * 1.8 + phase) * 0.026;
-              group.position.set(home.x, home.y + bob, home.z);
+            const progress =
+              (storyTime - animation.activeStartedAt) / animation.duration;
 
-              const observeProgress = (time * packetTravelSpeed + phase) % 1;
-              const replayProgress = (observeProgress + 0.5) % 1;
-              const observeVisibility = Math.sin(observeProgress * Math.PI);
-              const replayVisibility = Math.sin(replayProgress * Math.PI);
+            if (progress >= 1) {
+              animation.activeStartedAt = null;
+              animation.nextStartAt =
+                storyTime +
+                randomBetween(packetIdleDelayRange.min, packetIdleDelayRange.max);
+              updateLightTrail(animation.trail, animation.from, animation.to, 0, 0);
+              return;
+            }
 
-              updateLightTrail(
-                observeTrail,
-                target,
-                home,
-                observeProgress,
-                observeVisibility,
-              );
-              updateLightTrail(
-                replayTrail,
-                home,
-                target,
-                replayProgress,
-                replayVisibility,
-              );
-              markNodeActivity(
-                targetIndex,
-                0,
-                1 - Math.min(observeProgress / 0.2, 1),
-              );
-              markNodeActivity(
-                sourceIndex,
-                2,
-                Math.max((observeProgress - 0.8) / 0.2, 0),
-              );
-              markNodeActivity(
-                sourceIndex,
-                0,
-                1 - Math.min(replayProgress / 0.2, 1),
-              );
-              markNodeActivity(
-                targetIndex,
-                2,
-                Math.max((replayProgress - 0.8) / 0.2, 0),
-              );
-              markNodeActivity(
-                sourceIndex,
-                1,
-                replayVisibility * 0.18,
-              );
-              markNodeActivity(
-                targetIndex,
-                1,
-                observeVisibility * 0.18,
-              );
-            },
-          );
+            const from = animation.forward ? animation.from : animation.to;
+            const to = animation.forward ? animation.to : animation.from;
+            const fromIndex = animation.forward
+              ? animation.fromIndex
+              : animation.toIndex;
+            const toIndex = animation.forward
+              ? animation.toIndex
+              : animation.fromIndex;
+            const visibility = Math.sin(progress * Math.PI);
+
+            updateLightTrail(animation.trail, from, to, progress, visibility);
+            markNodeActivity(fromIndex, 0, 1 - Math.min(progress / 0.2, 1));
+            markNodeActivity(toIndex, 2, Math.max((progress - 0.8) / 0.2, 0));
+            markNodeActivity(fromIndex, 1, visibility * 0.22);
+            markNodeActivity(toIndex, 1, visibility * 0.22);
+          });
+
+          observerAnimations.forEach(({ group, home, phase }) => {
+            const bob = Math.sin(time * 1.8 + phase) * 0.026;
+            group.position.set(home.x, home.y + bob, home.z);
+          });
 
           nodeLedMaterials.forEach((materials, nodeIndex) => {
             materials.forEach((material, ledIndex) => {
