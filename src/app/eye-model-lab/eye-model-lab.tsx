@@ -73,27 +73,14 @@ export function EyeModelLab() {
 
         if (irisContext) {
           const center = irisCanvas.width / 2;
-          const irisGradient = irisContext.createRadialGradient(
-            center,
-            center,
-            18,
-            center,
-            center,
-            500,
-          );
 
-          irisGradient.addColorStop(0, "#d9fbf2");
-          irisGradient.addColorStop(0.18, "#69b6a7");
-          irisGradient.addColorStop(0.46, "#2e747b");
-          irisGradient.addColorStop(0.74, "#173d55");
-          irisGradient.addColorStop(1, "#07111f");
-          irisContext.fillStyle = irisGradient;
+          irisContext.fillStyle = "#f7f4ed";
           irisContext.fillRect(0, 0, irisCanvas.width, irisCanvas.height);
 
-          for (let index = 0; index < 160; index++) {
-            const angle = (index / 160) * Math.PI * 2;
-            const inner = 72 + (index % 11) * 5;
-            const outer = 410 + (index % 17) * 3;
+          for (let index = 0; index < 96; index++) {
+            const angle = (index / 96) * Math.PI * 2;
+            const inner = 150;
+            const outer = 430;
 
             irisContext.beginPath();
             irisContext.moveTo(
@@ -105,56 +92,45 @@ export function EyeModelLab() {
               center + Math.sin(angle) * outer,
             );
             irisContext.strokeStyle =
-              index % 4 === 0
-                ? "rgba(232, 255, 239, 0.34)"
-                : "rgba(2, 20, 31, 0.34)";
-            irisContext.lineWidth = index % 5 === 0 ? 7 : 3;
+              index % 3 === 0
+                ? "rgba(10, 10, 10, 0.62)"
+                : "rgba(10, 10, 10, 0.34)";
+            irisContext.lineWidth = index % 4 === 0 ? 7 : 4;
             irisContext.stroke();
           }
 
           irisContext.beginPath();
-          irisContext.arc(center, center, 500, 0, Math.PI * 2);
-          irisContext.strokeStyle = "rgba(1, 10, 20, 0.82)";
-          irisContext.lineWidth = 44;
+          irisContext.arc(center, center, 452, 0, Math.PI * 2);
+          irisContext.strokeStyle = "#050505";
+          irisContext.lineWidth = 72;
           irisContext.stroke();
 
           irisContext.beginPath();
           irisContext.arc(center, center, 165, 0, Math.PI * 2);
-          irisContext.fillStyle = "#020406";
+          irisContext.fillStyle = "#050505";
+          irisContext.fill();
+
+          irisContext.beginPath();
+          irisContext.ellipse(
+            center + 118,
+            center - 124,
+            70,
+            36,
+            -0.18,
+            0,
+            Math.PI * 2,
+          );
+          irisContext.fillStyle = "rgba(255, 255, 255, 0.9)";
           irisContext.fill();
         }
 
         const irisTexture = trackDisposable(new THREE.CanvasTexture(irisCanvas));
         irisTexture.colorSpace = THREE.SRGBColorSpace;
 
-        const skinMaterial = trackDisposable(
-          new THREE.MeshStandardMaterial({
-            color: "#8b625d",
-            emissive: "#1c0f12",
-            emissiveIntensity: 0.1,
-            metalness: 0.02,
-            roughness: 0.5,
+        const inkMaterial = trackDisposable(
+          new THREE.MeshBasicMaterial({
+            color: "#050505",
             side: THREE.DoubleSide,
-          }),
-        );
-        const rimMaterial = trackDisposable(
-          new THREE.MeshStandardMaterial({
-            color: "#171113",
-            emissive: "#020101",
-            emissiveIntensity: 0.04,
-            metalness: 0.02,
-            roughness: 0.42,
-          }),
-        );
-        const wetlineMaterial = trackDisposable(
-          new THREE.MeshPhysicalMaterial({
-            clearcoat: 1,
-            clearcoatRoughness: 0.05,
-            color: "#d2a69e",
-            emissive: "#2d1418",
-            emissiveIntensity: 0.12,
-            metalness: 0,
-            roughness: 0.12,
           }),
         );
 
@@ -222,14 +198,8 @@ export function EyeModelLab() {
         };
 
         const scleraMaterial = trackDisposable(
-          new THREE.MeshPhysicalMaterial({
-            clearcoat: 0.34,
-            clearcoatRoughness: 0.22,
-            color: "#f2efe7",
-            emissive: "#111315",
-            emissiveIntensity: 0.05,
-            metalness: 0,
-            roughness: 0.36,
+          new THREE.MeshBasicMaterial({
+            color: "#f8f6ef",
             side: THREE.DoubleSide,
           }),
         );
@@ -297,86 +267,35 @@ export function EyeModelLab() {
           return mesh;
         };
 
-        const createLidBand = (
+        const createLidLine = (
           upper: boolean,
-          thickness: number,
-          material: InstanceType<typeof THREE.Material>,
-          z: number,
+          radius: number,
         ) => {
-          const samples = 72;
-          const outer: Array<[number, number]> = [];
-          const inner: Array<[number, number]> = [];
+          const points = Array.from({ length: 68 }, (_, index) => {
+            const t = 0.025 + (index / 67) * 0.95;
+            const point = lidPoint(t, upper, 0.736);
 
-          for (let index = 0; index < samples; index++) {
-            const t = index / (samples - 1);
-            const point = lidPoint(t, upper);
-            const taper = Math.sin(t * Math.PI);
-            const bandThickness = thickness * Math.pow(taper, 0.78);
-            const yOffset = upper ? bandThickness : -bandThickness;
+            point.y += upper ? -0.026 : 0.022;
 
-            outer.push([point.x, point.y + yOffset]);
-            inner.push([point.x, point.y]);
-          }
+            return point;
+          });
 
-          return createShapeMesh([...outer, ...inner.reverse()], material, z);
+          return new THREE.Mesh(
+            trackDisposable(
+              new THREE.TubeGeometry(
+                new THREE.CatmullRomCurve3(points),
+                96,
+                radius,
+                8,
+                false,
+              ),
+            ),
+            inkMaterial,
+          );
         };
 
-        const upperOpening = Array.from({ length: 60 }, (_, index) =>
-          lidPoint(index / 59, true, 0.705),
-        );
-        const lowerOpening = Array.from({ length: 60 }, (_, index) =>
-          lidPoint(index / 59, false, 0.703),
-        );
-        const upperSkin = [
-          ...Array.from({ length: 60 }, (_, index) => {
-            const t = index / 59;
-            const inner = lidPoint(t, true, 0.705);
-            const taper = Math.sin(t * Math.PI);
-            const y = inner.y + taper * 0.145;
-            const x = inner.x + (t - 0.5) * 0.05 * taper;
-
-            return [x, y] as [number, number];
-          }),
-          ...upperOpening
-            .slice()
-            .reverse()
-            .map((point) => [point.x, point.y] as [number, number]),
-        ];
-        const lowerSkin = [
-          ...lowerOpening.map((point) => [point.x, point.y] as [number, number]),
-          ...Array.from({ length: 60 }, (_, index) => {
-            const t = 1 - index / 59;
-            const inner = lidPoint(t, false, 0.703);
-            const taper = Math.sin(t * Math.PI);
-            const y = inner.y - taper * 0.1;
-            const x = inner.x + (t - 0.5) * 0.035 * taper;
-
-            return [x, y] as [number, number];
-          }),
-        ];
-
-        eyeRig.add(createShapeMesh(upperSkin, skinMaterial, 0.718));
-        eyeRig.add(createShapeMesh(lowerSkin, skinMaterial, 0.716));
-
-        eyeRig.add(createLidBand(true, 0.052, rimMaterial, 0.724));
-        eyeRig.add(createLidBand(false, 0.034, wetlineMaterial, 0.722));
-
-        const highlightMaterial = trackDisposable(
-          new THREE.MeshBasicMaterial({
-            blending: THREE.AdditiveBlending,
-            color: "#ffffff",
-            opacity: 0.42,
-            side: THREE.DoubleSide,
-            transparent: true,
-          }),
-        );
-        const highlight = new THREE.Mesh(
-          trackDisposable(new THREE.CircleGeometry(0.064, 24)),
-          highlightMaterial,
-        );
-        highlight.position.set(0.13, 0.145, 0.716);
-        highlight.scale.y = 0.42;
-        eyeRig.add(highlight);
+        eyeRig.add(createLidLine(true, 0.011));
+        eyeRig.add(createLidLine(false, 0.008));
 
         const state = {
           dragging: false,
@@ -435,11 +354,8 @@ export function EyeModelLab() {
         resize();
 
         const render = () => {
-          const time = performance.now() * 0.001;
-
           eyeRig.rotation.x += (state.targetRotationX - eyeRig.rotation.x) * 0.08;
           eyeRig.rotation.y += (state.targetRotationY - eyeRig.rotation.y) * 0.08;
-          highlight.material.opacity = 0.58 + Math.sin(time * 1.6) * 0.08;
           renderer.render(scene, camera);
           animationFrame = requestAnimationFrame(render);
         };
