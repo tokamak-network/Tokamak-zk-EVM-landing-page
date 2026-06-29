@@ -1156,7 +1156,7 @@ export function EthereumLogoOrbit({
             image.onerror = () => {
               reject(new Error("Unable to load Natural Earth height map."));
             };
-            image.src = "/textures/maps/world-relief-height.png";
+            image.src = "/textures/maps/world-relief-height.png?v=finer-relief-patches";
           });
           const colorImageData = await new Promise<ImageData>((resolve, reject) => {
             const image = new Image();
@@ -1185,7 +1185,7 @@ export function EthereumLogoOrbit({
 
           const mapRadiusX = 1.76;
           const mapRadiusZ = 0.82;
-          const reliefHeight = 0.08;
+          const reliefHeight = 0.15;
           const mapSegmentsX = 164;
           const mapSegmentsZ = 82;
           const mapPositions: number[] = [];

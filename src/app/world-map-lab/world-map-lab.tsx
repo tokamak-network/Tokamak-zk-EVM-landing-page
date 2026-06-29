@@ -102,7 +102,7 @@ export function WorldMapLab() {
         image.onerror = () => {
           reject(new Error("Unable to load world map height texture."));
         };
-        image.src = "/textures/maps/world-relief-height.png";
+        image.src = "/textures/maps/world-relief-height.png?v=finer-relief-patches";
       });
       const colorImageData = await new Promise<ImageData>((resolve, reject) => {
         const image = new Image();
@@ -131,7 +131,7 @@ export function WorldMapLab() {
 
       const mapRadiusX = 1.9;
       const mapRadiusZ = 0.88;
-      const reliefHeight = 0.11;
+      const reliefHeight = 0.21;
       const mapSegmentsX = 192;
       const mapSegmentsZ = 96;
       const positions: number[] = [];
