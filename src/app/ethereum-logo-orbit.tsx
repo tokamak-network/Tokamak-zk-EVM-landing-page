@@ -1,20 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import worldLand from "../data/ne_110m_land.json";
 
 type EthereumLogoOrbitProps = Readonly<{
   variant?: "strength" | "tradeoff";
 }>;
-
-type GeoJsonPosition = [number, number] | [number, number, number];
-type GeoJsonPolygon = GeoJsonPosition[][];
-type GeoJsonGeometry =
-  | { type: "Polygon"; coordinates: GeoJsonPolygon }
-  | { type: "MultiPolygon"; coordinates: GeoJsonPolygon[] };
-type GeoJsonFeatureCollection = {
-  features: Array<{ geometry: GeoJsonGeometry }>;
-};
 
 export function EthereumLogoOrbit({
   variant = "tradeoff",
@@ -1129,105 +1119,185 @@ export function EthereumLogoOrbit({
           worldMapGroup.scale.setScalar(1.08);
           storyGroup.add(worldMapGroup);
 
-          const oceanPlateGeometry = trackDisposable(
-            new THREE.BoxGeometry(3.34, 0.11, 1.62),
+          const mapColorTexture = trackDisposable(
+            await new Promise<InstanceType<typeof THREE.Texture>>(
+              (resolve, reject) => {
+                const texture = textureLoader.load(
+                  "/textures/maps/world-relief-color.jpg",
+                  () => resolve(texture),
+                  undefined,
+                  (error) => reject(error),
+                );
+              },
+            ),
           );
-          const oceanPlateMaterial = trackDisposable(
+          mapColorTexture.colorSpace = THREE.SRGBColorSpace;
+          mapColorTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+
+          const heightImageData = await new Promise<ImageData>((resolve, reject) => {
+            const image = new Image();
+
+            image.onload = () => {
+              const heightCanvas = document.createElement("canvas");
+              heightCanvas.width = image.naturalWidth;
+              heightCanvas.height = image.naturalHeight;
+              const context = heightCanvas.getContext("2d");
+
+              if (!context) {
+                reject(new Error("Height map canvas context is unavailable."));
+                return;
+              }
+
+              context.drawImage(image, 0, 0);
+              resolve(
+                context.getImageData(0, 0, heightCanvas.width, heightCanvas.height),
+              );
+            };
+            image.onerror = () => {
+              reject(new Error("Unable to load Natural Earth height map."));
+            };
+            image.src = "/textures/maps/world-relief-height.png";
+          });
+
+          const mapRadiusX = 1.76;
+          const mapRadiusZ = 0.82;
+          const reliefHeight = 0.26;
+          const mapSegmentsX = 164;
+          const mapSegmentsZ = 82;
+          const mapPositions: number[] = [];
+          const mapUvs: number[] = [];
+          const mapIndices: number[] = [];
+          const projectedLandPoints: Array<{ x: number; z: number; height: number }> =
+            [];
+          const sampleRelief = (u: number, v: number) => {
+            const x = Math.max(
+              0,
+              Math.min(heightImageData.width - 1, Math.round(u * (heightImageData.width - 1))),
+            );
+            const y = Math.max(
+              0,
+              Math.min(heightImageData.height - 1, Math.round(v * (heightImageData.height - 1))),
+            );
+            const index = (y * heightImageData.width + x) * 4;
+            return heightImageData.data[index] / 255;
+          };
+          const projectMapPoint = (u: number, v: number) => {
+            const latitude = 1 - v * 2;
+            const longitude = u * 2 - 1;
+            const widthAtLatitude = Math.sqrt(Math.max(0.08, 1 - latitude * latitude));
+
+            return {
+              x: longitude * mapRadiusX * widthAtLatitude,
+              z: latitude * mapRadiusZ,
+            };
+          };
+          const reliefToHeight = (relief: number) =>
+            Math.pow(Math.max(0, relief - 0.45) / 0.55, 1.55) * reliefHeight;
+
+          for (let zIndex = 0; zIndex <= mapSegmentsZ; zIndex += 1) {
+            const v = zIndex / mapSegmentsZ;
+
+            for (let xIndex = 0; xIndex <= mapSegmentsX; xIndex += 1) {
+              const u = xIndex / mapSegmentsX;
+              const projected = projectMapPoint(u, v);
+              const height = reliefToHeight(sampleRelief(u, v));
+
+              mapPositions.push(projected.x, height, projected.z);
+              mapUvs.push(u, v);
+
+              if (
+                zIndex % 4 === 0 &&
+                xIndex % 4 === 0 &&
+                height > 0.024 &&
+                v > 0.08 &&
+                v < 0.9
+              ) {
+                projectedLandPoints.push({
+                  height,
+                  x: projected.x,
+                  z: projected.z,
+                });
+              }
+            }
+          }
+
+          const rowStride = mapSegmentsX + 1;
+
+          for (let zIndex = 0; zIndex < mapSegmentsZ; zIndex += 1) {
+            for (let xIndex = 0; xIndex < mapSegmentsX; xIndex += 1) {
+              const a = zIndex * rowStride + xIndex;
+              const b = a + 1;
+              const c = a + rowStride;
+              const d = c + 1;
+
+              mapIndices.push(a, c, b, b, c, d);
+            }
+          }
+
+          const reliefMapGeometry = trackDisposable(new THREE.BufferGeometry());
+          reliefMapGeometry.setAttribute(
+            "position",
+            new THREE.Float32BufferAttribute(mapPositions, 3),
+          );
+          reliefMapGeometry.setAttribute(
+            "uv",
+            new THREE.Float32BufferAttribute(mapUvs, 2),
+          );
+          reliefMapGeometry.setIndex(mapIndices);
+          reliefMapGeometry.computeVertexNormals();
+
+          const reliefBaseGeometry = trackDisposable(
+            new THREE.CylinderGeometry(1, 1, 0.09, 160, 1),
+          );
+          reliefBaseGeometry.scale(mapRadiusX * 1.02, 1, mapRadiusZ * 1.06);
+          const reliefBaseMaterial = trackDisposable(
             new THREE.MeshStandardMaterial({
-              color: "#050d15",
-              emissive: "#061b2a",
-              emissiveIntensity: 0.34,
-              metalness: 0.28,
-              opacity: 0.94,
-              roughness: 0.4,
+              color: "#07131c",
+              emissive: "#06141e",
+              emissiveIntensity: 0.26,
+              metalness: 0.18,
+              roughness: 0.52,
+            }),
+          );
+          const reliefBase = new THREE.Mesh(reliefBaseGeometry, reliefBaseMaterial);
+          reliefBase.position.y = -0.072;
+          reliefBase.renderOrder = 3;
+          worldMapGroup.add(reliefBase);
+
+          const reliefMapMaterial = trackDisposable(
+            new THREE.MeshStandardMaterial({
+              color: "#b9cfd8",
+              emissive: "#0a1f2a",
+              emissiveIntensity: 0.1,
+              map: mapColorTexture,
+              metalness: 0.08,
+              roughness: 0.62,
+              side: THREE.DoubleSide,
+            }),
+          );
+          const reliefMap = new THREE.Mesh(reliefMapGeometry, reliefMapMaterial);
+          reliefMap.renderOrder = 4;
+          worldMapGroup.add(reliefMap);
+
+          const reliefRimMaterial = trackDisposable(
+            new THREE.MeshBasicMaterial({
+              blending: THREE.AdditiveBlending,
+              color: "#54d7ff",
+              depthWrite: false,
+              opacity: 0.18,
+              side: THREE.DoubleSide,
               transparent: true,
             }),
           );
-          const oceanPlate = new THREE.Mesh(oceanPlateGeometry, oceanPlateMaterial);
-          oceanPlate.position.y = -0.07;
-          worldMapGroup.add(oceanPlate);
-
-          const landMaterial = trackDisposable(
-            new THREE.MeshStandardMaterial({
-              color: "#1682a8",
-              emissive: "#0c668d",
-              emissiveIntensity: 0.62,
-              metalness: 0.24,
-              roughness: 0.34,
-            }),
+          const reliefRimGeometry = trackDisposable(
+            new THREE.RingGeometry(0.985, 1, 192),
           );
-          const landSideMaterial = trackDisposable(
-            new THREE.MeshStandardMaterial({
-              color: "#062338",
-              emissive: "#03111c",
-              emissiveIntensity: 0.18,
-              metalness: 0.16,
-              roughness: 0.56,
-            }),
-          );
-          const projectedLandPoints: Array<{ x: number; y: number }> = [];
-          const projectGeoPoint = ([longitude, latitude]: GeoJsonPosition) => {
-            return new THREE.Vector2((longitude / 180) * 1.58, (latitude / 90) * 0.72);
-          };
-          const addProjectedSample = (point: GeoJsonPosition, sampleIndex: number) => {
-            if (sampleIndex % 6 !== 0 || point[1] < -58) {
-              return;
-            }
-
-            const projected = projectGeoPoint(point);
-            projectedLandPoints.push({ x: projected.x, y: projected.y });
-          };
-          const addMapPolygon = (polygon: GeoJsonPolygon) => {
-            const exterior = polygon[0]
-              ?.filter((point, pointIndex) => pointIndex % 2 === 0)
-              .map(projectGeoPoint);
-
-            if (!exterior || exterior.length < 4) {
-              return;
-            }
-
-            const landShape = new THREE.Shape(exterior);
-
-            polygon.slice(1).forEach((hole) => {
-              const holePoints = hole
-                .filter((point, pointIndex) => pointIndex % 2 === 0)
-                .map(projectGeoPoint);
-
-              if (holePoints.length >= 4) {
-                landShape.holes.push(new THREE.Path(holePoints));
-              }
-            });
-
-            const landGeometry = trackDisposable(
-              new THREE.ExtrudeGeometry(landShape, {
-                bevelEnabled: true,
-                bevelSegments: 2,
-                bevelSize: 0.008,
-                bevelThickness: 0.008,
-                depth: 0.082,
-              }),
-            );
-            landGeometry.rotateX(-Math.PI / 2);
-            landGeometry.computeVertexNormals();
-
-            const landMesh = new THREE.Mesh(landGeometry, [
-              landMaterial,
-              landSideMaterial,
-            ]);
-            landMesh.position.y = -0.006;
-            worldMapGroup.add(landMesh);
-          };
-
-          (worldLand as unknown as GeoJsonFeatureCollection).features.forEach((feature) => {
-            const { geometry } = feature;
-            const polygons =
-              geometry.type === "Polygon" ? [geometry.coordinates] : geometry.coordinates;
-
-            polygons.forEach((polygon) => {
-              polygon[0]?.forEach(addProjectedSample);
-              addMapPolygon(polygon);
-            });
-          });
+          reliefRimGeometry.scale(mapRadiusX * 1.022, mapRadiusZ * 1.062, 1);
+          reliefRimGeometry.rotateX(-Math.PI / 2);
+          const reliefRim = new THREE.Mesh(reliefRimGeometry, reliefRimMaterial);
+          reliefRim.position.y = 0.012;
+          reliefRim.renderOrder = 5;
+          worldMapGroup.add(reliefRim);
 
           const binaryGlyphGeometry = trackDisposable(
             new THREE.PlaneGeometry(0.102, 0.132),
@@ -1275,7 +1345,7 @@ export function EthereumLogoOrbit({
             const sample =
               projectedLandPoints[
                 Math.floor(Math.random() * projectedLandPoints.length)
-              ] ?? { x: 0, y: 0 };
+              ] ?? { height: 0, x: 0, z: 0 };
             const glyphCount = 4 + (streamIndex % 3);
             const glyphs = Array.from({ length: glyphCount }, (_, glyphIndex) => {
               const glyph =
@@ -1283,7 +1353,11 @@ export function EthereumLogoOrbit({
               const material = createBinaryGlyphMaterial(glyph);
               const mesh = new THREE.Mesh(binaryGlyphGeometry, material);
 
-              mesh.position.set(sample.x, 0.09 + glyphIndex * 0.13, -sample.y);
+              mesh.position.set(
+                sample.x,
+                0.15 + sample.height + glyphIndex * 0.13,
+                sample.z,
+              );
               mesh.rotation.y = (Math.random() - 0.5) * 0.28;
               mesh.renderOrder = 12;
               mesh.visible = false;
@@ -1298,7 +1372,8 @@ export function EthereumLogoOrbit({
 
             return {
               baseX: sample.x,
-              baseZ: -sample.y,
+              baseHeight: sample.height,
+              baseZ: sample.z,
               duration: randomBetween(0.9, 1.7),
               glyphs,
               nextStartAt: randomBetween(0, 1.8),
@@ -1360,7 +1435,7 @@ export function EthereumLogoOrbit({
                 mesh.visible = visibility > 0.01;
                 mesh.position.set(
                   streamState.baseX,
-                  0.105 + offset * 0.62 + progress * 0.2,
+                  0.165 + streamState.baseHeight + offset * 0.62 + progress * 0.2,
                   streamState.baseZ,
                 );
                 mesh.scale.setScalar(0.94 + visibility * 0.24);
