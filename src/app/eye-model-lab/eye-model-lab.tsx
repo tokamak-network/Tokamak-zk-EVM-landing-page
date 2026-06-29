@@ -426,16 +426,8 @@ export function EyeModelLab() {
         resizeObserver.observe(canvas);
         resize();
 
-        const reducedMotion = window.matchMedia(
-          "(prefers-reduced-motion: reduce)",
-        );
-
         const render = () => {
           const time = performance.now() * 0.001;
-
-          if (!state.dragging && !reducedMotion.matches) {
-            state.targetRotationY += 0.0022;
-          }
 
           eyeRig.rotation.x += (state.targetRotationX - eyeRig.rotation.x) * 0.08;
           eyeRig.rotation.y += (state.targetRotationY - eyeRig.rotation.y) * 0.08;
