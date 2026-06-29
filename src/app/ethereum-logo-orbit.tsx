@@ -362,7 +362,13 @@ export function EthereumLogoOrbit({
           new THREE.BoxGeometry(0.11, 0.19, 0.012),
         );
         const validatorSlotGeometry = trackDisposable(
-          new THREE.BoxGeometry(0.074, 0.006, 0.004),
+          new THREE.PlaneGeometry(0.058, 0.006),
+        );
+        const validatorLedGeometry = trackDisposable(
+          new THREE.CircleGeometry(0.016, 16),
+        );
+        const validatorLedGlowGeometry = trackDisposable(
+          new THREE.CircleGeometry(0.038, 20),
         );
         const personMaterial = trackDisposable(
           new THREE.MeshStandardMaterial({
@@ -405,14 +411,17 @@ export function EthereumLogoOrbit({
           }),
         );
         const validatorSlotMaterial = trackDisposable(
-          new THREE.MeshStandardMaterial({
-            color: "#9fe4ff",
-            emissive: "#35a8ff",
-            emissiveIntensity: 0.82,
-            metalness: 0,
-            roughness: 0.28,
+          new THREE.MeshBasicMaterial({
+            color: "#9fb2c7",
+            side: THREE.DoubleSide,
+            toneMapped: false,
           }),
         );
+        const ledPalette = [
+          { off: new THREE.Color(0x4a0808), on: new THREE.Color(0xff3030) },
+          { off: new THREE.Color(0x4a3806), on: new THREE.Color(0xffd43b) },
+          { off: new THREE.Color(0x083f1a), on: new THREE.Color(0x32ff74) },
+        ] as const;
         const verificationLineMaterial = trackDisposable(
           new THREE.LineBasicMaterial({
             blending: THREE.AdditiveBlending,
@@ -460,14 +469,24 @@ export function EthereumLogoOrbit({
           replayPacket: InstanceType<typeof THREE.Mesh>;
           phase: number;
           target: InstanceType<typeof THREE.Vector3>;
+          targetIndex: number | null;
+          sourceIndex: number;
         }> = [];
         const meshPacketAnimations: Array<{
           from: InstanceType<typeof THREE.Vector3>;
+          fromIndex: number;
           packet: InstanceType<typeof THREE.Mesh>;
           phase: number;
           speed: number;
           to: InstanceType<typeof THREE.Vector3>;
+          toIndex: number;
         }> = [];
+        const nodeLedMaterials: Array<
+          Array<InstanceType<typeof THREE.MeshBasicMaterial>>
+        > = [];
+        const nodeLedGlowMaterials: Array<
+          Array<InstanceType<typeof THREE.MeshBasicMaterial>>
+        > = [];
 
         const observerCount = 22;
         const strengthVerificationTarget = new THREE.Vector3(0, -1.34, 0.18);
@@ -491,9 +510,10 @@ export function EthereumLogoOrbit({
         for (let index = 0; index < observerCount; index++) {
           const angle = (index / observerCount) * Math.PI * 2;
           const radius = 1.66 + (index % 4) * 0.14;
+          const strengthTargetIndex = (index * 7 + 5) % observerCount;
           const target =
             variant === "strength"
-              ? getStrengthHome((index * 7 + 5) % observerCount)
+              ? getStrengthHome(strengthTargetIndex)
               : tradeoffVerificationTarget;
           const home =
             variant === "strength"
@@ -517,8 +537,32 @@ export function EthereumLogoOrbit({
           if (variant === "strength") {
             const nodeRotation = -angle - Math.PI / 2;
             const heightOffset = (index % 4) * 0.012;
+            const ledMaterials = ledPalette.map(({ off }) =>
+              trackDisposable(
+                new THREE.MeshBasicMaterial({
+                  color: off,
+                  side: THREE.DoubleSide,
+                  toneMapped: false,
+                }),
+              ),
+            );
+            const ledGlowMaterials = ledPalette.map(({ on }) =>
+              trackDisposable(
+                new THREE.MeshBasicMaterial({
+                  blending: THREE.AdditiveBlending,
+                  color: on,
+                  depthWrite: false,
+                  opacity: 0,
+                  side: THREE.DoubleSide,
+                  toneMapped: false,
+                  transparent: true,
+                }),
+              ),
+            );
 
             person.rotation.y = nodeRotation;
+            nodeLedMaterials[index] = ledMaterials;
+            nodeLedGlowMaterials[index] = ledGlowMaterials;
 
             const base = new THREE.Mesh(
               validatorBaseGeometry,
@@ -541,11 +585,35 @@ export function EthereumLogoOrbit({
                 validatorSlotMaterial,
               );
               clientSlot.position.set(
-                0,
+                0.016,
                 0.046 - layerIndex * 0.055 + heightOffset,
-                0.082,
+                0.079,
               );
               person.add(clientSlot);
+
+              const ledGlow = new THREE.Mesh(
+                validatorLedGlowGeometry,
+                ledGlowMaterials[layerIndex],
+              );
+              ledGlow.position.set(
+                -0.048,
+                0.046 - layerIndex * 0.055 + heightOffset,
+                0.080,
+              );
+              ledGlow.renderOrder = 4;
+              person.add(ledGlow);
+
+              const led = new THREE.Mesh(
+                validatorLedGeometry,
+                ledMaterials[layerIndex],
+              );
+              led.position.set(
+                -0.048,
+                0.046 - layerIndex * 0.055 + heightOffset,
+                0.081,
+              );
+              led.renderOrder = 5;
+              person.add(led);
             }
           } else {
             const body = new THREE.Mesh(personBodyGeometry, personPartMaterial);
@@ -601,10 +669,12 @@ export function EthereumLogoOrbit({
 
               meshPacketAnimations.push({
                 from: home,
+                fromIndex: index,
                 packet: meshPacket,
                 phase: ((index * 13 + edge * 17) % 29) / 29,
                 speed: 0.08 + ((index * 7 + edge * 11) % 5) * 0.012,
                 to: meshTarget,
+                toIndex: targetIndex,
               });
             }
           }
@@ -623,23 +693,60 @@ export function EthereumLogoOrbit({
             phase: index * 0.43,
             replayPacket,
             target,
+            targetIndex: variant === "strength" ? strengthTargetIndex : null,
+            sourceIndex: index,
           });
         }
 
         updateStoryLayers.push((time) => {
-          meshPacketAnimations.forEach(({ from, packet, phase, speed, to }) => {
-            const progress = (time * speed + phase) % 1;
-            const visibility = Math.sin(progress * Math.PI);
+          const ledActivity = Array.from({ length: observerCount }, () => [
+            0,
+            0,
+            0,
+          ]);
+          const markNodeActivity = (
+            nodeIndex: number | null,
+            ledIndex: number,
+            intensity: number,
+          ) => {
+            if (nodeIndex === null || !nodeLedMaterials[nodeIndex]) {
+              return;
+            }
 
-            packet.position.lerpVectors(from, to, progress);
-            packet.scale.setScalar(0.72 + visibility * 0.32);
-            (
-              packet.material as InstanceType<typeof THREE.MeshBasicMaterial>
-            ).opacity = 0.12 + visibility * 0.3;
-          });
+            ledActivity[nodeIndex][ledIndex] = Math.max(
+              ledActivity[nodeIndex][ledIndex],
+              Math.min(1, intensity),
+            );
+          };
+
+          meshPacketAnimations.forEach(
+            ({ from, fromIndex, packet, phase, speed, to, toIndex }) => {
+              const progress = (time * speed + phase) % 1;
+              const visibility = Math.sin(progress * Math.PI);
+
+              packet.position.lerpVectors(from, to, progress);
+              packet.scale.setScalar(0.72 + visibility * 0.32);
+              (
+                packet.material as InstanceType<typeof THREE.MeshBasicMaterial>
+              ).opacity = 0.12 + visibility * 0.3;
+              markNodeActivity(fromIndex, 0, 1 - Math.min(progress / 0.2, 1));
+              markNodeActivity(toIndex, 2, Math.max((progress - 0.8) / 0.2, 0));
+              markNodeActivity(fromIndex, 1, visibility * 0.22);
+              markNodeActivity(toIndex, 1, visibility * 0.22);
+            },
+          );
 
           observerAnimations.forEach(
-            ({ group, home, observePacket, phase, replayPacket, target }) => {
+            ({
+              group,
+              home,
+              observePacket,
+              phase,
+              replayPacket,
+              sourceIndex,
+              target,
+              targetIndex,
+            }) => {
               const bob = Math.sin(time * 1.8 + phase) * 0.026;
               group.position.set(home.x, home.y + bob, home.z);
 
@@ -658,8 +765,52 @@ export function EthereumLogoOrbit({
                 target,
                 replayProgress,
               );
+              markNodeActivity(
+                targetIndex,
+                0,
+                1 - Math.min(observeProgress / 0.2, 1),
+              );
+              markNodeActivity(
+                sourceIndex,
+                2,
+                Math.max((observeProgress - 0.8) / 0.2, 0),
+              );
+              markNodeActivity(
+                sourceIndex,
+                0,
+                1 - Math.min(replayProgress / 0.2, 1),
+              );
+              markNodeActivity(
+                targetIndex,
+                2,
+                Math.max((replayProgress - 0.8) / 0.2, 0),
+              );
+              markNodeActivity(
+                sourceIndex,
+                1,
+                Math.sin(replayProgress * Math.PI) * 0.18,
+              );
+              markNodeActivity(
+                targetIndex,
+                1,
+                Math.sin(observeProgress * Math.PI) * 0.18,
+              );
             },
           );
+
+          nodeLedMaterials.forEach((materials, nodeIndex) => {
+            materials.forEach((material, ledIndex) => {
+              material.color.copy(ledPalette[ledIndex].off).lerp(
+                ledPalette[ledIndex].on,
+                ledActivity[nodeIndex][ledIndex],
+              );
+            });
+          });
+          nodeLedGlowMaterials.forEach((materials, nodeIndex) => {
+            materials.forEach((material, ledIndex) => {
+              material.opacity = ledActivity[nodeIndex][ledIndex] * 0.62;
+            });
+          });
         });
 
         const privacyGroup = new THREE.Group();
