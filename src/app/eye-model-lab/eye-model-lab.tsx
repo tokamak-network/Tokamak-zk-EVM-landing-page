@@ -162,10 +162,8 @@ export function EyeModelLab() {
         const lidPoint = (t: number, upper: boolean, z = 0.69) => {
           const x = -eyeWidth / 2 + t * eyeWidth;
           const arch = Math.sin(t * Math.PI);
-          const canthusSlope = (t - 0.5) * 0.018;
-          const y = upper
-            ? -0.006 + arch * 0.31 + canthusSlope
-            : -0.006 - arch * 0.265 + canthusSlope * 0.6;
+          const base = -0.006 + (t - 0.5) * 0.014;
+          const y = upper ? base + arch * 0.31 : base - arch * 0.265;
 
           return new THREE.Vector3(x, y, z);
         };
@@ -299,6 +297,30 @@ export function EyeModelLab() {
           return mesh;
         };
 
+        const createLidBand = (
+          upper: boolean,
+          thickness: number,
+          material: InstanceType<typeof THREE.Material>,
+          z: number,
+        ) => {
+          const samples = 72;
+          const outer: Array<[number, number]> = [];
+          const inner: Array<[number, number]> = [];
+
+          for (let index = 0; index < samples; index++) {
+            const t = index / (samples - 1);
+            const point = lidPoint(t, upper);
+            const taper = Math.sin(t * Math.PI);
+            const bandThickness = thickness * Math.pow(taper, 0.78);
+            const yOffset = upper ? bandThickness : -bandThickness;
+
+            outer.push([point.x, point.y + yOffset]);
+            inner.push([point.x, point.y]);
+          }
+
+          return createShapeMesh([...outer, ...inner.reverse()], material, z);
+        };
+
         const upperOpening = Array.from({ length: 60 }, (_, index) =>
           lidPoint(index / 59, true, 0.705),
         );
@@ -309,9 +331,11 @@ export function EyeModelLab() {
           ...Array.from({ length: 60 }, (_, index) => {
             const t = index / 59;
             const inner = lidPoint(t, true, 0.705);
-            const y = inner.y + 0.07 + Math.sin(t * Math.PI) * 0.075;
+            const taper = Math.sin(t * Math.PI);
+            const y = inner.y + taper * 0.145;
+            const x = inner.x + (t - 0.5) * 0.05 * taper;
 
-            return [inner.x + (t - 0.5) * 0.05, y] as [number, number];
+            return [x, y] as [number, number];
           }),
           ...upperOpening
             .slice()
@@ -323,47 +347,19 @@ export function EyeModelLab() {
           ...Array.from({ length: 60 }, (_, index) => {
             const t = 1 - index / 59;
             const inner = lidPoint(t, false, 0.703);
-            const y = inner.y - 0.055 - Math.sin(t * Math.PI) * 0.045;
+            const taper = Math.sin(t * Math.PI);
+            const y = inner.y - taper * 0.1;
+            const x = inner.x + (t - 0.5) * 0.035 * taper;
 
-            return [inner.x + (t - 0.5) * 0.035, y] as [number, number];
+            return [x, y] as [number, number];
           }),
         ];
 
         eyeRig.add(createShapeMesh(upperSkin, skinMaterial, 0.718));
         eyeRig.add(createShapeMesh(lowerSkin, skinMaterial, 0.716));
 
-        const makeTube = (
-          points: Array<InstanceType<typeof THREE.Vector3>>,
-          radius: number,
-          material: InstanceType<typeof THREE.Material>,
-          segments = 48,
-        ) => {
-          return new THREE.Mesh(
-            trackDisposable(
-              new THREE.TubeGeometry(
-                new THREE.CatmullRomCurve3(points),
-                segments,
-                radius,
-                10,
-                false,
-              ),
-            ),
-            material,
-          );
-        };
-
-        eyeRig.add(makeTube(upperOpening, 0.026, rimMaterial, 96));
-        eyeRig.add(makeTube(lowerOpening, 0.018, wetlineMaterial, 96));
-
-        const upperCrease = Array.from({ length: 56 }, (_, index) => {
-          const t = index / 55;
-          const point = lidPoint(t, true, 0.674);
-          point.y += 0.135 + Math.sin(t * Math.PI) * 0.035;
-          point.x += (t - 0.5) * 0.05;
-
-          return point;
-        });
-        eyeRig.add(makeTube(upperCrease, 0.012, wetlineMaterial, 80));
+        eyeRig.add(createLidBand(true, 0.052, rimMaterial, 0.724));
+        eyeRig.add(createLidBand(false, 0.034, wetlineMaterial, 0.722));
 
         const highlightMaterial = trackDisposable(
           new THREE.MeshBasicMaterial({
