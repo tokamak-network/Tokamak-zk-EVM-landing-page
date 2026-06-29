@@ -1248,7 +1248,7 @@ export function EthereumLogoOrbit({
           const projectMapPoint = (u: number, v: number) => {
             const latitude = 1 - v * 2;
             const longitude = u * 2 - 1;
-            const widthAtLatitude = Math.sqrt(Math.max(0.08, 1 - latitude * latitude));
+            const widthAtLatitude = Math.sqrt(Math.max(0, 1 - latitude * latitude));
 
             return {
               x: longitude * mapRadiusX * widthAtLatitude,
@@ -1311,7 +1311,7 @@ export function EthereumLogoOrbit({
           const reliefBaseGeometry = trackDisposable(
             new THREE.CylinderGeometry(1, 1, 0.09, 160, 1),
           );
-          reliefBaseGeometry.scale(mapRadiusX * 1.02, 1, mapRadiusZ * 1.06);
+          reliefBaseGeometry.scale(mapRadiusX * 1.006, 1, mapRadiusZ * 1.012);
           const reliefBaseMaterial = trackDisposable(
             new THREE.MeshStandardMaterial({
               color: "#07131c",
