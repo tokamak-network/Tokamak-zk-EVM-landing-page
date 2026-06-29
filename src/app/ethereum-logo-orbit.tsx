@@ -1383,8 +1383,8 @@ export function EthereumLogoOrbit({
                 transparent: true,
               }),
             );
-          const binaryGlyphSpacing = 0.085;
-          const binaryGlyphDelay = 0.055;
+          const binaryGlyphSpacing = 0.0425;
+          const binaryGlyphDelay = 0.0275;
           const binaryStreamCount = 44;
           const binaryStreamActiveSpacing = 0.32;
           const binaryStreamActiveSpacingSq =
