@@ -1,10 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import worldLand from "../data/ne_110m_land.json";
 
 type EthereumLogoOrbitProps = Readonly<{
   variant?: "strength" | "tradeoff";
 }>;
+
+type GeoJsonPosition = [number, number] | [number, number, number];
+type GeoJsonPolygon = GeoJsonPosition[][];
+type GeoJsonGeometry =
+  | { type: "Polygon"; coordinates: GeoJsonPolygon }
+  | { type: "MultiPolygon"; coordinates: GeoJsonPolygon[] };
+type GeoJsonFeatureCollection = {
+  features: Array<{ geometry: GeoJsonGeometry }>;
+};
 
 export function EthereumLogoOrbit({
   variant = "tradeoff",
@@ -666,7 +676,9 @@ export function EthereumLogoOrbit({
           return strengthHomes[index].clone();
         };
 
-        storyGroup.add(observerGroup);
+        if (variant === "strength") {
+          storyGroup.add(observerGroup);
+        }
 
         for (let index = 0; index < observerCount; index++) {
           const angle = (index / observerCount) * Math.PI * 2;
@@ -1041,112 +1053,353 @@ export function EthereumLogoOrbit({
           });
         });
 
-        const privacyGroup = new THREE.Group();
-        privacyGroup.position.set(1.58, -0.72, 0.2);
-        privacyGroup.scale.setScalar(0.84);
         if (variant === "tradeoff") {
-          storyGroup.add(privacyGroup);
-        }
+          const faceEyeLineMaterial = trackDisposable(
+            new THREE.LineBasicMaterial({
+              blending: THREE.AdditiveBlending,
+              color: "#dff8ff",
+              depthWrite: false,
+              opacity: 0.86,
+              transparent: true,
+            }),
+          );
+          const faceEyeIrisMaterial = trackDisposable(
+            new THREE.MeshBasicMaterial({
+              blending: THREE.AdditiveBlending,
+              color: "#70c8ff",
+              depthWrite: false,
+              opacity: 0.34,
+              side: THREE.DoubleSide,
+              transparent: true,
+            }),
+          );
+          const faceEyePupilMaterial = trackDisposable(
+            new THREE.MeshBasicMaterial({
+              color: "#050a12",
+              depthWrite: false,
+              opacity: 0.92,
+              side: THREE.DoubleSide,
+              transparent: true,
+            }),
+          );
+          const faceEyeHighlightMaterial = trackDisposable(
+            new THREE.MeshBasicMaterial({
+              blending: THREE.AdditiveBlending,
+              color: "#ffffff",
+              depthWrite: false,
+              opacity: 0.52,
+              side: THREE.DoubleSide,
+              transparent: true,
+            }),
+          );
+          const faceEyeOutlineGeometry = trackDisposable(
+            new THREE.BufferGeometry().setFromPoints(
+              Array.from({ length: 81 }, (_, pointIndex) => {
+                const angle = (pointIndex / 80) * Math.PI * 2;
 
-        const eyeMaterial = trackDisposable(
-          new THREE.LineBasicMaterial({
-            blending: THREE.AdditiveBlending,
-            color: "#ff9ac7",
-            depthWrite: false,
-            opacity: 0.72,
-            transparent: true,
-          }),
-        );
-        const upperEye = new THREE.EllipseCurve(0, 0, 0.32, 0.16, 0, Math.PI);
-        const lowerEye = new THREE.EllipseCurve(
-          0,
-          0,
-          0.32,
-          0.16,
-          Math.PI,
-          Math.PI * 2,
-        );
-        const eyeGeometry = trackDisposable(
-          new THREE.BufferGeometry().setFromPoints([
-            ...upperEye.getPoints(36),
-            ...lowerEye.getPoints(36),
-          ].map((point) => new THREE.Vector3(point.x, point.y, 0.02))),
-        );
-        const eyeLine = new THREE.Line(eyeGeometry, eyeMaterial);
-        privacyGroup.add(eyeLine);
+                return new THREE.Vector3(
+                  Math.cos(angle) * 0.22,
+                  Math.sin(angle) * 0.1,
+                  0,
+                );
+              }),
+            ),
+          );
+          const faceEyeIrisGeometry = trackDisposable(
+            new THREE.CircleGeometry(0.07, 32),
+          );
+          const faceEyePupilGeometry = trackDisposable(
+            new THREE.CircleGeometry(0.033, 24),
+          );
+          const faceEyeHighlightGeometry = trackDisposable(
+            new THREE.CircleGeometry(0.012, 12),
+          );
+          const lowerFaceTriples = [
+            [bottom, lowerFront, lowerLeft],
+            [bottom, lowerRight, lowerFront],
+            [bottom, lowerBack, lowerRight],
+            [bottom, lowerLeft, lowerBack],
+          ] as const;
 
-        const pupilMaterial = trackDisposable(
-          new THREE.MeshBasicMaterial({
-            blending: THREE.AdditiveBlending,
-            color: "#ffd1e4",
-            depthWrite: false,
-            opacity: 0.54,
-            transparent: true,
-          }),
-        );
-        const pupil = new THREE.Mesh(
-          trackDisposable(new THREE.SphereGeometry(0.055, 18, 12)),
-          pupilMaterial,
-        );
-        pupil.position.z = 0.04;
-        privacyGroup.add(pupil);
+          lowerFaceTriples.forEach((facePoints) => {
+            const centroid = facePoints
+              .reduce(
+                (sum, point) => sum.add(point),
+                new THREE.Vector3(0, 0, 0),
+              )
+              .divideScalar(facePoints.length);
+            const xAxis = new THREE.Vector3()
+              .subVectors(facePoints[2], facePoints[1])
+              .normalize();
+            const normal = new THREE.Vector3()
+              .crossVectors(
+                new THREE.Vector3().subVectors(facePoints[1], facePoints[0]),
+                new THREE.Vector3().subVectors(facePoints[2], facePoints[0]),
+              )
+              .normalize();
+            const yAxis = new THREE.Vector3()
+              .crossVectors(normal, xAxis)
+              .normalize();
+            const eyeBasis = new THREE.Matrix4().makeBasis(xAxis, yAxis, normal);
+            const eyeGroup = new THREE.Group();
 
-        const slashGeometry = trackDisposable(
-          new THREE.BufferGeometry().setFromPoints([
-            new THREE.Vector3(-0.34, -0.23, 0.06),
-            new THREE.Vector3(0.34, 0.23, 0.06),
-          ]),
-        );
-        const slashMaterial = trackDisposable(
-          new THREE.LineBasicMaterial({
-            blending: THREE.AdditiveBlending,
-            color: "#ff5d97",
-            depthWrite: false,
-            opacity: 0.86,
-            transparent: true,
-          }),
-        );
-        const privacySlash = new THREE.Line(slashGeometry, slashMaterial);
-        privacyGroup.add(privacySlash);
+            eyeGroup.position.copy(centroid).addScaledVector(normal, 0.018);
+            eyeGroup.quaternion.setFromRotationMatrix(eyeBasis);
+            eyeGroup.scale.setScalar(1.08);
 
-        if (variant === "tradeoff") {
+            const outline = new THREE.Line(
+              faceEyeOutlineGeometry,
+              faceEyeLineMaterial,
+            );
+            outline.renderOrder = 6;
+            eyeGroup.add(outline);
+
+            const iris = new THREE.Mesh(
+              faceEyeIrisGeometry,
+              faceEyeIrisMaterial,
+            );
+            iris.position.z = 0.003;
+            iris.scale.y = 0.62;
+            iris.renderOrder = 7;
+            eyeGroup.add(iris);
+
+            const pupil = new THREE.Mesh(
+              faceEyePupilGeometry,
+              faceEyePupilMaterial,
+            );
+            pupil.position.z = 0.006;
+            pupil.scale.y = 0.84;
+            pupil.renderOrder = 8;
+            eyeGroup.add(pupil);
+
+            const highlight = new THREE.Mesh(
+              faceEyeHighlightGeometry,
+              faceEyeHighlightMaterial,
+            );
+            highlight.position.set(0.019, 0.018, 0.009);
+            highlight.renderOrder = 9;
+            eyeGroup.add(highlight);
+
+            logoGroup.add(eyeGroup);
+          });
+
+          const worldMapGroup = new THREE.Group();
+          worldMapGroup.position.set(0, -1.78, 0.2);
+          worldMapGroup.scale.setScalar(0.96);
+          storyGroup.add(worldMapGroup);
+
+          const oceanPlateGeometry = trackDisposable(
+            new THREE.BoxGeometry(3.26, 0.018, 1.54),
+          );
+          const oceanPlateMaterial = trackDisposable(
+            new THREE.MeshStandardMaterial({
+              color: "#06111b",
+              emissive: "#031a29",
+              emissiveIntensity: 0.26,
+              metalness: 0.18,
+              opacity: 0.9,
+              roughness: 0.52,
+              transparent: true,
+            }),
+          );
+          const oceanPlate = new THREE.Mesh(oceanPlateGeometry, oceanPlateMaterial);
+          oceanPlate.position.y = -0.012;
+          worldMapGroup.add(oceanPlate);
+
+          const landMaterial = trackDisposable(
+            new THREE.MeshStandardMaterial({
+              color: "#1c7c9c",
+              emissive: "#0c3954",
+              emissiveIntensity: 0.44,
+              metalness: 0.16,
+              roughness: 0.46,
+            }),
+          );
+          const landSideMaterial = trackDisposable(
+            new THREE.MeshStandardMaterial({
+              color: "#0b334a",
+              emissive: "#051724",
+              emissiveIntensity: 0.24,
+              metalness: 0.1,
+              roughness: 0.58,
+            }),
+          );
+          const projectedLandPoints: Array<{ x: number; y: number }> = [];
+          const projectGeoPoint = ([longitude, latitude]: GeoJsonPosition) => {
+            return new THREE.Vector2((longitude / 180) * 1.58, (latitude / 90) * 0.72);
+          };
+          const addProjectedSample = (point: GeoJsonPosition, sampleIndex: number) => {
+            if (sampleIndex % 6 !== 0 || point[1] < -58) {
+              return;
+            }
+
+            const projected = projectGeoPoint(point);
+            projectedLandPoints.push({ x: projected.x, y: projected.y });
+          };
+          const addMapPolygon = (polygon: GeoJsonPolygon) => {
+            const exterior = polygon[0]
+              ?.filter((point, pointIndex) => pointIndex % 2 === 0)
+              .map(projectGeoPoint);
+
+            if (!exterior || exterior.length < 4) {
+              return;
+            }
+
+            const landShape = new THREE.Shape(exterior);
+
+            polygon.slice(1).forEach((hole) => {
+              const holePoints = hole
+                .filter((point, pointIndex) => pointIndex % 2 === 0)
+                .map(projectGeoPoint);
+
+              if (holePoints.length >= 4) {
+                landShape.holes.push(new THREE.Path(holePoints));
+              }
+            });
+
+            const landGeometry = trackDisposable(
+              new THREE.ExtrudeGeometry(landShape, {
+                bevelEnabled: true,
+                bevelSegments: 1,
+                bevelSize: 0.003,
+                bevelThickness: 0.004,
+                depth: 0.045,
+              }),
+            );
+            landGeometry.rotateX(-Math.PI / 2);
+            landGeometry.computeVertexNormals();
+
+            const landMesh = new THREE.Mesh(landGeometry, [
+              landMaterial,
+              landSideMaterial,
+            ]);
+            landMesh.position.y = -0.002;
+            worldMapGroup.add(landMesh);
+          };
+
+          (worldLand as unknown as GeoJsonFeatureCollection).features.forEach((feature) => {
+            const { geometry } = feature;
+            const polygons =
+              geometry.type === "Polygon" ? [geometry.coordinates] : geometry.coordinates;
+
+            polygons.forEach((polygon) => {
+              polygon[0]?.forEach(addProjectedSample);
+              addMapPolygon(polygon);
+            });
+          });
+
+          const binaryStreamGeometry = trackDisposable(
+            new THREE.PlaneGeometry(0.22, 0.72),
+          );
+          const createBinaryStreamTexture = (streamIndex: number) => {
+            const streamCanvas = document.createElement("canvas");
+            streamCanvas.width = 192;
+            streamCanvas.height = 384;
+            const context = streamCanvas.getContext("2d");
+
+            if (context) {
+              context.clearRect(0, 0, streamCanvas.width, streamCanvas.height);
+              context.font = "700 34px monospace";
+              context.textAlign = "center";
+              context.textBaseline = "top";
+              context.shadowColor = "rgba(130, 230, 255, 0.9)";
+              context.shadowBlur = 12;
+
+              for (let row = 0; row < 9; row++) {
+                const bits = Array.from({ length: 4 }, (_, bitIndex) =>
+                  (streamIndex * 17 + row * 11 + bitIndex * 5) % 3 === 0
+                    ? "0"
+                    : "1",
+                ).join("");
+                const alpha = 0.36 + ((streamIndex + row) % 5) * 0.12;
+
+                context.fillStyle = `rgba(153, 235, 255, ${alpha})`;
+                context.fillText(bits, streamCanvas.width / 2, row * 40);
+              }
+            }
+
+            const texture = trackDisposable(new THREE.CanvasTexture(streamCanvas));
+            texture.colorSpace = THREE.SRGBColorSpace;
+
+            return texture;
+          };
+          const binaryStreams = Array.from({ length: 64 }, (_, streamIndex) => {
+            const sample =
+              projectedLandPoints[
+                Math.floor(Math.random() * projectedLandPoints.length)
+              ] ?? { x: 0, y: 0 };
+            const texture = createBinaryStreamTexture(streamIndex);
+            const material = trackDisposable(
+              new THREE.MeshBasicMaterial({
+                blending: THREE.AdditiveBlending,
+                color: "#8feaff",
+                depthTest: false,
+                depthWrite: false,
+                map: texture,
+                opacity: 0,
+                side: THREE.DoubleSide,
+                transparent: true,
+              }),
+            );
+            const stream = new THREE.Mesh(binaryStreamGeometry, material);
+
+            stream.position.set(sample.x, 0.13, -sample.y);
+            stream.rotation.y = (Math.random() - 0.5) * 0.32;
+            stream.renderOrder = 10;
+            worldMapGroup.add(stream);
+
+            return {
+              duration: randomBetween(0.72, 1.42),
+              material,
+              nextStartAt: randomBetween(0, 1.8),
+              startedAt: null as number | null,
+              stream,
+              texture,
+            };
+          });
+
           updateStoryLayers.push((time) => {
-            const privacyPulse = (Math.sin(time * 1.86 + 1.2) + 1) / 2;
+            storyStartedAt ??= time;
+            const storyTime = time - storyStartedAt;
 
-            privacyGroup.scale.setScalar(0.8 + privacyPulse * 0.08);
-            eyeMaterial.opacity = 0.5 + privacyPulse * 0.32;
-            slashMaterial.opacity = 0.72 + privacyPulse * 0.2;
-            pupilMaterial.opacity = 0.38 + privacyPulse * 0.28;
+            binaryStreams.forEach((streamState) => {
+              if (
+                streamState.startedAt === null &&
+                storyTime >= streamState.nextStartAt
+              ) {
+                streamState.startedAt = storyTime;
+                streamState.duration = randomBetween(0.72, 1.42);
+              }
+
+              if (streamState.startedAt === null) {
+                streamState.material.opacity = 0;
+                streamState.stream.visible = false;
+                return;
+              }
+
+              const progress =
+                (storyTime - streamState.startedAt) / streamState.duration;
+
+              if (progress >= 1) {
+                streamState.startedAt = null;
+                streamState.nextStartAt = storyTime + randomBetween(0.08, 1.1);
+                streamState.material.opacity = 0;
+                streamState.stream.visible = false;
+                return;
+              }
+
+              const fadeIn = Math.min(progress / 0.18, 1);
+              const fadeOut = Math.min((1 - progress) / 0.28, 1);
+              const visibility = Math.min(fadeIn, fadeOut);
+
+              streamState.stream.visible = true;
+              streamState.stream.position.y = 0.1 + progress * 0.16;
+              streamState.stream.scale.y = 0.78 + progress * 0.58;
+              streamState.material.opacity = visibility * 0.96;
+              streamState.texture.offset.y = progress * 0.32;
+            });
           });
         }
-
-        const pressureRingGeometry = trackDisposable(
-          new THREE.TorusGeometry(1.36, 0.006, 8, 128),
-        );
-        const pressureRingMaterial = trackDisposable(
-          new THREE.MeshBasicMaterial({
-            blending: THREE.AdditiveBlending,
-            color: "#4bbaff",
-            depthWrite: false,
-            opacity: 0.22,
-            transparent: true,
-          }),
-        );
-        const pressureRing = new THREE.Mesh(
-          pressureRingGeometry,
-          pressureRingMaterial,
-        );
-        pressureRing.rotation.x = Math.PI / 2;
-        pressureRing.scale.y = 0.58;
-        if (variant === "tradeoff") {
-          storyGroup.add(pressureRing);
-        }
-
-        updateStoryLayers.push((time) => {
-          const ringPulse = (Math.sin(time * 1.28) + 1) / 2;
-
-          pressureRingMaterial.opacity = 0.08 + ringPulse * 0.1;
-        });
 
         const logoPitch = (31.5 * Math.PI) / 180;
 
@@ -1184,9 +1437,12 @@ export function EthereumLogoOrbit({
           const time = performance.now() * 0.001;
 
           if (!reducedMotion.matches) {
-            logoGroup.rotation.y = 0.58 + time * logoSpinSpeed;
-            pressureRing.rotation.z = time * 0.09;
-            observerGroup.rotation.y = Math.sin(time * 0.13) * 0.12;
+            if (variant === "strength") {
+              logoGroup.rotation.y = 0.58 + time * logoSpinSpeed;
+              observerGroup.rotation.y = Math.sin(time * 0.13) * 0.12;
+            } else {
+              logoGroup.rotation.y = 0.58;
+            }
           }
 
           updateStoryLayers.forEach((updateStoryLayer) =>
