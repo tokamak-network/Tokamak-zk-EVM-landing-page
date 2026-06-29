@@ -1192,7 +1192,7 @@ export function EthereumLogoOrbit({
             };
           };
           const reliefToHeight = (relief: number) =>
-            Math.pow(Math.max(0, relief - 0.45) / 0.55, 1.55) * reliefHeight;
+            Math.pow(relief, 0.72) * reliefHeight;
 
           for (let zIndex = 0; zIndex <= mapSegmentsZ; zIndex += 1) {
             const v = zIndex / mapSegmentsZ;

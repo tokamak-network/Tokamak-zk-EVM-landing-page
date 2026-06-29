@@ -134,7 +134,7 @@ export function WorldMapLab() {
         return heightImageData.data[index] / 255;
       };
       const reliefToHeight = (relief: number) =>
-        Math.pow(Math.max(0, relief - 0.45) / 0.55, 1.45) * reliefHeight;
+        Math.pow(relief, 0.72) * reliefHeight;
       const projectPoint = (u: number, v: number) => {
         const latitude = 1 - v * 2;
         const longitude = u * 2 - 1;
