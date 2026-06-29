@@ -1185,7 +1185,7 @@ export function EthereumLogoOrbit({
 
           const mapRadiusX = 1.76;
           const mapRadiusZ = 0.82;
-          const reliefHeight = 0.26;
+          const reliefHeight = 0.14;
           const mapSegmentsX = 164;
           const mapSegmentsZ = 82;
           const mapPositions: number[] = [];
@@ -1244,61 +1244,32 @@ export function EthereumLogoOrbit({
             const color = sampleColor(u, v);
             const { hue, lightness, saturation } = rgbToHsl(color);
             const blue =
-              color.b > 100 &&
+              color.b > 88 &&
               hue >= 165 &&
               hue <= 255 &&
-              color.b >= color.r + 2 &&
-              color.b >= color.g - 8;
-            const white = lightness >= 0.76 && saturation <= 0.24;
+              color.b >= color.r - 4 &&
+              color.b >= color.g - 16 &&
+              saturation >= 0.16;
+            const white = lightness >= 0.72 && saturation <= 0.3;
             const green =
-              hue >= 72 &&
-              hue <= 165 &&
-              color.g >= color.r - 14 &&
-              color.g >= color.b - 18 &&
-              lightness >= 0.34;
+              hue >= 62 &&
+              hue <= 172 &&
+              color.g >= color.b - 24 &&
+              lightness >= 0.3;
             const ochre =
-              hue >= 28 &&
-              hue < 72 &&
-              color.r >= color.b + 8 &&
-              color.g >= color.b + 4 &&
-              lightness >= 0.36;
+              hue >= 24 &&
+              hue < 78 &&
+              color.r >= color.b - 2 &&
+              color.g >= color.b - 4 &&
+              lightness >= 0.32;
+            const neutralLand =
+              lightness >= 0.43 && saturation <= 0.26 && color.b < 205;
 
             return {
               blue,
-              raised: !blue && (green || ochre || white),
+              raised: !blue && (green || ochre || white || neutralLand),
             };
           };
-          const cellSampleOffsets = [
-            [0, 0],
-            [0.25, 0],
-            [0.5, 0],
-            [0.75, 0],
-            [1, 0],
-            [0, 0.25],
-            [0.25, 0.25],
-            [0.5, 0.25],
-            [0.75, 0.25],
-            [1, 0.25],
-            [0, 0.5],
-            [0.25, 0.5],
-            [0.5, 0.5],
-            [0.75, 0.5],
-            [1, 0.5],
-            [0, 0.75],
-            [0.25, 0.75],
-            [0.5, 0.75],
-            [0.75, 0.75],
-            [1, 0.75],
-            [0, 1],
-            [0.25, 1],
-            [0.5, 1],
-            [0.75, 1],
-            [1, 1],
-          ] as const;
-          const cellAllowsHeight = Array.from(
-            { length: mapSegmentsZ },
-            () => Array.from({ length: mapSegmentsX }, () => false),
-          );
           const landMaskCanvas = document.createElement("canvas");
           landMaskCanvas.width = 1024;
           landMaskCanvas.height = 512;
@@ -1357,74 +1328,47 @@ export function EthereumLogoOrbit({
             };
           };
           const reliefToHeight = (relief: number) =>
-            Math.pow(relief, 0.72) * reliefHeight;
+            Math.pow(relief, 1.12) * reliefHeight;
 
-          for (let zIndex = 0; zIndex < mapSegmentsZ; zIndex += 1) {
-            for (let xIndex = 0; xIndex < mapSegmentsX; xIndex += 1) {
-              let allowed = true;
+          for (let zIndex = 0; zIndex <= mapSegmentsZ; zIndex += 1) {
+            const v = zIndex / mapSegmentsZ;
 
-              for (const [offsetX, offsetZ] of cellSampleOffsets) {
-                const u = (xIndex + offsetX) / mapSegmentsX;
-                const v = (zIndex + offsetZ) / mapSegmentsZ;
-                const classification = classifyMapColor(u, v);
+            for (let xIndex = 0; xIndex <= mapSegmentsX; xIndex += 1) {
+              const u = xIndex / mapSegmentsX;
+              const projected = projectMapPoint(u, v);
+              const relief = sampleRelief(u, v);
+              const height = relief > 0 ? reliefToHeight(relief) : 0;
 
-                if (!classification.raised) {
-                  allowed = false;
-                  break;
-                }
+              mapPositions.push(projected.x, height, projected.z);
+              mapUvs.push(u, v);
+
+              if (
+                zIndex % 4 === 0 &&
+                xIndex % 4 === 0 &&
+                height > 0.016 &&
+                classifyMapColor(u, v).raised &&
+                v > 0.08 &&
+                v < 0.9
+              ) {
+                projectedLandPoints.push({
+                  height,
+                  x: projected.x,
+                  z: projected.z,
+                });
               }
-
-              cellAllowsHeight[zIndex][xIndex] = allowed;
             }
           }
 
+          const rowStride = mapSegmentsX + 1;
+
           for (let zIndex = 0; zIndex < mapSegmentsZ; zIndex += 1) {
             for (let xIndex = 0; xIndex < mapSegmentsX; xIndex += 1) {
-              const allowed = cellAllowsHeight[zIndex][xIndex];
-              const corners = [
-                [xIndex, zIndex],
-                [xIndex + 1, zIndex],
-                [xIndex, zIndex + 1],
-                [xIndex + 1, zIndex + 1],
-              ] as const;
-              const baseIndex = mapPositions.length / 3;
+              const a = zIndex * rowStride + xIndex;
+              const b = a + 1;
+              const c = a + rowStride;
+              const d = c + 1;
 
-              for (const [cornerX, cornerZ] of corners) {
-                const u = cornerX / mapSegmentsX;
-                const v = cornerZ / mapSegmentsZ;
-                const projected = projectMapPoint(u, v);
-                const height = allowed
-                  ? 0.006 + reliefToHeight(sampleRelief(u, v))
-                  : 0;
-
-                mapPositions.push(projected.x, height, projected.z);
-                mapUvs.push(u, v);
-              }
-
-              if (allowed && zIndex % 4 === 0 && xIndex % 4 === 0) {
-                const centerU = (xIndex + 0.5) / mapSegmentsX;
-                const centerV = (zIndex + 0.5) / mapSegmentsZ;
-                const centerHeight = reliefToHeight(sampleRelief(centerU, centerV));
-
-                if (centerHeight > 0.024 && centerV > 0.08 && centerV < 0.9) {
-                  const center = projectMapPoint(centerU, centerV);
-
-                  projectedLandPoints.push({
-                    height: centerHeight,
-                    x: center.x,
-                    z: center.z,
-                  });
-                }
-              }
-
-              mapIndices.push(
-                baseIndex,
-                baseIndex + 2,
-                baseIndex + 1,
-                baseIndex + 1,
-                baseIndex + 2,
-                baseIndex + 3,
-              );
+              mapIndices.push(a, c, b, b, c, d);
             }
           }
 
