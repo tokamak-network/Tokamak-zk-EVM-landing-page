@@ -356,19 +356,19 @@ export function EthereumLogoOrbit({
           new THREE.CylinderGeometry(0.052, 0.07, 0.16, 18, 1),
         );
         const validatorBaseGeometry = trackDisposable(
-          new THREE.BoxGeometry(0.22, 0.07, 0.16),
+          new THREE.BoxGeometry(0.14, 0.24, 0.13),
         );
-        const validatorDeckGeometry = trackDisposable(
-          new THREE.BoxGeometry(0.16, 0.045, 0.12),
+        const validatorFaceGeometry = trackDisposable(
+          new THREE.BoxGeometry(0.11, 0.19, 0.012),
         );
-        const validatorCoreGeometry = trackDisposable(
-          new THREE.CylinderGeometry(0.038, 0.032, 0.07, 6, 1),
+        const validatorStateGeometry = trackDisposable(
+          new THREE.OctahedronGeometry(0.045, 0),
         );
         const validatorPortGeometry = trackDisposable(
-          new THREE.BoxGeometry(0.026, 0.012, 0.01),
+          new THREE.BoxGeometry(0.074, 0.01, 0.012),
         );
         const validatorLightGeometry = trackDisposable(
-          new THREE.SphereGeometry(0.014, 10, 8),
+          new THREE.SphereGeometry(0.011, 10, 8),
         );
         const personMaterial = trackDisposable(
           new THREE.MeshStandardMaterial({
@@ -394,27 +394,27 @@ export function EthereumLogoOrbit({
         );
         const validatorShellMaterial = trackDisposable(
           new THREE.MeshStandardMaterial({
-            color: "#7fa8d8",
-            emissive: "#12386f",
-            emissiveIntensity: 0.42,
-            metalness: 0.18,
-            opacity: 0.84,
-            roughness: 0.46,
+            color: "#86a9d6",
+            emissive: "#0e2c5a",
+            emissiveIntensity: 0.36,
+            metalness: 0.24,
+            opacity: 0.88,
+            roughness: 0.42,
             transparent: true,
           }),
         );
-        const validatorDeckMaterial = trackDisposable(
+        const validatorPanelMaterial = trackDisposable(
           new THREE.MeshStandardMaterial({
-            color: "#cde9ff",
-            emissive: "#1b6bb5",
-            emissiveIntensity: 0.34,
-            metalness: 0.08,
-            opacity: 0.78,
-            roughness: 0.38,
+            color: "#d7efff",
+            emissive: "#1a5f9d",
+            emissiveIntensity: 0.28,
+            metalness: 0.1,
+            opacity: 0.72,
+            roughness: 0.34,
             transparent: true,
           }),
         );
-        const validatorCoreMaterial = trackDisposable(
+        const validatorSignalMaterial = trackDisposable(
           new THREE.MeshBasicMaterial({
             blending: THREE.AdditiveBlending,
             color: "#dff7ff",
@@ -525,7 +525,7 @@ export function EthereumLogoOrbit({
             : personMaterial;
 
           if (variant === "strength") {
-            const nodeRotation = angle + Math.PI / 2;
+            const nodeRotation = angle + Math.PI;
             const heightOffset = (index % 4) * 0.012;
 
             person.rotation.y = nodeRotation;
@@ -534,43 +534,48 @@ export function EthereumLogoOrbit({
               validatorBaseGeometry,
               validatorShellMaterial,
             );
-            base.position.y = -0.03 + heightOffset;
-            base.scale.set(1 + (index % 3) * 0.05, 1, 1);
+            base.position.y = -0.016 + heightOffset;
+            base.scale.set(0.92 + (index % 3) * 0.04, 1, 1);
             person.add(base);
 
-            const deck = new THREE.Mesh(
-              validatorDeckGeometry,
-              validatorDeckMaterial,
+            const face = new THREE.Mesh(
+              validatorFaceGeometry,
+              validatorPanelMaterial,
             );
-            deck.position.y = 0.035 + heightOffset;
-            person.add(deck);
+            face.position.set(0, -0.016 + heightOffset, 0.072);
+            person.add(face);
 
-            const core = new THREE.Mesh(
-              validatorCoreGeometry,
-              validatorCoreMaterial,
+            const stateShard = new THREE.Mesh(
+              validatorStateGeometry,
+              validatorSignalMaterial,
             );
-            core.position.y = 0.106 + heightOffset;
-            core.rotation.y = Math.PI / 6;
-            person.add(core);
+            stateShard.position.y = 0.15 + heightOffset;
+            stateShard.rotation.y = Math.PI / 4;
+            stateShard.rotation.z = Math.PI / 8;
+            person.add(stateShard);
 
-            for (let portIndex = 0; portIndex < 3; portIndex++) {
-              const port = new THREE.Mesh(
+            for (let layerIndex = 0; layerIndex < 3; layerIndex++) {
+              const clientLayer = new THREE.Mesh(
                 validatorPortGeometry,
-                validatorDeckMaterial,
+                validatorPanelMaterial,
               );
-              port.position.set(-0.058 + portIndex * 0.058, 0.038, 0.066);
-              person.add(port);
+              clientLayer.position.set(
+                -0.016,
+                0.046 - layerIndex * 0.055 + heightOffset,
+                0.082,
+              );
+              person.add(clientLayer);
             }
 
-            for (let lightIndex = 0; lightIndex < 2; lightIndex++) {
+            for (let lightIndex = 0; lightIndex < 4; lightIndex++) {
               const light = new THREE.Mesh(
                 validatorLightGeometry,
-                validatorCoreMaterial,
+                validatorSignalMaterial,
               );
               light.position.set(
-                lightIndex === 0 ? -0.064 : 0.064,
-                0.086 + heightOffset,
-                0.054,
+                0.048,
+                0.066 - lightIndex * 0.038 + heightOffset,
+                0.086,
               );
               person.add(light);
             }
