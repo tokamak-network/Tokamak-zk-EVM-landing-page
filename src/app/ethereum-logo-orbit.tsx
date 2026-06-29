@@ -1158,6 +1158,30 @@ export function EthereumLogoOrbit({
             };
             image.src = "/textures/maps/world-relief-height.png";
           });
+          const colorImageData = await new Promise<ImageData>((resolve, reject) => {
+            const image = new Image();
+
+            image.onload = () => {
+              const colorCanvas = document.createElement("canvas");
+              colorCanvas.width = image.naturalWidth;
+              colorCanvas.height = image.naturalHeight;
+              const context = colorCanvas.getContext("2d");
+
+              if (!context) {
+                reject(new Error("Color map canvas context is unavailable."));
+                return;
+              }
+
+              context.drawImage(image, 0, 0);
+              resolve(
+                context.getImageData(0, 0, colorCanvas.width, colorCanvas.height),
+              );
+            };
+            image.onerror = () => {
+              reject(new Error("Unable to load Natural Earth color map."));
+            };
+            image.src = "/textures/maps/world-relief-color.jpg";
+          });
 
           const mapRadiusX = 1.76;
           const mapRadiusZ = 0.82;
@@ -1169,6 +1193,147 @@ export function EthereumLogoOrbit({
           const mapIndices: number[] = [];
           const projectedLandPoints: Array<{ x: number; z: number; height: number }> =
             [];
+          const sampleColor = (u: number, v: number) => {
+            const x = Math.max(
+              0,
+              Math.min(colorImageData.width - 1, Math.round(u * (colorImageData.width - 1))),
+            );
+            const y = Math.max(
+              0,
+              Math.min(colorImageData.height - 1, Math.round(v * (colorImageData.height - 1))),
+            );
+            const index = (y * colorImageData.width + x) * 4;
+
+            return {
+              b: colorImageData.data[index + 2],
+              g: colorImageData.data[index + 1],
+              r: colorImageData.data[index],
+            };
+          };
+          const rgbToHsl = ({ b, g, r }: { b: number; g: number; r: number }) => {
+            const red = r / 255;
+            const green = g / 255;
+            const blue = b / 255;
+            const max = Math.max(red, green, blue);
+            const min = Math.min(red, green, blue);
+            const lightness = (max + min) / 2;
+            let hue = 0;
+            let saturation = 0;
+
+            if (max !== min) {
+              const delta = max - min;
+              saturation =
+                lightness > 0.5
+                  ? delta / (2 - max - min)
+                  : delta / (max + min);
+
+              if (max === red) {
+                hue = (green - blue) / delta + (green < blue ? 6 : 0);
+              } else if (max === green) {
+                hue = (blue - red) / delta + 2;
+              } else {
+                hue = (red - green) / delta + 4;
+              }
+
+              hue *= 60;
+            }
+
+            return { hue, lightness, saturation };
+          };
+          const classifyMapColor = (u: number, v: number) => {
+            const color = sampleColor(u, v);
+            const { hue, lightness, saturation } = rgbToHsl(color);
+            const blue =
+              color.b > 100 &&
+              hue >= 165 &&
+              hue <= 255 &&
+              color.b >= color.r + 2 &&
+              color.b >= color.g - 8;
+            const white = lightness >= 0.76 && saturation <= 0.24;
+            const green =
+              hue >= 72 &&
+              hue <= 165 &&
+              color.g >= color.r - 14 &&
+              color.g >= color.b - 18 &&
+              lightness >= 0.34;
+            const ochre =
+              hue >= 28 &&
+              hue < 72 &&
+              color.r >= color.b + 8 &&
+              color.g >= color.b + 4 &&
+              lightness >= 0.36;
+
+            return {
+              blue,
+              raised: !blue && (green || ochre || white),
+            };
+          };
+          const cellSampleOffsets = [
+            [0, 0],
+            [0.25, 0],
+            [0.5, 0],
+            [0.75, 0],
+            [1, 0],
+            [0, 0.25],
+            [0.25, 0.25],
+            [0.5, 0.25],
+            [0.75, 0.25],
+            [1, 0.25],
+            [0, 0.5],
+            [0.25, 0.5],
+            [0.5, 0.5],
+            [0.75, 0.5],
+            [1, 0.5],
+            [0, 0.75],
+            [0.25, 0.75],
+            [0.5, 0.75],
+            [0.75, 0.75],
+            [1, 0.75],
+            [0, 1],
+            [0.25, 1],
+            [0.5, 1],
+            [0.75, 1],
+            [1, 1],
+          ] as const;
+          const cellAllowsHeight = Array.from(
+            { length: mapSegmentsZ },
+            () => Array.from({ length: mapSegmentsX }, () => false),
+          );
+          const landMaskCanvas = document.createElement("canvas");
+          landMaskCanvas.width = 1024;
+          landMaskCanvas.height = 512;
+          const landMaskContext = landMaskCanvas.getContext("2d");
+
+          if (!landMaskContext) {
+            throw new Error("Land mask canvas context is unavailable.");
+          }
+
+          const landMaskImage = landMaskContext.createImageData(
+            landMaskCanvas.width,
+            landMaskCanvas.height,
+          );
+
+          for (let y = 0; y < landMaskCanvas.height; y += 1) {
+            for (let x = 0; x < landMaskCanvas.width; x += 1) {
+              const u = x / (landMaskCanvas.width - 1);
+              const v = y / (landMaskCanvas.height - 1);
+              const value = classifyMapColor(u, v).raised ? 255 : 0;
+              const index = (y * landMaskCanvas.width + x) * 4;
+
+              landMaskImage.data[index] = value;
+              landMaskImage.data[index + 1] = value;
+              landMaskImage.data[index + 2] = value;
+              landMaskImage.data[index + 3] = 255;
+            }
+          }
+
+          landMaskContext.putImageData(landMaskImage, 0, 0);
+          const landMaskTexture = trackDisposable(
+            new THREE.CanvasTexture(landMaskCanvas),
+          );
+          landMaskTexture.minFilter = THREE.LinearFilter;
+          landMaskTexture.magFilter = THREE.LinearFilter;
+          landMaskTexture.needsUpdate = true;
           const sampleRelief = (u: number, v: number) => {
             const x = Math.max(
               0,
@@ -1194,43 +1359,72 @@ export function EthereumLogoOrbit({
           const reliefToHeight = (relief: number) =>
             Math.pow(relief, 0.72) * reliefHeight;
 
-          for (let zIndex = 0; zIndex <= mapSegmentsZ; zIndex += 1) {
-            const v = zIndex / mapSegmentsZ;
+          for (let zIndex = 0; zIndex < mapSegmentsZ; zIndex += 1) {
+            for (let xIndex = 0; xIndex < mapSegmentsX; xIndex += 1) {
+              let allowed = true;
 
-            for (let xIndex = 0; xIndex <= mapSegmentsX; xIndex += 1) {
-              const u = xIndex / mapSegmentsX;
-              const projected = projectMapPoint(u, v);
-              const height = reliefToHeight(sampleRelief(u, v));
+              for (const [offsetX, offsetZ] of cellSampleOffsets) {
+                const u = (xIndex + offsetX) / mapSegmentsX;
+                const v = (zIndex + offsetZ) / mapSegmentsZ;
+                const classification = classifyMapColor(u, v);
 
-              mapPositions.push(projected.x, height, projected.z);
-              mapUvs.push(u, v);
-
-              if (
-                zIndex % 4 === 0 &&
-                xIndex % 4 === 0 &&
-                height > 0.024 &&
-                v > 0.08 &&
-                v < 0.9
-              ) {
-                projectedLandPoints.push({
-                  height,
-                  x: projected.x,
-                  z: projected.z,
-                });
+                if (!classification.raised) {
+                  allowed = false;
+                  break;
+                }
               }
+
+              cellAllowsHeight[zIndex][xIndex] = allowed;
             }
           }
 
-          const rowStride = mapSegmentsX + 1;
-
           for (let zIndex = 0; zIndex < mapSegmentsZ; zIndex += 1) {
             for (let xIndex = 0; xIndex < mapSegmentsX; xIndex += 1) {
-              const a = zIndex * rowStride + xIndex;
-              const b = a + 1;
-              const c = a + rowStride;
-              const d = c + 1;
+              const allowed = cellAllowsHeight[zIndex][xIndex];
+              const corners = [
+                [xIndex, zIndex],
+                [xIndex + 1, zIndex],
+                [xIndex, zIndex + 1],
+                [xIndex + 1, zIndex + 1],
+              ] as const;
+              const baseIndex = mapPositions.length / 3;
 
-              mapIndices.push(a, c, b, b, c, d);
+              for (const [cornerX, cornerZ] of corners) {
+                const u = cornerX / mapSegmentsX;
+                const v = cornerZ / mapSegmentsZ;
+                const projected = projectMapPoint(u, v);
+                const height = allowed
+                  ? 0.006 + reliefToHeight(sampleRelief(u, v))
+                  : 0;
+
+                mapPositions.push(projected.x, height, projected.z);
+                mapUvs.push(u, v);
+              }
+
+              if (allowed && zIndex % 4 === 0 && xIndex % 4 === 0) {
+                const centerU = (xIndex + 0.5) / mapSegmentsX;
+                const centerV = (zIndex + 0.5) / mapSegmentsZ;
+                const centerHeight = reliefToHeight(sampleRelief(centerU, centerV));
+
+                if (centerHeight > 0.024 && centerV > 0.08 && centerV < 0.9) {
+                  const center = projectMapPoint(centerU, centerV);
+
+                  projectedLandPoints.push({
+                    height: centerHeight,
+                    x: center.x,
+                    z: center.z,
+                  });
+                }
+              }
+
+              mapIndices.push(
+                baseIndex,
+                baseIndex + 2,
+                baseIndex + 1,
+                baseIndex + 1,
+                baseIndex + 2,
+                baseIndex + 3,
+              );
             }
           }
 
@@ -1245,6 +1439,21 @@ export function EthereumLogoOrbit({
           );
           reliefMapGeometry.setIndex(mapIndices);
           reliefMapGeometry.computeVertexNormals();
+
+          const flatMapPositions = mapPositions.map((value, index) =>
+            index % 3 === 1 ? 0 : value,
+          );
+          const flatMapGeometry = trackDisposable(new THREE.BufferGeometry());
+          flatMapGeometry.setAttribute(
+            "position",
+            new THREE.Float32BufferAttribute(flatMapPositions, 3),
+          );
+          flatMapGeometry.setAttribute(
+            "uv",
+            new THREE.Float32BufferAttribute(mapUvs, 2),
+          );
+          flatMapGeometry.setIndex(mapIndices);
+          flatMapGeometry.computeVertexNormals();
 
           const reliefBaseGeometry = trackDisposable(
             new THREE.CylinderGeometry(1, 1, 0.09, 160, 1),
@@ -1266,6 +1475,8 @@ export function EthereumLogoOrbit({
 
           const reliefMapMaterial = trackDisposable(
             new THREE.MeshStandardMaterial({
+              alphaMap: landMaskTexture,
+              alphaTest: 0.45,
               color: "#b9cfd8",
               emissive: "#0a1f2a",
               emissiveIntensity: 0.1,
@@ -1275,8 +1486,23 @@ export function EthereumLogoOrbit({
               side: THREE.DoubleSide,
             }),
           );
+          const flatMapMaterial = trackDisposable(
+            new THREE.MeshStandardMaterial({
+              color: "#d3e1e3",
+              emissive: "#061923",
+              emissiveIntensity: 0.08,
+              map: mapColorTexture,
+              metalness: 0.05,
+              roughness: 0.62,
+              side: THREE.DoubleSide,
+            }),
+          );
+          const flatMap = new THREE.Mesh(flatMapGeometry, flatMapMaterial);
+          flatMap.renderOrder = 4;
+          worldMapGroup.add(flatMap);
+
           const reliefMap = new THREE.Mesh(reliefMapGeometry, reliefMapMaterial);
-          reliefMap.renderOrder = 4;
+          reliefMap.renderOrder = 5;
           worldMapGroup.add(reliefMap);
 
           const reliefRimMaterial = trackDisposable(
@@ -1296,7 +1522,7 @@ export function EthereumLogoOrbit({
           reliefRimGeometry.rotateX(-Math.PI / 2);
           const reliefRim = new THREE.Mesh(reliefRimGeometry, reliefRimMaterial);
           reliefRim.position.y = 0.012;
-          reliefRim.renderOrder = 5;
+          reliefRim.renderOrder = 6;
           worldMapGroup.add(reliefRim);
 
           const binaryGlyphGeometry = trackDisposable(
