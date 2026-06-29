@@ -63,7 +63,7 @@ export function EyeModelLab() {
         scene.add(rimLight);
 
         const eyeRig = new THREE.Group();
-        eyeRig.rotation.set(-0.04, -0.22, 0.015);
+        eyeRig.rotation.set(0, 0, 0);
         scene.add(eyeRig);
 
         const irisCanvas = document.createElement("canvas");
@@ -163,7 +163,7 @@ export function EyeModelLab() {
           const x = -eyeWidth / 2 + t * eyeWidth;
           const arch = Math.sin(t * Math.PI);
           const base = -0.006 + (t - 0.5) * 0.014;
-          const y = upper ? base + arch * 0.31 : base - arch * 0.265;
+          const y = upper ? base + arch * 0.335 : base - arch * 0.285;
 
           return new THREE.Vector3(x, y, z);
         };
@@ -247,14 +247,14 @@ export function EyeModelLab() {
           }),
         );
         const iris = new THREE.Mesh(
-          trackDisposable(new THREE.CircleGeometry(0.305, 128)),
+          trackDisposable(new THREE.CircleGeometry(0.265, 128)),
           irisMaterial,
         );
-        iris.position.set(0.01, 0.004, 0.695);
+        iris.position.set(0, 0, 0.695);
         eyeRig.add(iris);
 
         const cornea = new THREE.Mesh(
-          trackDisposable(new THREE.CircleGeometry(0.332, 128)),
+          trackDisposable(new THREE.CircleGeometry(0.288, 128)),
           trackDisposable(
             new THREE.MeshPhysicalMaterial({
               clearcoat: 1,
@@ -269,7 +269,7 @@ export function EyeModelLab() {
             }),
           ),
         );
-        cornea.position.set(0.01, 0.004, 0.704);
+        cornea.position.set(0, 0, 0.704);
         eyeRig.add(cornea);
 
         const createShapeMesh = (
@@ -382,8 +382,8 @@ export function EyeModelLab() {
           dragging: false,
           lastX: 0,
           lastY: 0,
-          targetRotationX: -0.04,
-          targetRotationY: -0.22,
+          targetRotationX: 0,
+          targetRotationY: 0,
         };
 
         const onPointerDown = (event: PointerEvent) => {
