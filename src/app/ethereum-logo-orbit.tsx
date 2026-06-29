@@ -652,9 +652,9 @@ export function EthereumLogoOrbit({
         const observerCount = 22;
         const strengthVerificationTarget = new THREE.Vector3(0, -1.34, 0.18);
         const tradeoffVerificationTarget = centerPoint;
+        const strengthRadius = 1.38;
         const strengthHomes = Array.from({ length: observerCount }, (_, index) => {
           const angle = (index / observerCount) * Math.PI * 2;
-          const strengthRadius = 1.28 + (index % 3) * 0.08;
 
           return new THREE.Vector3(
             strengthVerificationTarget.x + Math.cos(angle) * strengthRadius,
@@ -697,7 +697,7 @@ export function EthereumLogoOrbit({
 
           if (variant === "strength") {
             const nodeRotation = -angle - Math.PI / 2;
-            const heightOffset = (index % 4) * 0.012;
+            const heightOffset = 0;
             const ledMaterials = ledPalette.map(({ off }) =>
               trackDisposable(
                 new THREE.MeshBasicMaterial({
@@ -730,7 +730,6 @@ export function EthereumLogoOrbit({
               validatorShellMaterial,
             );
             base.position.y = -0.016 + heightOffset;
-            base.scale.set(0.92 + (index % 3) * 0.04, 1, 1);
             person.add(base);
 
             const face = new THREE.Mesh(
