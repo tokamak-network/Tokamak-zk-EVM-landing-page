@@ -1385,11 +1385,56 @@ export function EthereumLogoOrbit({
             );
           const binaryGlyphSpacing = 0.085;
           const binaryGlyphDelay = 0.055;
-          const binaryStreams = Array.from({ length: 44 }, (_, streamIndex) => {
-            const sample =
-              projectedLandPoints[
-                Math.floor(Math.random() * projectedLandPoints.length)
-              ] ?? { height: 0, x: 0, z: 0 };
+          const binaryStreamCount = 44;
+          const binaryStreamActiveSpacing = 0.32;
+          const binaryStreamActiveSpacingSq =
+            binaryStreamActiveSpacing * binaryStreamActiveSpacing;
+          const binaryStreamAnchors: Array<{
+            height: number;
+            x: number;
+            z: number;
+          }> = [];
+
+          while (
+            binaryStreamAnchors.length < binaryStreamCount &&
+            projectedLandPoints.length > 0
+          ) {
+            let bestPoint = projectedLandPoints[0];
+            let bestDistanceSq = -1;
+
+            projectedLandPoints.forEach((candidate) => {
+              if (binaryStreamAnchors.length === 0) {
+                return;
+              }
+
+              const nearestDistanceSq = binaryStreamAnchors.reduce(
+                (nearest, selected) => {
+                  const dx = candidate.x - selected.x;
+                  const dz = candidate.z - selected.z;
+
+                  return Math.min(nearest, dx * dx + dz * dz);
+                },
+                Number.POSITIVE_INFINITY,
+              );
+
+              if (nearestDistanceSq > bestDistanceSq) {
+                bestDistanceSq = nearestDistanceSq;
+                bestPoint = candidate;
+              }
+            });
+
+            if (binaryStreamAnchors.length === 0) {
+              const startIndex = Math.floor(
+                Math.random() * projectedLandPoints.length,
+              );
+
+              bestPoint = projectedLandPoints[startIndex];
+            }
+
+            binaryStreamAnchors.push(bestPoint);
+          }
+
+          const binaryStreams = binaryStreamAnchors.map((sample, streamIndex) => {
             const glyphCount = 4 + (streamIndex % 3);
             const glyphs = Array.from({ length: glyphCount }, (_, glyphIndex) => {
               const glyph =
@@ -1430,6 +1475,17 @@ export function EthereumLogoOrbit({
             storyStartedAt ??= time;
             const storyTime = time - storyStartedAt;
             const activeStreamLimit = 17;
+            const hasNearbyActiveStream = (baseX: number, baseZ: number) =>
+              binaryStreams.some((streamState) => {
+                if (streamState.startedAt === null) {
+                  return false;
+                }
+
+                const dx = streamState.baseX - baseX;
+                const dz = streamState.baseZ - baseZ;
+
+                return dx * dx + dz * dz < binaryStreamActiveSpacingSq;
+              });
             let activeStreamCount = binaryStreams.reduce(
               (count, streamState) =>
                 streamState.startedAt === null ? count : count + 1,
@@ -1440,11 +1496,17 @@ export function EthereumLogoOrbit({
               if (
                 streamState.startedAt === null &&
                 storyTime >= streamState.nextStartAt &&
-                activeStreamCount < activeStreamLimit
+                activeStreamCount < activeStreamLimit &&
+                !hasNearbyActiveStream(streamState.baseX, streamState.baseZ)
               ) {
                 streamState.startedAt = storyTime;
                 streamState.duration = randomBetween(0.9, 1.7);
                 activeStreamCount += 1;
+              } else if (
+                streamState.startedAt === null &&
+                storyTime >= streamState.nextStartAt
+              ) {
+                streamState.nextStartAt = storyTime + randomBetween(0.12, 0.4);
               }
 
               if (streamState.startedAt === null) {
