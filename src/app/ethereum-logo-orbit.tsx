@@ -1488,11 +1488,10 @@ export function EthereumLogoOrbit({
           const time = performance.now() * 0.001;
 
           if (!reducedMotion.matches) {
+            logoGroup.rotation.y = 0.58 + time * logoSpinSpeed;
+
             if (variant === "strength") {
-              logoGroup.rotation.y = 0.58 + time * logoSpinSpeed;
               observerGroup.rotation.y = Math.sin(time * 0.13) * 0.12;
-            } else {
-              logoGroup.rotation.y = 0.58;
             }
           }
 
