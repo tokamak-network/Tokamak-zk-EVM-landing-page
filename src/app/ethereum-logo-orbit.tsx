@@ -355,35 +355,20 @@ export function EthereumLogoOrbit({
         const personBodyGeometry = trackDisposable(
           new THREE.CylinderGeometry(0.052, 0.07, 0.16, 18, 1),
         );
-        const humanHeadGeometry = trackDisposable(
-          new THREE.SphereGeometry(0.064, 16, 12),
+        const validatorBaseGeometry = trackDisposable(
+          new THREE.BoxGeometry(0.22, 0.07, 0.16),
         );
-        const humanNeckGeometry = trackDisposable(
-          new THREE.CylinderGeometry(0.018, 0.022, 0.038, 8, 1),
+        const validatorDeckGeometry = trackDisposable(
+          new THREE.BoxGeometry(0.16, 0.045, 0.12),
         );
-        const humanChestGeometry = trackDisposable(
-          new THREE.CylinderGeometry(0.07, 0.052, 0.15, 8, 1),
+        const validatorCoreGeometry = trackDisposable(
+          new THREE.CylinderGeometry(0.038, 0.032, 0.07, 6, 1),
         );
-        const humanPelvisGeometry = trackDisposable(
-          new THREE.CylinderGeometry(0.052, 0.064, 0.068, 8, 1),
+        const validatorPortGeometry = trackDisposable(
+          new THREE.BoxGeometry(0.026, 0.012, 0.01),
         );
-        const humanShoulderGeometry = trackDisposable(
-          new THREE.CylinderGeometry(0.016, 0.016, 0.18, 8, 1),
-        );
-        const humanUpperLimbGeometry = trackDisposable(
-          new THREE.CylinderGeometry(0.016, 0.018, 0.104, 8, 1),
-        );
-        const humanLowerLimbGeometry = trackDisposable(
-          new THREE.CylinderGeometry(0.012, 0.015, 0.104, 8, 1),
-        );
-        const humanHandGeometry = trackDisposable(
-          new THREE.SphereGeometry(0.019, 10, 8),
-        );
-        const humanFootGeometry = trackDisposable(
-          new THREE.BoxGeometry(0.052, 0.024, 0.068),
-        );
-        const humanFaceGeometry = trackDisposable(
-          new THREE.SphereGeometry(0.012, 8, 6),
+        const validatorLightGeometry = trackDisposable(
+          new THREE.SphereGeometry(0.014, 10, 8),
         );
         const personMaterial = trackDisposable(
           new THREE.MeshStandardMaterial({
@@ -404,6 +389,37 @@ export function EthereumLogoOrbit({
             metalness: 0.04,
             opacity: 0.52,
             roughness: 0.62,
+            transparent: true,
+          }),
+        );
+        const validatorShellMaterial = trackDisposable(
+          new THREE.MeshStandardMaterial({
+            color: "#7fa8d8",
+            emissive: "#12386f",
+            emissiveIntensity: 0.42,
+            metalness: 0.18,
+            opacity: 0.84,
+            roughness: 0.46,
+            transparent: true,
+          }),
+        );
+        const validatorDeckMaterial = trackDisposable(
+          new THREE.MeshStandardMaterial({
+            color: "#cde9ff",
+            emissive: "#1b6bb5",
+            emissiveIntensity: 0.34,
+            metalness: 0.08,
+            opacity: 0.78,
+            roughness: 0.38,
+            transparent: true,
+          }),
+        );
+        const validatorCoreMaterial = trackDisposable(
+          new THREE.MeshBasicMaterial({
+            blending: THREE.AdditiveBlending,
+            color: "#dff7ff",
+            depthWrite: false,
+            opacity: 0.86,
             transparent: true,
           }),
         );
@@ -509,122 +525,55 @@ export function EthereumLogoOrbit({
             : personMaterial;
 
           if (variant === "strength") {
-            const head = new THREE.Mesh(humanHeadGeometry, personPartMaterial);
-            head.position.y = 0.142;
-            head.scale.set(0.92, 1.05, 0.86);
-            person.add(head);
+            const nodeRotation = angle + Math.PI / 2;
+            const heightOffset = (index % 4) * 0.012;
 
-            const face = new THREE.Mesh(humanFaceGeometry, observePacketMaterial);
-            face.position.set(0, 0.15, 0.055);
-            person.add(face);
+            person.rotation.y = nodeRotation;
 
-            const neck = new THREE.Mesh(humanNeckGeometry, personPartMaterial);
-            neck.position.y = 0.072;
-            person.add(neck);
-
-            const chest = new THREE.Mesh(
-              humanChestGeometry,
-              personPartMaterial,
+            const base = new THREE.Mesh(
+              validatorBaseGeometry,
+              validatorShellMaterial,
             );
-            chest.position.y = -0.005;
-            chest.scale.z = 0.62;
-            person.add(chest);
+            base.position.y = -0.03 + heightOffset;
+            base.scale.set(1 + (index % 3) * 0.05, 1, 1);
+            person.add(base);
 
-            const pelvis = new THREE.Mesh(
-              humanPelvisGeometry,
-              personPartMaterial,
+            const deck = new THREE.Mesh(
+              validatorDeckGeometry,
+              validatorDeckMaterial,
             );
-            pelvis.position.y = -0.118;
-            pelvis.scale.z = 0.62;
-            person.add(pelvis);
+            deck.position.y = 0.035 + heightOffset;
+            person.add(deck);
 
-            const shoulders = new THREE.Mesh(
-              humanShoulderGeometry,
-              personPartMaterial,
+            const core = new THREE.Mesh(
+              validatorCoreGeometry,
+              validatorCoreMaterial,
             );
-            shoulders.position.y = 0.036;
-            shoulders.rotation.z = Math.PI / 2;
-            person.add(shoulders);
+            core.position.y = 0.106 + heightOffset;
+            core.rotation.y = Math.PI / 6;
+            person.add(core);
 
-            const leftUpperArm = new THREE.Mesh(
-              humanUpperLimbGeometry,
-              personPartMaterial,
-            );
-            leftUpperArm.position.set(-0.095, -0.022, 0);
-            leftUpperArm.rotation.z = -0.36;
-            person.add(leftUpperArm);
+            for (let portIndex = 0; portIndex < 3; portIndex++) {
+              const port = new THREE.Mesh(
+                validatorPortGeometry,
+                validatorDeckMaterial,
+              );
+              port.position.set(-0.058 + portIndex * 0.058, 0.038, 0.066);
+              person.add(port);
+            }
 
-            const leftForearm = new THREE.Mesh(
-              humanLowerLimbGeometry,
-              personPartMaterial,
-            );
-            leftForearm.position.set(-0.125, -0.102, 0);
-            leftForearm.rotation.z = -0.14;
-            person.add(leftForearm);
-
-            const leftHand = new THREE.Mesh(humanHandGeometry, personPartMaterial);
-            leftHand.position.set(-0.135, -0.17, 0);
-            person.add(leftHand);
-
-            const rightUpperArm = new THREE.Mesh(
-              humanUpperLimbGeometry,
-              personPartMaterial,
-            );
-            rightUpperArm.position.set(0.095, -0.022, 0);
-            rightUpperArm.rotation.z = 0.36;
-            person.add(rightUpperArm);
-
-            const rightForearm = new THREE.Mesh(
-              humanLowerLimbGeometry,
-              personPartMaterial,
-            );
-            rightForearm.position.set(0.125, -0.102, 0);
-            rightForearm.rotation.z = 0.14;
-            person.add(rightForearm);
-
-            const rightHand = new THREE.Mesh(humanHandGeometry, personPartMaterial);
-            rightHand.position.set(0.135, -0.17, 0);
-            person.add(rightHand);
-
-            const leftThigh = new THREE.Mesh(
-              humanUpperLimbGeometry,
-              personPartMaterial,
-            );
-            leftThigh.position.set(-0.034, -0.205, 0);
-            leftThigh.rotation.z = -0.08;
-            person.add(leftThigh);
-
-            const leftShin = new THREE.Mesh(
-              humanLowerLimbGeometry,
-              personPartMaterial,
-            );
-            leftShin.position.set(-0.04, -0.298, 0);
-            leftShin.rotation.z = -0.02;
-            person.add(leftShin);
-
-            const leftFoot = new THREE.Mesh(humanFootGeometry, personPartMaterial);
-            leftFoot.position.set(-0.044, -0.36, 0.026);
-            person.add(leftFoot);
-
-            const rightThigh = new THREE.Mesh(
-              humanUpperLimbGeometry,
-              personPartMaterial,
-            );
-            rightThigh.position.set(0.034, -0.205, 0);
-            rightThigh.rotation.z = 0.08;
-            person.add(rightThigh);
-
-            const rightShin = new THREE.Mesh(
-              humanLowerLimbGeometry,
-              personPartMaterial,
-            );
-            rightShin.position.set(0.04, -0.298, 0);
-            rightShin.rotation.z = 0.02;
-            person.add(rightShin);
-
-            const rightFoot = new THREE.Mesh(humanFootGeometry, personPartMaterial);
-            rightFoot.position.set(0.044, -0.36, 0.026);
-            person.add(rightFoot);
+            for (let lightIndex = 0; lightIndex < 2; lightIndex++) {
+              const light = new THREE.Mesh(
+                validatorLightGeometry,
+                validatorCoreMaterial,
+              );
+              light.position.set(
+                lightIndex === 0 ? -0.064 : 0.064,
+                0.086 + heightOffset,
+                0.054,
+              );
+              person.add(light);
+            }
           } else {
             const body = new THREE.Mesh(personBodyGeometry, personPartMaterial);
             body.position.y = -0.078;
