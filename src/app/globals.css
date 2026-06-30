@@ -484,22 +484,19 @@ p {
 }
 
 .vision-manifesto {
-  width: min(820px, calc(100% - var(--page-gutter)));
   padding: clamp(72px, 11vh, 124px) 0 var(--section-padding-large);
 }
 
 .vision-manifesto__intro h1 {
   margin: 0;
-  max-width: 780px;
   color: var(--foreground);
-  font-size: clamp(3.1rem, 7.4vw, 6.6rem);
-  line-height: 0.94;
+  font-size: clamp(2.7rem, 5.8vw, 5.1rem);
+  line-height: 0.96;
   font-weight: 790;
 }
 
 .vision-manifesto__intro p {
   margin-top: 26px;
-  max-width: 690px;
   color: #d8dde5;
   font-size: clamp(1.16rem, 2vw, 1.42rem);
   line-height: 1.56;
@@ -536,7 +533,6 @@ p {
 
 .vision-manifesto h2 {
   margin: 0;
-  max-width: 680px;
   color: var(--foreground);
   font-size: clamp(1.55rem, 2.8vw, 2.25rem);
   line-height: 1.08;
@@ -546,7 +542,6 @@ p {
 .vision-bridge,
 .vision-note p {
   margin-top: 16px;
-  max-width: 680px;
   color: #c3c9d3;
 }
 
@@ -755,12 +750,11 @@ code {
   }
 
   .vision-manifesto {
-    width: min(100% - var(--page-gutter), 820px);
     padding-top: 56px;
   }
 
   .vision-manifesto__intro h1 {
-    font-size: clamp(2.78rem, 13.8vw, 4.7rem);
+    font-size: clamp(2.38rem, 11vw, 3.6rem);
   }
 
   .vision-manifesto__intro p {
@@ -794,7 +788,7 @@ code {
   }
 
   .vision-manifesto__intro h1 {
-    font-size: 2.56rem;
+    font-size: 2.26rem;
   }
 
   .vision-manifesto__quote p {

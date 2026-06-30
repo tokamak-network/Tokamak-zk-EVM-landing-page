@@ -35,7 +35,7 @@ export default function VisionPage() {
 
       <article className="section-shell vision-manifesto">
         <header className="vision-manifesto__intro">
-          <h1>Privacy must be built, not granted.</h1>
+          <h1>Privacy: Built, Not Granted</h1>
           <p>
             Tonigma exists for people who want Ethereum&apos;s public
             verification without making every action public exhaust.
