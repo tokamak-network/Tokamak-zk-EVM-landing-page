@@ -387,7 +387,59 @@ main {
   z-index: 2;
   width: 32%;
   min-width: 0;
+  border-radius: 999px;
+  isolation: isolate;
   transform: translate(34%, -50%) scale(0.9);
+}
+
+.solution-flow .solution-flow__tonigma-logo::before,
+.solution-flow .solution-flow__tonigma-logo::after {
+  position: absolute;
+  border-radius: 999px;
+  content: "";
+  pointer-events: none;
+}
+
+.solution-flow .solution-flow__tonigma-logo::before {
+  inset: -9%;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 32% 22%, rgba(255, 255, 255, 0.18), transparent 15%),
+    radial-gradient(circle at 68% 74%, rgba(58, 195, 255, 0.12), transparent 32%),
+    radial-gradient(circle at 42% 36%, rgba(190, 237, 255, 0.07), transparent 42%),
+    radial-gradient(circle at 50% 48%, rgba(7, 20, 31, 0.01), rgba(5, 18, 28, 0.28) 76%, rgba(5, 18, 28, 0.48));
+  box-shadow:
+    inset 8px 10px 18px rgba(214, 247, 255, 0.11),
+    inset -18px -22px 34px rgba(1, 11, 20, 0.46),
+    0 0 20px rgba(87, 209, 255, 0.16),
+    0 22px 42px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(1.2px) saturate(1.12);
+}
+
+.solution-flow .solution-flow__tonigma-logo::after {
+  inset: -9%;
+  z-index: 3;
+  background:
+    conic-gradient(
+      from 218deg,
+      transparent 0deg,
+      rgba(222, 249, 255, 0.42) 18deg,
+      transparent 38deg,
+      transparent 118deg,
+      rgba(114, 220, 255, 0.26) 144deg,
+      transparent 168deg,
+      transparent 254deg,
+      rgba(244, 253, 255, 0.34) 282deg,
+      transparent 310deg,
+      transparent 360deg
+    );
+  mask-image: radial-gradient(circle, transparent 61%, #000 68%, #000 75%, transparent 82%);
+  mix-blend-mode: screen;
+}
+
+.solution-flow .solution-flow__tonigma-logo .tonigma-network-logo__canvas,
+.solution-flow .solution-flow__tonigma-logo .tonigma-network-logo__fallback {
+  z-index: 1;
 }
 
 .solution-flow__fallback {
