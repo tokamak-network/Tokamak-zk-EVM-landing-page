@@ -81,9 +81,9 @@ export function SolutionFlowAnimation() {
         const root = new THREE.Group();
         scene.add(root);
 
-        const ethereumPosition = new THREE.Vector3(-0.42, 1.16, 0);
-        const userPosition = new THREE.Vector3(-0.42, -1.34, 0);
-        const tonigmaPosition = new THREE.Vector3(1.48, -0.05, 0);
+        const ethereumPosition = new THREE.Vector3(-0.6333333333, 1.2366666667, 0);
+        const userPosition = new THREE.Vector3(-0.6333333333, -1.2633333333, 0);
+        const tonigmaPosition = new THREE.Vector3(1.2666666667, 0.0266666667, 0);
         const userBaseScale = 0.82;
 
         const createUserNode = () => {
