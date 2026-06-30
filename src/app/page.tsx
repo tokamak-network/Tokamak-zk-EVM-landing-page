@@ -8,6 +8,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { EthereumLogoOrbit } from "./ethereum-logo-orbit";
 import { ParallaxBackground } from "./parallax-background";
 import { TonigmaNetworkLogo } from "./tonigma-network-logo";
@@ -50,7 +51,10 @@ export default function Home() {
               width={42}
             />
           </a>
-          <div className="nav-actions" aria-label="Inactive page actions">
+          <div className="nav-actions" aria-label="Page navigation">
+            <Link className="nav-link nav-link--enabled" href="/vision">
+              Vision
+            </Link>
             <button className="nav-link" disabled type="button">
               Observer
             </button>

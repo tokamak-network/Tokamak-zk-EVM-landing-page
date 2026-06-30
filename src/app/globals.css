@@ -201,8 +201,21 @@ main {
   min-height: 34px;
   border: 0;
   padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
   color: var(--muted);
   background: transparent;
+  text-decoration: none;
+}
+
+.nav-link--enabled,
+.nav-link--active {
+  cursor: pointer;
+}
+
+.nav-link--enabled:hover,
+.nav-link--active {
+  color: var(--foreground);
 }
 
 .hero-copy {
@@ -462,6 +475,182 @@ p {
   max-width: 760px;
 }
 
+.vision-page {
+  min-height: 100vh;
+}
+
+.vision-hero {
+  min-height: 78vh;
+  padding: 24px 0 var(--section-padding);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--hero-block-gap);
+}
+
+.vision-hero__content {
+  align-self: center;
+  max-width: 900px;
+}
+
+.vision-hero h1 {
+  margin-top: var(--heading-gap);
+  max-width: 960px;
+  color: var(--foreground);
+  font-size: clamp(3.1rem, 8vw, 7rem);
+  line-height: 0.94;
+  font-weight: 780;
+}
+
+.vision-hero p {
+  margin-top: 24px;
+  max-width: 760px;
+  color: #d6d9dd;
+  font-size: 1.18rem;
+  line-height: 1.64;
+}
+
+.vision-source {
+  margin-top: 28px;
+  min-height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #f5f9ff;
+  background: rgba(255, 255, 255, 0.05);
+  text-decoration: none;
+}
+
+.vision-source:hover {
+  border-color: rgba(31, 143, 255, 0.52);
+  color: var(--foreground);
+  background: rgba(31, 143, 255, 0.12);
+}
+
+.vision-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: start;
+  gap: clamp(32px, 6vw, 88px);
+}
+
+.vision-statement {
+  max-width: 540px;
+}
+
+.vision-statement h2 {
+  font-size: clamp(2.15rem, 4vw, 3.4rem);
+}
+
+.vision-statement p {
+  margin-top: 20px;
+  max-width: 520px;
+}
+
+.vision-copy {
+  display: grid;
+  gap: 18px;
+  max-width: 680px;
+}
+
+.vision-copy p,
+.vision-timeline p,
+.vision-principle p,
+.vision-closing p {
+  color: #c3c9d3;
+}
+
+.vision-quote {
+  margin: 0;
+  border-left: 2px solid rgba(31, 143, 255, 0.72);
+  padding-left: 24px;
+}
+
+.vision-quote p {
+  color: var(--foreground);
+  font-size: clamp(1.9rem, 4.2vw, 3.7rem);
+  font-weight: 760;
+  line-height: 1.02;
+}
+
+.vision-quote cite {
+  margin-top: 18px;
+  display: block;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.vision-timeline {
+  display: grid;
+  gap: 22px;
+}
+
+.vision-timeline__item {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 22px;
+  display: grid;
+  grid-template-columns: 116px minmax(0, 1fr);
+  gap: 22px;
+}
+
+.vision-timeline__date {
+  color: var(--blue);
+  font-family:
+    "Geist Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.vision-timeline__item h3,
+.vision-principle h3 {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 1.18rem;
+  line-height: 1.22;
+}
+
+.vision-timeline__item p,
+.vision-principle p {
+  margin-top: 10px;
+  line-height: 1.64;
+}
+
+.vision-principles {
+  margin-top: 34px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 26px 34px;
+}
+
+.vision-principle {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 20px;
+}
+
+.vision-closing {
+  padding: var(--section-padding) 0 var(--section-padding-large);
+}
+
+.vision-closing h2 {
+  max-width: 940px;
+  font-size: clamp(2.4rem, 5vw, 4.8rem);
+}
+
+.vision-closing p {
+  margin-top: 24px;
+  max-width: 760px;
+  font-size: 1.12rem;
+  line-height: 1.68;
+}
+
 code {
   font-family:
     "Geist Mono",
@@ -518,6 +707,15 @@ code {
 
   .story-stage {
     min-height: 390px;
+  }
+
+  .vision-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .vision-statement,
+  .vision-copy {
+    max-width: 720px;
   }
 
 }
@@ -590,6 +788,33 @@ code {
     padding: var(--section-padding) 0;
   }
 
+  .vision-hero {
+    min-height: 72vh;
+    padding-bottom: var(--section-padding);
+  }
+
+  .vision-hero h1 {
+    font-size: clamp(2.9rem, 14vw, 4.7rem);
+  }
+
+  .vision-hero p {
+    font-size: 1.05rem;
+  }
+
+  .vision-timeline__item {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .vision-principles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .vision-source {
+    width: 100%;
+    justify-content: center;
+  }
+
   .story-stage {
     min-height: 340px;
   }
@@ -626,6 +851,14 @@ code {
 
   h2 {
     font-size: 1.86rem;
+  }
+
+  .vision-hero h1 {
+    font-size: 2.72rem;
+  }
+
+  .vision-quote p {
+    font-size: 1.72rem;
   }
 
   .ethereum-orbit {
