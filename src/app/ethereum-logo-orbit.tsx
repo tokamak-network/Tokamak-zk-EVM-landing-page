@@ -1114,7 +1114,7 @@ export function EthereumLogoOrbit({
           });
 
           const worldMapGroup = new THREE.Group();
-          worldMapGroup.position.set(0, -1.68, 0.18);
+          worldMapGroup.position.set(0, -1.34, 0.18);
           worldMapGroup.rotation.x = 0;
           worldMapGroup.scale.setScalar(1.08);
           storyGroup.add(worldMapGroup);

@@ -129,9 +129,9 @@ export default function Home() {
         aria-labelledby="ethereum-tradeoff-title"
       >
         <div className="story-copy">
-          <span className="section-kicker">Ethereum tradeoff</span>
+          <span className="section-kicker">We Want Privacy on Ethereum</span>
           <h2 id="ethereum-tradeoff-title">
-            The same public verification model exposes activity by design.
+            Transparency for Security, Not Privacy
           </h2>
           <p>
             Ethereum keeps security auditable by letting participants observe
