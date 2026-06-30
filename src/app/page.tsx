@@ -134,9 +134,9 @@ export default function Home() {
             Transparency for Security, Not Privacy
           </h2>
           <p>
-            Ethereum is public by design. Anyone can see what happens on the
-            network. That openness helps keep Ethereum secure. But it leaves
-            users without privacy. Tonigma starts from this problem.
+            Ethereum is public by design. Anyone can see what users do. That
+            openness helps keep Ethereum secure. But it leaves users without
+            privacy. Tonigma starts from this problem.
           </p>
           <div className="story-points" aria-label="Ethereum tradeoff signals">
             <div className="story-point">
