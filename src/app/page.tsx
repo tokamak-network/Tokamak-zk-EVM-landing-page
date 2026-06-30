@@ -1,5 +1,5 @@
 import {
-  ArrowRight,
+  ArrowUpRight,
   CircleQuestionMark,
   Eye,
   LockKeyhole,
@@ -21,7 +21,7 @@ function DisabledAction({
   return (
     <button className="action" disabled type="button">
       {children}
-      <ArrowRight aria-hidden="true" size={16} />
+      <ArrowUpRight aria-hidden="true" size={16} />
     </button>
   );
 }
