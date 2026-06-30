@@ -470,15 +470,6 @@ p {
   padding-block: clamp(64px, 8vh, 88px);
 }
 
-.example-section {
-  padding-bottom: var(--section-padding-large);
-}
-
-.example-section p {
-  margin-top: var(--content-gap);
-  max-width: 760px;
-}
-
 .vision-page {
   min-height: 100vh;
 }

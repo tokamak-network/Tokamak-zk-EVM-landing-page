@@ -164,17 +164,6 @@ export default function Home() {
         <div className="story-stage story-stage--empty" aria-hidden="true" />
       </section>
 
-      <section className="section-shell compact-section example-section">
-        <span className="section-kicker">Example DApp</span>
-        <h2>
-          <code>private-state</code> is one Tonigma DApp, not the Tonigma brand.
-        </h2>
-        <p>
-          The <code>private-state</code> note transfer DApp lets users opt into a
-          DApp-specific channel for channel-local note behavior, with public
-          Ethereum entry and exit remaining visible at the boundary.
-        </p>
-      </section>
     </main>
   );
 }
