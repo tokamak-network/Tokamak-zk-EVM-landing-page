@@ -84,34 +84,35 @@ export function SolutionFlowAnimation() {
         const ethereumPosition = new THREE.Vector3(-0.42, 1.16, 0);
         const userPosition = new THREE.Vector3(-0.42, -1.34, 0);
         const tonigmaPosition = new THREE.Vector3(1.48, -0.05, 0);
+        const userBaseScale = 0.82;
 
         const createUserNode = () => {
           const group = new THREE.Group();
           group.position.copy(userPosition);
-          group.scale.setScalar(0.5);
+          group.scale.setScalar(userBaseScale);
 
           const badgeMaterial = track(
             new THREE.MeshPhysicalMaterial({
-              clearcoat: 0.86,
-              clearcoatRoughness: 0.14,
-              color: "#17344b",
-              emissive: "#0b263d",
-              emissiveIntensity: 0.18,
-              metalness: 0.18,
-              roughness: 0.22,
+              clearcoat: 1,
+              clearcoatRoughness: 0.08,
+              color: "#12324c",
+              emissive: "#06192a",
+              emissiveIntensity: 0.12,
+              metalness: 0.28,
+              roughness: 0.18,
               transparent: true,
               opacity: 0.92,
             }),
           );
           const avatarMaterial = track(
             new THREE.MeshPhysicalMaterial({
-              clearcoat: 0.78,
-              clearcoatRoughness: 0.12,
-              color: "#eafaff",
-              emissive: "#1b668d",
-              emissiveIntensity: 0.16,
-              metalness: 0.04,
-              roughness: 0.26,
+              clearcoat: 1,
+              clearcoatRoughness: 0.08,
+              color: "#f1fcff",
+              emissive: "#2c83ad",
+              emissiveIntensity: 0.1,
+              metalness: 0.08,
+              roughness: 0.18,
             }),
           );
           const rimMaterial = track(
@@ -119,7 +120,16 @@ export function SolutionFlowAnimation() {
               blending: THREE.AdditiveBlending,
               color: 0xc9f3ff,
               depthWrite: false,
-              opacity: 0.18,
+              opacity: 0.28,
+              transparent: true,
+            }),
+          );
+          const reflectionMaterial = track(
+            new THREE.MeshBasicMaterial({
+              blending: THREE.AdditiveBlending,
+              color: 0xffffff,
+              depthWrite: false,
+              opacity: 0.22,
               transparent: true,
             }),
           );
@@ -132,11 +142,20 @@ export function SolutionFlowAnimation() {
           group.add(badge);
 
           const badgeRim = new THREE.Mesh(
-            track(new THREE.TorusGeometry(0.62, 0.018, 12, 128)),
+            track(new THREE.TorusGeometry(0.62, 0.024, 12, 128)),
             rimMaterial,
           );
           badgeRim.position.z = -0.03;
           group.add(badgeRim);
+
+          const badgeReflection = new THREE.Mesh(
+            track(new THREE.CircleGeometry(0.18, 48)),
+            reflectionMaterial,
+          );
+          badgeReflection.position.set(-0.19, 0.2, 0.08);
+          badgeReflection.scale.set(1.55, 0.34, 1);
+          badgeReflection.rotation.z = -0.36;
+          group.add(badgeReflection);
 
           const head = new THREE.Mesh(
             track(new THREE.SphereGeometry(0.2, 64, 32)),
@@ -153,6 +172,14 @@ export function SolutionFlowAnimation() {
           headRim.position.copy(head.position);
           headRim.scale.copy(head.scale);
           group.add(headRim);
+
+          const headReflection = new THREE.Mesh(
+            track(new THREE.SphereGeometry(0.07, 32, 16)),
+            reflectionMaterial,
+          );
+          headReflection.position.set(-0.065, 0.255, 0.16);
+          headReflection.scale.set(1, 0.48, 0.22);
+          group.add(headReflection);
 
           const shoulderGeometry = track(new THREE.SphereGeometry(0.42, 64, 32));
           const torso = new THREE.Mesh(shoulderGeometry, avatarMaterial);
@@ -174,7 +201,7 @@ export function SolutionFlowAnimation() {
         } = createEthereumDiamondModel({
           THREE,
           camera,
-          scale: 0.34,
+          scale: 0.47,
           track,
         });
         const ethereumViewGroup = new THREE.Group();
@@ -283,7 +310,7 @@ export function SolutionFlowAnimation() {
             ethereumNode.rotation.y = 0.58 + time * ethereumSpinSpeed;
           }
           updateEthereumDiamond(time);
-          userNode.scale.setScalar(0.48 + pulse * 0.012);
+          userNode.scale.setScalar(userBaseScale + pulse * 0.018);
 
           pulses.forEach(({ core, offset, path, tail }) => {
             const progress = (time * path.speed + offset) % 1;
