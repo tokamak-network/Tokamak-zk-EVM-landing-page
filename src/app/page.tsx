@@ -152,7 +152,7 @@ export default function Home() {
             </div>
             <div className="story-point story-point--question">
               <CircleQuestionMark aria-hidden="true" size={20} />
-              <span>Does security really need every wallet action replayed?</span>
+              <span>Is replaying every wallet action necessary for security?</span>
             </div>
           </div>
         </div>
