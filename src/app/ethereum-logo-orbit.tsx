@@ -1159,8 +1159,7 @@ export function EthereumLogoOrbit({
             image.src = "/textures/maps/world-relief-color.jpg";
           });
 
-          const mapRadiusX = 1.76;
-          const mapRadiusZ = 0.82;
+          const mapRadius = 1.2;
           const mapSegmentsX = 164;
           const mapSegmentsZ = 82;
           const mapPositions: number[] = [];
@@ -1246,13 +1245,13 @@ export function EthereumLogoOrbit({
             };
           };
           const projectMapPoint = (u: number, v: number) => {
-            const latitude = 1 - v * 2;
+            const latitude = (0.5 - v) * Math.PI;
             const longitude = u * 2 - 1;
-            const widthAtLatitude = Math.sqrt(Math.max(0, 1 - latitude * latitude));
+            const widthAtLatitude = Math.max(0, Math.cos(latitude));
 
             return {
-              x: longitude * mapRadiusX * widthAtLatitude,
-              z: latitude * mapRadiusZ,
+              x: longitude * mapRadius * widthAtLatitude,
+              z: Math.sin(latitude) * mapRadius,
             };
           };
 
@@ -1311,7 +1310,7 @@ export function EthereumLogoOrbit({
           const reliefBaseGeometry = trackDisposable(
             new THREE.CylinderGeometry(1, 1, 0.09, 160, 1),
           );
-          reliefBaseGeometry.scale(mapRadiusX * 1.006, 1, mapRadiusZ * 1.012);
+          reliefBaseGeometry.scale(mapRadius * 1.012, 1, mapRadius * 1.012);
           const reliefBaseMaterial = trackDisposable(
             new THREE.MeshStandardMaterial({
               color: "#07131c",
