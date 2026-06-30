@@ -7,7 +7,7 @@ import { ParallaxBackground } from "../parallax-background";
 export const metadata: Metadata = {
   title: "Vision | Tonigma",
   description:
-    "Tonigma carries the cypherpunk belief into Ethereum: users should run their apps, create their proofs, and reveal only what must be public.",
+    "Tonigma carries the cypherpunk belief into Ethereum: privacy must be built with cryptography and open-source software.",
 };
 
 const beliefs = [
@@ -21,14 +21,8 @@ const beliefs = [
   },
   {
     title: "Code is the user's leverage.",
-    body: "Cryptography and software can give individuals power that policy alone cannot.",
+    body: "Cryptography and open-source software can give individuals power that policy alone cannot.",
   },
-];
-
-const promises = [
-  "Run decentralized apps on your own computer.",
-  "Generate your own proofs.",
-  "Settle verified updates on Ethereum.",
 ];
 
 export default function VisionPage() {
@@ -55,11 +49,10 @@ export default function VisionPage() {
 
       <article className="section-shell vision-manifesto">
         <header className="vision-manifesto__intro">
-          <span className="section-kicker">Vision</span>
           <h1>Privacy must be built, not granted.</h1>
           <p>
             Tonigma exists for people who want Ethereum&apos;s public
-            verification without turning every action into public exhaust.
+            verification without making every action public exhaust.
           </p>
         </header>
 
@@ -68,16 +61,10 @@ export default function VisionPage() {
           <cite>Eric Hughes, 1993</cite>
         </blockquote>
 
-        <section
-          className="vision-manifesto__section"
-          aria-labelledby="inherit-title"
-        >
-          <h2 id="inherit-title">We inherit the attitude.</h2>
-          <p>
-            Do not wait for privacy to be granted. Build the systems that make
-            it possible.
-          </p>
-        </section>
+        <p className="vision-bridge">
+          We inherit that attitude: do not wait for privacy to be granted.
+          Build the systems that make it possible.
+        </p>
 
         <section className="vision-beliefs" aria-labelledby="beliefs-title">
           <h2 id="beliefs-title">What we believe</h2>
@@ -89,15 +76,6 @@ export default function VisionPage() {
               </article>
             ))}
           </div>
-        </section>
-
-        <section className="vision-promise" aria-labelledby="promise-title">
-          <h2 id="promise-title">What Tonigma builds</h2>
-          <ol>
-            {promises.map((promise) => (
-              <li key={promise}>{promise}</li>
-            ))}
-          </ol>
         </section>
 
         <section className="vision-note" aria-labelledby="history-title">

@@ -524,7 +524,7 @@ p {
 }
 
 .vision-manifesto__intro h1 {
-  margin-top: var(--heading-gap);
+  margin: 0;
   max-width: 780px;
   color: var(--foreground);
   font-size: clamp(3.1rem, 7.4vw, 6.6rem);
@@ -562,9 +562,7 @@ p {
   font-weight: 650;
 }
 
-.vision-manifesto__section,
 .vision-beliefs,
-.vision-promise,
 .vision-note {
   margin-top: clamp(54px, 8vw, 78px);
   border-top: 1px solid rgba(255, 255, 255, 0.12);
@@ -580,11 +578,18 @@ p {
   font-weight: 740;
 }
 
-.vision-manifesto__section p,
+.vision-bridge,
 .vision-note p {
   margin-top: 16px;
   max-width: 680px;
   color: #c3c9d3;
+}
+
+.vision-bridge {
+  margin-top: 32px;
+  color: #d8dde5;
+  font-size: 1.08rem;
+  line-height: 1.64;
 }
 
 .vision-beliefs__list {
@@ -608,40 +613,6 @@ p {
 
 .vision-belief p {
   color: #c3c9d3;
-}
-
-.vision-promise ol {
-  margin: 24px 0 0;
-  padding: 0;
-  display: grid;
-  gap: 12px;
-  list-style: none;
-  counter-reset: promise;
-}
-
-.vision-promise li {
-  position: relative;
-  padding-left: 44px;
-  color: var(--foreground);
-  font-size: clamp(1.24rem, 2.4vw, 1.76rem);
-  font-weight: 720;
-  line-height: 1.24;
-  counter-increment: promise;
-}
-
-.vision-promise li::before {
-  position: absolute;
-  left: 0;
-  top: 0.18em;
-  content: counter(promise, decimal-leading-zero);
-  color: var(--blue);
-  font-family:
-    "Geist Mono",
-    "SFMono-Regular",
-    Consolas,
-    monospace;
-  font-size: 0.72rem;
-  font-weight: 800;
 }
 
 .vision-note {
