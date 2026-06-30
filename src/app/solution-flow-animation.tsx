@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createEthereumDiamondModel } from "./ethereum-diamond-model";
 
 type Disposable = {
   dispose: () => void;
@@ -83,73 +84,6 @@ export function SolutionFlowAnimation() {
         const ethereumPosition = new THREE.Vector3(-0.42, 1.16, 0);
         const userPosition = new THREE.Vector3(-0.42, -1.34, 0);
         const tonigmaPosition = new THREE.Vector3(1.48, -0.05, 0);
-
-        const createEthereumDiamond = () => {
-          const group = new THREE.Group();
-          group.position.copy(ethereumPosition);
-          group.scale.setScalar(0.42);
-
-          const top = new THREE.Vector3(0, 1.25, 0);
-          const bottom = new THREE.Vector3(0, -1.05, 0);
-          const upperY = 0.18;
-          const lowerY = 0.02;
-          const upper = [
-            new THREE.Vector3(-0.7, upperY, 0),
-            new THREE.Vector3(0, upperY, 0.7),
-            new THREE.Vector3(0.7, upperY, 0),
-            new THREE.Vector3(0, upperY, -0.7),
-          ];
-          const lower = [
-            new THREE.Vector3(-0.7, lowerY, 0),
-            new THREE.Vector3(0, lowerY, 0.7),
-            new THREE.Vector3(0.7, lowerY, 0),
-            new THREE.Vector3(0, lowerY, -0.7),
-          ];
-          const faces = [
-            [top, upper[0], upper[1], "#9fcfff"],
-            [top, upper[1], upper[2], "#6f8dff"],
-            [top, upper[2], upper[3], "#4b58a4"],
-            [top, upper[3], upper[0], "#7987c6"],
-            [bottom, lower[1], lower[0], "#88c7ff"],
-            [bottom, lower[2], lower[1], "#5775d8"],
-            [bottom, lower[3], lower[2], "#2f3e83"],
-            [bottom, lower[0], lower[3], "#6976b8"],
-          ] as const;
-
-          faces.forEach(([a, b, c, color]) => {
-            const geometry = track(new THREE.BufferGeometry().setFromPoints([a, b, c]));
-            geometry.setIndex([0, 1, 2]);
-            geometry.computeVertexNormals();
-
-            const material = track(
-              new THREE.MeshStandardMaterial({
-                color,
-                emissive: "#10214a",
-                emissiveIntensity: 0.22,
-                metalness: 0.38,
-                roughness: 0.36,
-                side: THREE.DoubleSide,
-              }),
-            );
-
-            group.add(new THREE.Mesh(geometry, material));
-          });
-
-          const ringGeometry = track(new THREE.TorusGeometry(1.08, 0.012, 8, 96));
-          const ringMaterial = track(
-            new THREE.MeshBasicMaterial({
-              blending: THREE.AdditiveBlending,
-              color: 0x78d8ff,
-              opacity: 0.34,
-              transparent: true,
-            }),
-          );
-          const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-          ring.rotation.x = Math.PI / 2;
-          group.add(ring);
-
-          return group;
-        };
 
         const createUserNode = () => {
           const group = new THREE.Group();
@@ -267,7 +201,16 @@ export function SolutionFlowAnimation() {
           return group;
         };
 
-        const ethereumNode = createEthereumDiamond();
+        const {
+          group: ethereumNode,
+          update: updateEthereumDiamond,
+        } = createEthereumDiamondModel({
+          THREE,
+          camera,
+          scale: 0.34,
+          track,
+        });
+        ethereumNode.position.copy(ethereumPosition);
         const userNode = createUserNode();
         const tonigmaNode = createTonigmaNode();
         root.add(ethereumNode, userNode, tonigmaNode);
@@ -366,6 +309,7 @@ export function SolutionFlowAnimation() {
           const pulse = Math.sin(time * 2.2) * 0.5 + 0.5;
 
           ethereumNode.rotation.y = Math.sin(time * 0.5) * 0.1;
+          updateEthereumDiamond(time);
           tonigmaNode.rotation.z = time * 0.18;
           userNode.scale.setScalar(0.48 + pulse * 0.012);
 
