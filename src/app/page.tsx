@@ -143,8 +143,8 @@ export default function Home() {
           </h2>
           <p>
             Tonigma lets apps run inside private channels. Users choose what to
-            disclose in their zero-knowledge proofs. Ethereum verifies the
-            zero-knowledge proofs instead of replaying private activity. Valid
+            disclose and generate their own zero-knowledge proofs. Ethereum
+            verifies those proofs instead of replaying private activity. Valid
             proofs update the channel. Security shifts from replay to
             cryptography.
           </p>
