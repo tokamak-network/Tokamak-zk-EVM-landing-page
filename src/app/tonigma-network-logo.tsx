@@ -32,6 +32,9 @@ const TIMELINE_SECONDS = 8.8;
 const ANIMATION_SPEED = 1.2;
 const COMPLETION_HOLD_SECONDS = 3;
 const CYCLE_SECONDS = TIMELINE_SECONDS / ANIMATION_SPEED + COMPLETION_HOLD_SECONDS;
+const FINAL_FLASH_START = 6.12;
+const FINAL_FLASH_ACTIVE_SECONDS = 1.58;
+const FINAL_FLASH_CYCLE_SECONDS = 2.05;
 const UV_PASSTHROUGH_VERTEX_SHADER = `
   varying vec2 vUv;
 
@@ -236,9 +239,13 @@ function edgeSegment(edge: LogoEdge) {
 
 type TonigmaNetworkLogoProps = Readonly<{
   className?: string;
+  playback?: "full" | "final-flash";
 }>;
 
-export function TonigmaNetworkLogo({ className }: TonigmaNetworkLogoProps) {
+export function TonigmaNetworkLogo({
+  className,
+  playback = "full",
+}: TonigmaNetworkLogoProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [showFallback, setShowFallback] = useState(false);
 
@@ -716,12 +723,19 @@ export function TonigmaNetworkLogo({ className }: TonigmaNetworkLogoProps) {
 
         const render = () => {
           const absoluteTime = performance.now() * 0.001;
+          const finalFlashCycleTime =
+            (absoluteTime - startedAt) % FINAL_FLASH_CYCLE_SECONDS;
+          const finalFlashTime =
+            FINAL_FLASH_START +
+            Math.min(finalFlashCycleTime, FINAL_FLASH_ACTIVE_SECONDS);
           const cycleTime = reducedMotion.matches
             ? 6.9
             : (absoluteTime - startedAt) % CYCLE_SECONDS;
           const timelineTime = reducedMotion.matches
             ? 6.9
-            : Math.min(cycleTime * ANIMATION_SPEED, TIMELINE_SECONDS);
+            : playback === "final-flash"
+              ? finalFlashTime
+              : Math.min(cycleTime * ANIMATION_SPEED, TIMELINE_SECONDS);
           const finalGlow = smoothstep((timelineTime - 6.1) / 0.85);
           const sweepProgress = clamp((timelineTime - 6.18) / 1.22);
           const sweepEnvelope =
@@ -733,13 +747,20 @@ export function TonigmaNetworkLogo({ className }: TonigmaNetworkLogoProps) {
             : (Math.sin(absoluteTime * 2.6) + 1) / 2;
 
           nodeRenders.forEach(({ active, bloom, flash, rim, node }) => {
-            const activation = smoothstep((timelineTime - node.turnOnAt) / 0.48);
+            const activation =
+              playback === "final-flash"
+                ? 1
+                : smoothstep((timelineTime - node.turnOnAt) / 0.48);
             const emphasize =
-              smoothstep((timelineTime - node.turnOnAt) / 0.16) *
-              (1 - smoothstep((timelineTime - node.turnOnAt - 0.58) / 0.5));
+              playback === "final-flash"
+                ? 0
+                : smoothstep((timelineTime - node.turnOnAt) / 0.16) *
+                  (1 - smoothstep((timelineTime - node.turnOnAt - 0.58) / 0.5));
             const postFillGlow =
-              smoothstep((timelineTime - node.turnOnAt - 0.42) / 0.14) *
-              (1 - smoothstep((timelineTime - node.turnOnAt - 1.0) / 0.42));
+              playback === "final-flash"
+                ? 0
+                : smoothstep((timelineTime - node.turnOnAt - 0.42) / 0.14) *
+                  (1 - smoothstep((timelineTime - node.turnOnAt - 1.0) / 0.42));
             const scale =
               1 +
               emphasize * 0.09 +
@@ -768,7 +789,10 @@ export function TonigmaNetworkLogo({ className }: TonigmaNetworkLogoProps) {
           });
 
           edgeRenders.forEach(({ active, edge, trail }) => {
-            const rawProgress = (timelineTime - edge.startAt) / edge.duration;
+            const rawProgress =
+              playback === "final-flash"
+                ? 1
+                : (timelineTime - edge.startAt) / edge.duration;
             const fillProgress = smoothstep(rawProgress);
             const inFlight = rawProgress > 0 && rawProgress < 1;
             const trailOpacity = inFlight
@@ -810,7 +834,7 @@ export function TonigmaNetworkLogo({ className }: TonigmaNetworkLogoProps) {
       resizeObserver?.disconnect();
       disposeScene?.();
     };
-  }, []);
+  }, [playback]);
 
   return (
     <div

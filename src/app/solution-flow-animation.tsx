@@ -295,7 +295,10 @@ export function SolutionFlowAnimation() {
   return (
     <div className="solution-flow" aria-hidden="true">
       <canvas ref={canvasRef} className="solution-flow__canvas" />
-      <TonigmaNetworkLogo className="solution-flow__tonigma-logo" />
+      <TonigmaNetworkLogo
+        className="solution-flow__tonigma-logo"
+        playback="final-flash"
+      />
       {showFallback ? (
         <div className="solution-flow__fallback">
           <span className="solution-flow__fallback-node solution-flow__fallback-node--ethereum" />
