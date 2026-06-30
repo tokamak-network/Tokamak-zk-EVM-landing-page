@@ -63,7 +63,7 @@ export function EthereumLogoOrbit({
         viewGroup.add(storyGroup);
 
         const logoGroup = new THREE.Group();
-        logoGroup.scale.setScalar(variant === "strength" ? 0.78 : 0.68);
+        logoGroup.scale.setScalar(0.78);
         storyGroup.add(logoGroup);
         const disposableResources: Array<{ dispose: () => void }> = [];
 
