@@ -1,8 +1,7 @@
 import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { ParallaxBackground } from "../parallax-background";
+import { SiteHeader } from "../site-header";
 
 export const metadata: Metadata = {
   title: "Vision | Tonigma",
@@ -30,21 +29,8 @@ export default function VisionPage() {
     <main className="vision-page">
       <ParallaxBackground />
 
-      <header className="section-shell vision-subheader">
-        <Link className="vision-home-link" href="/" aria-label="Tonigma home">
-          <Image
-            alt="Tonigma"
-            height={40}
-            priority
-            src="/brand/tonigma-logo.png"
-            width={168}
-          />
-        </Link>
-        <nav className="vision-breadcrumb" aria-label="Breadcrumb">
-          <Link href="/">Home</Link>
-          <span aria-hidden="true">/</span>
-          <span>Vision</span>
-        </nav>
+      <header className="section-shell vision-header">
+        <SiteHeader visionActive />
       </header>
 
       <article className="section-shell vision-manifesto">

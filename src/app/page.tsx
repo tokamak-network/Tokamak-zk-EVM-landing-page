@@ -8,9 +8,9 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { EthereumLogoOrbit } from "./ethereum-logo-orbit";
 import { ParallaxBackground } from "./parallax-background";
+import { SiteHeader } from "./site-header";
 import { TonigmaNetworkLogo } from "./tonigma-network-logo";
 
 function DisabledAction({
@@ -32,40 +32,7 @@ export default function Home() {
       <ParallaxBackground />
 
       <section className="hero section-shell">
-        <nav className="topbar" aria-label="Primary navigation">
-          <a className="brand-lockup" href="#top" aria-label="Tonigma home">
-            <Image
-              alt="Tonigma"
-              className="brand-logo"
-              fill
-              priority
-              sizes="(max-width: 760px) 42px, 202px"
-              src="/brand/tonigma-logo.png"
-            />
-            <Image
-              alt="Tonigma"
-              className="brand-symbol"
-              height={42}
-              priority
-              src="/brand/tonigma-square-logo.svg"
-              width={42}
-            />
-          </a>
-          <div className="nav-actions" aria-label="Page navigation">
-            <Link className="nav-link nav-link--enabled" href="/vision">
-              Vision
-            </Link>
-            <button className="nav-link" disabled type="button">
-              Observer
-            </button>
-            <button className="nav-link" disabled type="button">
-              DApps
-            </button>
-            <button className="nav-link" disabled type="button">
-              Docs
-            </button>
-          </div>
-        </nav>
+        <SiteHeader homeHref="#top" />
 
         <div className="hero-stage">
           <div className="hero-copy" id="top">
