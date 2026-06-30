@@ -57,7 +57,7 @@ export function SolutionFlowAnimation() {
 
         const scene = new THREE.Scene();
         const camera = new THREE.OrthographicCamera(-2.2, 2.2, 2.2, -2.2, 0.1, 100);
-        camera.position.set(0, 0.12, 6);
+        camera.position.set(0, 0.28, 5.4);
         camera.lookAt(0, 0, 0);
 
         const disposableResources: Disposable[] = [];
@@ -78,7 +78,6 @@ export function SolutionFlowAnimation() {
         scene.add(rimLight);
 
         const root = new THREE.Group();
-        root.rotation.x = -0.07;
         scene.add(root);
 
         const ethereumPosition = new THREE.Vector3(-0.42, 1.16, 0);
@@ -210,10 +209,14 @@ export function SolutionFlowAnimation() {
           scale: 0.34,
           track,
         });
-        ethereumNode.position.copy(ethereumPosition);
+        const ethereumViewGroup = new THREE.Group();
+        ethereumViewGroup.position.copy(ethereumPosition);
+        ethereumViewGroup.rotation.x = (31.5 * Math.PI) / 180;
+        ethereumNode.rotation.y = 0.58;
+        ethereumViewGroup.add(ethereumNode);
         const userNode = createUserNode();
         const tonigmaNode = createTonigmaNode();
-        root.add(ethereumNode, userNode, tonigmaNode);
+        root.add(ethereumViewGroup, userNode, tonigmaNode);
 
         const flowPaths: FlowPath[] = [
           {
@@ -283,6 +286,7 @@ export function SolutionFlowAnimation() {
 
         const clock = new THREE.Clock();
         const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const ethereumSpinSpeed = 0.37;
 
         const resize = () => {
           const bounds = canvas.getBoundingClientRect();
@@ -308,7 +312,9 @@ export function SolutionFlowAnimation() {
           const time = reducedMotion.matches ? 0.35 : elapsed;
           const pulse = Math.sin(time * 2.2) * 0.5 + 0.5;
 
-          ethereumNode.rotation.y = Math.sin(time * 0.5) * 0.1;
+          if (!reducedMotion.matches) {
+            ethereumNode.rotation.y = 0.58 + time * ethereumSpinSpeed;
+          }
           updateEthereumDiamond(time);
           tonigmaNode.rotation.z = time * 0.18;
           userNode.scale.setScalar(0.48 + pulse * 0.012);
