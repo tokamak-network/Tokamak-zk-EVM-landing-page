@@ -134,22 +134,22 @@ export default function Home() {
             Transparency for Security, Not Privacy
           </h2>
           <p>
-            Ethereum keeps security auditable by letting participants observe
-            activity and re-execute state transitions. The more public the
-            validation path becomes, the more privacy is exposed to the network.
+            Ethereum is public by design. Anyone can see what happens on the
+            network. That openness helps keep Ethereum secure. But it leaves
+            users without privacy. Tonigma starts from this problem.
           </p>
           <div className="story-points" aria-label="Ethereum tradeoff signals">
             <div className="story-point">
               <Eye aria-hidden="true" size={20} />
-              <span>Network participants can see public activity.</span>
+              <span>Wallet activity is visible to everyone.</span>
             </div>
             <div className="story-point">
               <Repeat2 aria-hidden="true" size={20} />
-              <span>State transitions can be re-executed by observers.</span>
+              <span>Each action leaves a public trail.</span>
             </div>
             <div className="story-point story-point--warning">
               <Eye aria-hidden="true" size={20} />
-              <span>Stronger public validation increases privacy exposure.</span>
+              <span>Users should not have to give up privacy.</span>
             </div>
           </div>
         </div>
