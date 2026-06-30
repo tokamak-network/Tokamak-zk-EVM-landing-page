@@ -142,12 +142,11 @@ export default function Home() {
             SELECTIVE-DISCLOSURE WITH TONIGMA
           </h2>
           <p>
-            Tonigma lets users use apps inside private channels. Users choose
-            what to disclose from their channel activity. Their channel activity
-            is not replayed on Ethereum. Instead, users generate zero-knowledge
-            proofs from private inputs. Ethereum accepts channel updates only
-            after the submitted proof and required checks pass. Security shifts
-            from replay to cryptography.
+            Tonigma lets apps run inside private channels. Users choose what to
+            disclose in their zero-knowledge proofs. Ethereum verifies the
+            zero-knowledge proofs instead of replaying private activity. Valid
+            proofs update the channel. Security shifts from replay to
+            cryptography.
           </p>
           <div className="story-points" aria-label="Tonigma solution signals">
             <div className="story-point">
