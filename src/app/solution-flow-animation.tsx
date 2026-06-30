@@ -88,26 +88,30 @@ export function SolutionFlowAnimation() {
         const createUserNode = () => {
           const group = new THREE.Group();
           group.position.copy(userPosition);
-          group.scale.setScalar(0.52);
+          group.scale.setScalar(0.5);
 
-          const avatarMaterial = track(
+          const badgeMaterial = track(
             new THREE.MeshPhysicalMaterial({
-              clearcoat: 0.72,
-              clearcoatRoughness: 0.18,
-              color: "#e7f8ff",
-              emissive: "#123657",
+              clearcoat: 0.86,
+              clearcoatRoughness: 0.14,
+              color: "#17344b",
+              emissive: "#0b263d",
               emissiveIntensity: 0.18,
-              metalness: 0.06,
-              roughness: 0.3,
+              metalness: 0.18,
+              roughness: 0.22,
+              transparent: true,
+              opacity: 0.92,
             }),
           );
-          const shadowMaterial = track(
-            new THREE.MeshBasicMaterial({
-              blending: THREE.AdditiveBlending,
-              color: 0x58c7ff,
-              depthWrite: false,
-              opacity: 0.16,
-              transparent: true,
+          const avatarMaterial = track(
+            new THREE.MeshPhysicalMaterial({
+              clearcoat: 0.78,
+              clearcoatRoughness: 0.12,
+              color: "#eafaff",
+              emissive: "#1b668d",
+              emissiveIntensity: 0.16,
+              metalness: 0.04,
+              roughness: 0.26,
             }),
           );
           const rimMaterial = track(
@@ -119,64 +123,47 @@ export function SolutionFlowAnimation() {
               transparent: true,
             }),
           );
+          const badge = new THREE.Mesh(
+            track(new THREE.CylinderGeometry(0.62, 0.62, 0.08, 96)),
+            badgeMaterial,
+          );
+          badge.rotation.x = Math.PI / 2;
+          badge.position.z = -0.08;
+          group.add(badge);
+
+          const badgeRim = new THREE.Mesh(
+            track(new THREE.TorusGeometry(0.62, 0.018, 12, 128)),
+            rimMaterial,
+          );
+          badgeRim.position.z = -0.03;
+          group.add(badgeRim);
 
           const head = new THREE.Mesh(
-            track(new THREE.SphereGeometry(0.24, 64, 32)),
+            track(new THREE.SphereGeometry(0.2, 64, 32)),
             avatarMaterial,
           );
-          head.position.set(0, 0.38, 0.02);
-          head.scale.set(0.93, 1.04, 0.9);
+          head.position.set(0, 0.18, 0.04);
+          head.scale.set(0.98, 1.02, 0.82);
           group.add(head);
 
           const headRim = new THREE.Mesh(
-            track(new THREE.SphereGeometry(0.255, 64, 32)),
+            track(new THREE.SphereGeometry(0.21, 64, 32)),
             rimMaterial,
           );
           headRim.position.copy(head.position);
           headRim.scale.copy(head.scale);
           group.add(headRim);
 
-          const neck = new THREE.Mesh(
-            track(new THREE.CylinderGeometry(0.12, 0.15, 0.22, 48)),
-            avatarMaterial,
-          );
-          neck.position.set(0, 0.13, 0);
-          group.add(neck);
-
-          const torsoShape = new THREE.Shape();
-          torsoShape.moveTo(0, 0.14);
-          torsoShape.bezierCurveTo(0.22, 0.13, 0.42, 0.02, 0.5, -0.18);
-          torsoShape.bezierCurveTo(0.58, -0.38, 0.46, -0.54, 0.22, -0.59);
-          torsoShape.bezierCurveTo(0.12, -0.61, -0.12, -0.61, -0.22, -0.59);
-          torsoShape.bezierCurveTo(-0.46, -0.54, -0.58, -0.38, -0.5, -0.18);
-          torsoShape.bezierCurveTo(-0.42, 0.02, -0.22, 0.13, 0, 0.14);
-
-          const torsoGeometry = track(
-            new THREE.ExtrudeGeometry(torsoShape, {
-              bevelEnabled: true,
-              bevelSegments: 10,
-              bevelSize: 0.035,
-              bevelThickness: 0.035,
-              curveSegments: 28,
-              depth: 0.18,
-            }),
-          );
-          const torso = new THREE.Mesh(torsoGeometry, avatarMaterial);
-          torso.position.set(0, -0.1, -0.1);
+          const shoulderGeometry = track(new THREE.SphereGeometry(0.42, 64, 32));
+          const torso = new THREE.Mesh(shoulderGeometry, avatarMaterial);
+          torso.position.set(0, -0.27, 0.04);
+          torso.scale.set(1.16, 0.56, 0.46);
           group.add(torso);
 
-          const torsoGlow = new THREE.Mesh(torsoGeometry, rimMaterial);
+          const torsoGlow = new THREE.Mesh(shoulderGeometry, rimMaterial);
           torsoGlow.position.copy(torso.position);
-          torsoGlow.scale.set(1.035, 1.035, 1);
+          torsoGlow.scale.set(1.22, 0.62, 0.5);
           group.add(torsoGlow);
-
-          const baseShadow = new THREE.Mesh(
-            track(new THREE.CircleGeometry(0.58, 96)),
-            shadowMaterial,
-          );
-          baseShadow.position.set(0, -0.66, -0.08);
-          baseShadow.scale.set(1.16, 0.2, 1);
-          group.add(baseShadow);
 
           return group;
         };
