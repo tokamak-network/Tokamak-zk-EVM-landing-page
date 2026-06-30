@@ -439,20 +439,24 @@ p {
 }
 
 .action {
-  min-height: 42px;
-  border: 1px solid rgba(31, 143, 255, 0.45);
+  min-height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
-  padding: 0 16px;
+  padding: 0 14px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  color: #d9ecff;
-  background: var(--blue-soft);
+  color: #f5f9ff;
+  background: rgba(255, 255, 255, 0.05);
+  text-decoration: none;
   white-space: nowrap;
 }
 
-.action:disabled,
+.action:disabled {
+  opacity: 1;
+}
+
 .nav-link:disabled {
   opacity: 0.74;
 }
