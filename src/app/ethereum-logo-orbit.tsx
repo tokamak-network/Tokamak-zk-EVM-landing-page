@@ -1159,7 +1159,7 @@ export function EthereumLogoOrbit({
             image.src = "/textures/maps/world-relief-color.jpg";
           });
 
-          const mapRadius = 1.2;
+          const mapRadius = 1.38 / 1.08;
           const mapSegmentsX = 164;
           const mapSegmentsZ = 82;
           const mapPositions: number[] = [];
