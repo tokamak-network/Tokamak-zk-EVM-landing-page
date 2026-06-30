@@ -1,9 +1,10 @@
 import {
   ArrowRight,
+  CircleQuestionMark,
   Eye,
   LockKeyhole,
   Network,
-  Repeat2,
+  RotateCcw,
   ShieldCheck,
 } from "lucide-react";
 import Image from "next/image";
@@ -139,17 +140,19 @@ export default function Home() {
             privacy. Tonigma starts from this problem.
           </p>
           <div className="story-points" aria-label="Ethereum tradeoff signals">
-            <div className="story-point">
+            <div className="story-point story-point--danger">
               <Eye aria-hidden="true" size={20} />
               <span>Wallet activity is visible to everyone.</span>
             </div>
             <div className="story-point">
-              <Repeat2 aria-hidden="true" size={20} />
-              <span>Each action leaves a public trail.</span>
+              <RotateCcw aria-hidden="true" size={20} />
+              <span>
+                Validators strengthen security by replaying every wallet action.
+              </span>
             </div>
-            <div className="story-point story-point--warning">
-              <Eye aria-hidden="true" size={20} />
-              <span>Users should not have to give up privacy.</span>
+            <div className="story-point story-point--question">
+              <CircleQuestionMark aria-hidden="true" size={20} />
+              <span>Does security really need every wallet action replayed?</span>
             </div>
           </div>
         </div>

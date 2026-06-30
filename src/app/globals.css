@@ -355,9 +355,14 @@ main {
   filter: drop-shadow(0 0 10px rgba(80, 184, 255, 0.34));
 }
 
-.story-point--warning svg {
-  color: #ff9ac7;
-  filter: drop-shadow(0 0 10px rgba(255, 111, 168, 0.28));
+.story-point--danger svg {
+  color: #ff7777;
+  filter: drop-shadow(0 0 10px rgba(255, 92, 92, 0.3));
+}
+
+.story-point--question svg {
+  color: #71cfff;
+  filter: drop-shadow(0 0 10px rgba(80, 184, 255, 0.34));
 }
 
 .section-kicker {
