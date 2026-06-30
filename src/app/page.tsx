@@ -142,22 +142,23 @@ export default function Home() {
             SELECTIVE-DISCLOSURE WITH TONIGMA
           </h2>
           <p>
-            Tonigma builds private app channels on Ethereum. User activity no
-            longer has to be public by default. Ethereum verifies accepted
-            channel updates. Users choose what to reveal.
+            Tonigma builds private app channels on Ethereum. They use proof
+            verification instead of public replay. Ethereum verifies accepted
+            channel updates, not every private action. Users choose what to
+            reveal.
           </p>
           <div className="story-points" aria-label="Tonigma solution signals">
             <div className="story-point">
               <Eye aria-hidden="true" size={20} />
-              <span>Users choose what to disclose.</span>
+              <span>Users choose what to reveal.</span>
             </div>
             <div className="story-point">
               <LockKeyhole aria-hidden="true" size={20} />
-              <span>App activity moves inside proof-backed channels.</span>
+              <span>Private actions do not need public replay.</span>
             </div>
             <div className="story-point">
               <ShieldCheck aria-hidden="true" size={20} />
-              <span>Ethereum verifies and settles accepted channel updates.</span>
+              <span>Proofs let Ethereum verify channel updates.</span>
             </div>
           </div>
         </div>
