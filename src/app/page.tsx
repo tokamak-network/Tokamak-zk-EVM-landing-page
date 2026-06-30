@@ -157,7 +157,7 @@ export default function Home() {
             </div>
             <div className="story-point">
               <ShieldCheck aria-hidden="true" size={20} />
-              <span>Ethereum verifies and settles accepted updates.</span>
+              <span>Ethereum verifies and settles accepted channel updates.</span>
             </div>
           </div>
         </div>
