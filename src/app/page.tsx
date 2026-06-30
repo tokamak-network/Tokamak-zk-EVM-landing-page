@@ -11,6 +11,7 @@ import Image from "next/image";
 import { EthereumLogoOrbit } from "./ethereum-logo-orbit";
 import { ParallaxBackground } from "./parallax-background";
 import { SiteHeader } from "./site-header";
+import { SolutionFlowAnimation } from "./solution-flow-animation";
 import { TonigmaNetworkLogo } from "./tonigma-network-logo";
 
 function DisabledAction({
@@ -163,7 +164,9 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="story-stage story-stage--empty" aria-hidden="true" />
+        <div className="story-stage" aria-hidden="true">
+          <SolutionFlowAnimation />
+        </div>
       </section>
 
     </main>

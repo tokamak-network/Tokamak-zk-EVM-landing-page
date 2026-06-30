@@ -347,8 +347,67 @@ main {
     radial-gradient(ellipse at 62% 62%, rgba(255, 108, 170, 0.16), transparent 34%);
 }
 
-.story-stage--empty::before {
-  display: none;
+.story-section--solution .story-stage::before {
+  background:
+    radial-gradient(ellipse at 42% 24%, rgba(111, 141, 255, 0.16), transparent 30%),
+    radial-gradient(ellipse at 70% 50%, rgba(85, 215, 255, 0.18), transparent 34%),
+    radial-gradient(ellipse at 42% 78%, rgba(217, 242, 255, 0.1), transparent 30%);
+}
+
+.solution-flow {
+  position: relative;
+  width: min(48vw, 560px);
+  min-width: 360px;
+  aspect-ratio: 1;
+  justify-self: center;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.solution-flow__canvas,
+.solution-flow__fallback {
+  position: absolute;
+  inset: -8%;
+  display: block;
+  width: 116%;
+  height: 116%;
+}
+
+.solution-flow__canvas {
+  z-index: 1;
+  filter:
+    drop-shadow(0 0 16px rgba(85, 215, 255, 0.16))
+    drop-shadow(0 0 34px rgba(255, 255, 255, 0.06));
+}
+
+.solution-flow__fallback {
+  z-index: 0;
+}
+
+.solution-flow__fallback-node {
+  position: absolute;
+  width: 16%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(120, 216, 255, 0.6);
+  border-radius: 999px;
+  background: rgba(85, 215, 255, 0.12);
+  box-shadow: 0 0 24px rgba(85, 215, 255, 0.16);
+}
+
+.solution-flow__fallback-node--ethereum {
+  left: 34%;
+  top: 14%;
+  clip-path: polygon(50% 0, 92% 48%, 50% 100%, 8% 48%);
+}
+
+.solution-flow__fallback-node--tonigma {
+  right: 9%;
+  top: 43%;
+}
+
+.solution-flow__fallback-node--user {
+  left: 34%;
+  bottom: 12%;
 }
 
 .story-points {
@@ -637,6 +696,11 @@ code {
     margin-top: -16px;
   }
 
+  .solution-flow {
+    width: min(78vw, 440px);
+    min-width: 300px;
+  }
+
   .ethereum-orbit-section {
     min-height: auto;
     grid-template-columns: minmax(0, 1fr);
@@ -701,6 +765,11 @@ code {
   }
 
   .ethereum-orbit {
+    width: min(82vw, 360px);
+    min-width: 260px;
+  }
+
+  .solution-flow {
     width: min(82vw, 360px);
     min-width: 260px;
   }
@@ -795,6 +864,10 @@ code {
   }
 
   .ethereum-orbit-section .ethereum-orbit {
+    min-width: 236px;
+  }
+
+  .solution-flow {
     min-width: 236px;
   }
 
