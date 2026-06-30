@@ -334,6 +334,10 @@ main {
     radial-gradient(ellipse at 62% 62%, rgba(255, 108, 170, 0.16), transparent 34%);
 }
 
+.story-stage--empty::before {
+  display: none;
+}
+
 .story-points {
   margin-top: 26px;
   display: grid;

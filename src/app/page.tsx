@@ -161,6 +161,38 @@ export default function Home() {
         </div>
       </section>
 
+      <section
+        className="section-shell compact-section story-section story-section--solution ethereum-orbit-section"
+        aria-labelledby="tonigma-solution-title"
+      >
+        <div className="story-copy">
+          <span className="section-kicker">PRIVACY SOLUTION</span>
+          <h2 id="tonigma-solution-title">
+            SELECTIVE-DISCLOSURE WITH TONIGMA
+          </h2>
+          <p>
+            Tonigma brings selective disclosure to Ethereum. Users choose what
+            to reveal. Apps keep the rest private. Ethereum still verifies what
+            matters.
+          </p>
+          <div className="story-points" aria-label="Tonigma solution signals">
+            <div className="story-point">
+              <Eye aria-hidden="true" size={20} />
+              <span>Users choose what becomes public.</span>
+            </div>
+            <div className="story-point">
+              <LockKeyhole aria-hidden="true" size={20} />
+              <span>Private channels keep wallet activity hidden.</span>
+            </div>
+            <div className="story-point">
+              <ShieldCheck aria-hidden="true" size={20} />
+              <span>Ethereum still verifies what matters.</span>
+            </div>
+          </div>
+        </div>
+        <div className="story-stage story-stage--empty" aria-hidden="true" />
+      </section>
+
       <section className="section-shell compact-section example-section">
         <span className="section-kicker">Example DApp</span>
         <h2>
