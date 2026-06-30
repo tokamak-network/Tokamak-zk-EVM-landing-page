@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createEthereumDiamondModel } from "./ethereum-diamond-model";
+import { TonigmaNetworkLogo } from "./tonigma-network-logo";
 
 type Disposable = {
   dispose: () => void;
@@ -131,75 +132,6 @@ export function SolutionFlowAnimation() {
           return group;
         };
 
-        const createTonigmaNode = () => {
-          const group = new THREE.Group();
-          group.position.copy(tonigmaPosition);
-          group.scale.setScalar(0.58);
-
-          const portalMaterial = track(
-            new THREE.MeshBasicMaterial({
-              blending: THREE.AdditiveBlending,
-              color: 0x64d7ff,
-              opacity: 0.72,
-              transparent: true,
-            }),
-          );
-          const innerMaterial = track(
-            new THREE.MeshBasicMaterial({
-              color: 0x06111a,
-              opacity: 0.9,
-              transparent: true,
-            }),
-          );
-
-          const outer = new THREE.Mesh(track(new THREE.TorusGeometry(0.56, 0.055, 20, 120)), portalMaterial);
-          group.add(outer);
-
-          const inner = new THREE.Mesh(track(new THREE.CircleGeometry(0.48, 72)), innerMaterial);
-          inner.position.z = -0.02;
-          group.add(inner);
-
-          [0.72, 0.52, 0.34].forEach((scale, index) => {
-            const ring = new THREE.Mesh(track(new THREE.TorusGeometry(0.56 * scale, 0.01, 8, 96)), portalMaterial);
-            ring.position.z = -0.1 - index * 0.08;
-            ring.material.opacity = 0.36 - index * 0.07;
-            group.add(ring);
-          });
-
-          const labelCanvas = document.createElement("canvas");
-          labelCanvas.width = 128;
-          labelCanvas.height = 128;
-          const context = labelCanvas.getContext("2d");
-
-          if (!context) {
-            throw new Error("Tonigma label canvas context is unavailable.");
-          }
-
-          context.clearRect(0, 0, labelCanvas.width, labelCanvas.height);
-          context.fillStyle = "rgba(245, 251, 255, 0.95)";
-          context.font = "700 74px Inter, Arial, sans-serif";
-          context.textAlign = "center";
-          context.textBaseline = "middle";
-          context.fillText("T", 64, 68);
-
-          const texture = track(new THREE.CanvasTexture(labelCanvas));
-          texture.colorSpace = THREE.SRGBColorSpace;
-          const labelMaterial = track(
-            new THREE.SpriteMaterial({
-              blending: THREE.AdditiveBlending,
-              map: texture,
-              opacity: 0.9,
-              transparent: true,
-            }),
-          );
-          const label = new THREE.Sprite(labelMaterial);
-          label.scale.set(0.46, 0.46, 1);
-          label.position.z = 0.04;
-          group.add(label);
-
-          return group;
-        };
-
         const {
           group: ethereumNode,
           update: updateEthereumDiamond,
@@ -215,8 +147,7 @@ export function SolutionFlowAnimation() {
         ethereumNode.rotation.y = 0.58;
         ethereumViewGroup.add(ethereumNode);
         const userNode = createUserNode();
-        const tonigmaNode = createTonigmaNode();
-        root.add(ethereumViewGroup, userNode, tonigmaNode);
+        root.add(ethereumViewGroup, userNode);
 
         const flowPaths: FlowPath[] = [
           {
@@ -316,7 +247,6 @@ export function SolutionFlowAnimation() {
             ethereumNode.rotation.y = 0.58 + time * ethereumSpinSpeed;
           }
           updateEthereumDiamond(time);
-          tonigmaNode.rotation.z = time * 0.18;
           userNode.scale.setScalar(0.48 + pulse * 0.012);
 
           pulses.forEach(({ core, offset, path, tail }) => {
@@ -365,10 +295,10 @@ export function SolutionFlowAnimation() {
   return (
     <div className="solution-flow" aria-hidden="true">
       <canvas ref={canvasRef} className="solution-flow__canvas" />
+      <TonigmaNetworkLogo className="solution-flow__tonigma-logo" />
       {showFallback ? (
         <div className="solution-flow__fallback">
           <span className="solution-flow__fallback-node solution-flow__fallback-node--ethereum" />
-          <span className="solution-flow__fallback-node solution-flow__fallback-node--tonigma" />
           <span className="solution-flow__fallback-node solution-flow__fallback-node--user" />
         </div>
       ) : null}

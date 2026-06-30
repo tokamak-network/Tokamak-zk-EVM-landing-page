@@ -234,7 +234,11 @@ function edgeSegment(edge: LogoEdge) {
   };
 }
 
-export function TonigmaNetworkLogo() {
+type TonigmaNetworkLogoProps = Readonly<{
+  className?: string;
+}>;
+
+export function TonigmaNetworkLogo({ className }: TonigmaNetworkLogoProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [showFallback, setShowFallback] = useState(false);
 
@@ -809,7 +813,10 @@ export function TonigmaNetworkLogo() {
   }, []);
 
   return (
-    <div className="tonigma-network-logo" aria-hidden="true">
+    <div
+      className={className ? `tonigma-network-logo ${className}` : "tonigma-network-logo"}
+      aria-hidden="true"
+    >
       <canvas
         ref={canvasRef}
         className="tonigma-network-logo__canvas"

@@ -380,6 +380,16 @@ main {
     drop-shadow(0 0 34px rgba(255, 255, 255, 0.06));
 }
 
+.solution-flow .solution-flow__tonigma-logo {
+  position: absolute;
+  right: 1%;
+  top: 42%;
+  z-index: 2;
+  width: 32%;
+  min-width: 0;
+  transform: translate(34%, -50%) scale(0.9);
+}
+
 .solution-flow__fallback {
   z-index: 0;
 }
@@ -398,11 +408,6 @@ main {
   left: 34%;
   top: 14%;
   clip-path: polygon(50% 0, 92% 48%, 50% 100%, 8% 48%);
-}
-
-.solution-flow__fallback-node--tonigma {
-  right: 9%;
-  top: 43%;
 }
 
 .solution-flow__fallback-node--user {
@@ -701,6 +706,11 @@ code {
     min-width: 300px;
   }
 
+  .solution-flow .solution-flow__tonigma-logo {
+    width: 34%;
+    transform: translate(32%, -50%) scale(0.9);
+  }
+
   .ethereum-orbit-section {
     min-height: auto;
     grid-template-columns: minmax(0, 1fr);
@@ -772,6 +782,11 @@ code {
   .solution-flow {
     width: min(82vw, 360px);
     min-width: 260px;
+  }
+
+  .solution-flow .solution-flow__tonigma-logo {
+    width: 35%;
+    transform: translate(26%, -50%) scale(0.92);
   }
 
   .tonigma-network-logo {
