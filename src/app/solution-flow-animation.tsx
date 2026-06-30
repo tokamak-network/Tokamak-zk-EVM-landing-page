@@ -88,46 +88,95 @@ export function SolutionFlowAnimation() {
         const createUserNode = () => {
           const group = new THREE.Group();
           group.position.copy(userPosition);
-          group.scale.setScalar(0.48);
+          group.scale.setScalar(0.52);
 
-          const material = track(
-            new THREE.MeshStandardMaterial({
-              color: "#d9f2ff",
-              emissive: "#163654",
-              emissiveIntensity: 0.24,
-              metalness: 0.16,
-              roughness: 0.48,
+          const avatarMaterial = track(
+            new THREE.MeshPhysicalMaterial({
+              clearcoat: 0.72,
+              clearcoatRoughness: 0.18,
+              color: "#e7f8ff",
+              emissive: "#123657",
+              emissiveIntensity: 0.18,
+              metalness: 0.06,
+              roughness: 0.3,
             }),
           );
-          const accentMaterial = track(
+          const shadowMaterial = track(
             new THREE.MeshBasicMaterial({
               blending: THREE.AdditiveBlending,
               color: 0x58c7ff,
-              opacity: 0.3,
+              depthWrite: false,
+              opacity: 0.16,
+              transparent: true,
+            }),
+          );
+          const rimMaterial = track(
+            new THREE.MeshBasicMaterial({
+              blending: THREE.AdditiveBlending,
+              color: 0xc9f3ff,
+              depthWrite: false,
+              opacity: 0.18,
               transparent: true,
             }),
           );
 
-          const head = new THREE.Mesh(track(new THREE.SphereGeometry(0.22, 32, 20)), material);
-          head.position.y = 0.33;
+          const head = new THREE.Mesh(
+            track(new THREE.SphereGeometry(0.24, 64, 32)),
+            avatarMaterial,
+          );
+          head.position.set(0, 0.38, 0.02);
+          head.scale.set(0.93, 1.04, 0.9);
           group.add(head);
 
-          const body = new THREE.Mesh(
-            track(new THREE.CylinderGeometry(0.34, 0.46, 0.58, 36, 1, true)),
-            material,
+          const headRim = new THREE.Mesh(
+            track(new THREE.SphereGeometry(0.255, 64, 32)),
+            rimMaterial,
           );
-          body.position.y = -0.18;
-          group.add(body);
+          headRim.position.copy(head.position);
+          headRim.scale.copy(head.scale);
+          group.add(headRim);
 
-          const shoulders = new THREE.Mesh(track(new THREE.TorusGeometry(0.33, 0.035, 12, 72)), material);
-          shoulders.position.y = 0.04;
-          shoulders.scale.y = 0.34;
-          group.add(shoulders);
+          const neck = new THREE.Mesh(
+            track(new THREE.CylinderGeometry(0.12, 0.15, 0.22, 48)),
+            avatarMaterial,
+          );
+          neck.position.set(0, 0.13, 0);
+          group.add(neck);
 
-          const halo = new THREE.Mesh(track(new THREE.TorusGeometry(0.7, 0.012, 8, 96)), accentMaterial);
-          halo.rotation.x = Math.PI / 2;
-          halo.position.y = -0.36;
-          group.add(halo);
+          const torsoShape = new THREE.Shape();
+          torsoShape.moveTo(0, 0.14);
+          torsoShape.bezierCurveTo(0.22, 0.13, 0.42, 0.02, 0.5, -0.18);
+          torsoShape.bezierCurveTo(0.58, -0.38, 0.46, -0.54, 0.22, -0.59);
+          torsoShape.bezierCurveTo(0.12, -0.61, -0.12, -0.61, -0.22, -0.59);
+          torsoShape.bezierCurveTo(-0.46, -0.54, -0.58, -0.38, -0.5, -0.18);
+          torsoShape.bezierCurveTo(-0.42, 0.02, -0.22, 0.13, 0, 0.14);
+
+          const torsoGeometry = track(
+            new THREE.ExtrudeGeometry(torsoShape, {
+              bevelEnabled: true,
+              bevelSegments: 10,
+              bevelSize: 0.035,
+              bevelThickness: 0.035,
+              curveSegments: 28,
+              depth: 0.18,
+            }),
+          );
+          const torso = new THREE.Mesh(torsoGeometry, avatarMaterial);
+          torso.position.set(0, -0.1, -0.1);
+          group.add(torso);
+
+          const torsoGlow = new THREE.Mesh(torsoGeometry, rimMaterial);
+          torsoGlow.position.copy(torso.position);
+          torsoGlow.scale.set(1.035, 1.035, 1);
+          group.add(torsoGlow);
+
+          const baseShadow = new THREE.Mesh(
+            track(new THREE.CircleGeometry(0.58, 96)),
+            shadowMaterial,
+          );
+          baseShadow.position.set(0, -0.66, -0.08);
+          baseShadow.scale.set(1.16, 0.2, 1);
+          group.add(baseShadow);
 
           return group;
         };
