@@ -142,9 +142,9 @@ export default function Home() {
             SELECTIVE-DISCLOSURE WITH TONIGMA
           </h2>
           <p>
-            Tonigma builds private app channels on Ethereum. App activity moves
-            inside a channel. Ethereum checks proof-backed updates. Users
-            choose what they disclose. Wallet secrets stay local.
+            Tonigma builds private app channels on Ethereum. User activity no
+            longer has to be public by default. Ethereum verifies accepted
+            channel updates. Users choose what to reveal.
           </p>
           <div className="story-points" aria-label="Tonigma solution signals">
             <div className="story-point">
