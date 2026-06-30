@@ -147,7 +147,7 @@ export default function Home() {
             <div className="story-point">
               <RotateCcw aria-hidden="true" size={20} />
               <span>
-                Validators strengthen security by replaying every wallet action.
+                Replaying every wallet action strengthens security.
               </span>
             </div>
             <div className="story-point story-point--question">
