@@ -196,8 +196,8 @@ export function SolutionFlowAnimation() {
               new THREE.Vector3(0.68, 1.28, 0.12),
               tonigmaPosition,
             ),
-            offsets: [0, 0.38, 0.74],
-            speed: 0.18,
+            offsets: [0.08],
+            speed: 0.16,
           },
           {
             color: 0x8adfff,
@@ -206,8 +206,8 @@ export function SolutionFlowAnimation() {
               new THREE.Vector3(1.08, -0.94, 0.08),
               userPosition,
             ),
-            offsets: [0.12, 0.52, 0.86],
-            speed: 0.18,
+            offsets: [0.42],
+            speed: 0.16,
           },
           {
             color: 0xd9f2ff,
@@ -216,41 +216,41 @@ export function SolutionFlowAnimation() {
               new THREE.Vector3(-0.78, -0.1, 0.04),
               ethereumPosition,
             ),
-            offsets: [0.24, 0.62, 0.94],
-            speed: 0.18,
+            offsets: [0.76],
+            speed: 0.16,
           },
         ];
 
-        const pulseMaterial = (color: number, opacity: number) =>
+        const arrowMaterial = (color: number) =>
           track(
             new THREE.MeshBasicMaterial({
               blending: THREE.AdditiveBlending,
               color,
               depthWrite: false,
-              opacity,
+              opacity: 0,
+              side: THREE.DoubleSide,
               transparent: true,
             }),
           );
 
-        const pulseGeometry = track(new THREE.SphereGeometry(0.035, 16, 10));
-        const pulseTailGeometry = track(new THREE.SphereGeometry(0.022, 12, 8));
-        const pulses = flowPaths.flatMap((path) =>
+        const arrowShape = new THREE.Shape();
+        arrowShape.moveTo(0.11, 0);
+        arrowShape.lineTo(-0.035, 0.075);
+        arrowShape.lineTo(-0.012, 0.028);
+        arrowShape.lineTo(-0.11, 0.028);
+        arrowShape.lineTo(-0.11, -0.028);
+        arrowShape.lineTo(-0.012, -0.028);
+        arrowShape.lineTo(-0.035, -0.075);
+        arrowShape.lineTo(0.11, 0);
+
+        const arrowGeometry = track(new THREE.ShapeGeometry(arrowShape));
+        const arrows = flowPaths.flatMap((path) =>
           path.offsets.map((offset) => {
-            const core = new THREE.Mesh(pulseGeometry, pulseMaterial(path.color, 0.95));
-            const tail = [0.055, 0.11, 0.165].map((lag, index) => {
-              const mesh = new THREE.Mesh(
-                pulseTailGeometry,
-                pulseMaterial(path.color, 0.4 - index * 0.1),
-              );
+            const mesh = new THREE.Mesh(arrowGeometry, arrowMaterial(path.color));
+            mesh.scale.setScalar(0.88);
+            root.add(mesh);
 
-              root.add(mesh);
-
-              return { lag, mesh };
-            });
-
-            root.add(core);
-
-            return { core, offset, path, tail };
+            return { mesh, offset, path };
           }),
         );
 
@@ -288,21 +288,15 @@ export function SolutionFlowAnimation() {
           updateEthereumDiamond(time);
           userNode.scale.setScalar(userBaseScale + pulse * 0.018);
 
-          pulses.forEach(({ core, offset, path, tail }) => {
+          arrows.forEach(({ mesh, offset, path }) => {
             const progress = (time * path.speed + offset) % 1;
             const opacity = fadeAtEnds(progress);
+            const position = path.curve.getPoint(progress);
+            const tangent = path.curve.getTangent(progress);
 
-            core.position.copy(path.curve.getPoint(progress));
-            core.scale.setScalar(1 + opacity * 0.42);
-            core.material.opacity = 0.92 * opacity;
-
-            tail.forEach(({ lag, mesh }, index) => {
-              const tailProgress = (progress - lag + 1) % 1;
-              const tailOpacity = fadeAtEnds(tailProgress) * opacity * (0.44 - index * 0.09);
-
-              mesh.position.copy(path.curve.getPoint(tailProgress));
-              mesh.material.opacity = tailOpacity;
-            });
+            mesh.position.set(position.x, position.y, position.z + 0.16);
+            mesh.rotation.z = Math.atan2(tangent.y, tangent.x);
+            mesh.material.opacity = 0.78 * opacity;
           });
 
           renderer.render(scene, camera);
