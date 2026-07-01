@@ -84,7 +84,7 @@ export function SolutionFlowAnimation() {
         const ethereumPosition = new THREE.Vector3(-0.6333333333, 1.2366666667, 0);
         const userPosition = new THREE.Vector3(-0.6333333333, -1.2633333333, 0);
         const tonigmaPosition = new THREE.Vector3(1.2666666667, 0.0266666667, 0);
-        const userBaseScale = 0.82;
+        const userBaseScale = 0.943;
 
         const createUserNode = () => {
           const group = new THREE.Group();
@@ -177,7 +177,7 @@ export function SolutionFlowAnimation() {
         } = createEthereumDiamondModel({
           THREE,
           camera,
-          scale: 0.41,
+          scale: 0.4715,
           track,
         });
         const ethereumViewGroup = new THREE.Group();

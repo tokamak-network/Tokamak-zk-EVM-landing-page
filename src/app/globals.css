@@ -355,7 +355,7 @@ main {
 }
 
 .solution-flow {
-  --solution-capsule-size: 28%;
+  --solution-capsule-size: 32.2%;
   position: relative;
   width: min(48vw, 560px);
   min-width: 360px;
@@ -396,7 +396,7 @@ main {
   left: 85.406%;
   top: 49.255%;
   z-index: 3;
-  width: 28%;
+  width: 32.2%;
   min-width: 0;
   margin: 0;
   transform: translate(-50%, -50%);
