@@ -15,28 +15,6 @@ type FlowPath = {
   speed: number;
 };
 
-type ArrowRender = {
-  body: import("three").Mesh<
-    import("three").ExtrudeGeometry,
-    import("three").MeshPhysicalMaterial
-  >;
-  face: import("three").Mesh<
-    import("three").ShapeGeometry,
-    import("three").MeshBasicMaterial
-  >;
-  glow: import("three").Mesh<
-    import("three").ShapeGeometry,
-    import("three").MeshBasicMaterial
-  >;
-  group: import("three").Group;
-  offset: number;
-  path: FlowPath;
-  trail: import("three").Mesh<
-    import("three").ShapeGeometry,
-    import("three").MeshBasicMaterial
-  >;
-};
-
 function clamp(value: number, min = 0, max = 1) {
   return Math.min(Math.max(value, min), max);
 }
@@ -243,105 +221,128 @@ export function SolutionFlowAnimation() {
           },
         ];
 
-        const arrowShape = new THREE.Shape();
-        arrowShape.moveTo(0.21, 0);
-        arrowShape.lineTo(0.02, 0.13);
-        arrowShape.lineTo(0.045, 0.052);
-        arrowShape.lineTo(-0.21, 0.052);
-        arrowShape.lineTo(-0.21, -0.052);
-        arrowShape.lineTo(0.045, -0.052);
-        arrowShape.lineTo(0.02, -0.13);
-        arrowShape.lineTo(0.21, 0);
+        const createLightArrowGeometry = () => {
+          const geometry = track(new THREE.BufferGeometry());
+          const positions: number[] = [];
+          const progressValues: number[] = [];
+          const edgeValues: number[] = [];
+          const indices: number[] = [];
+          const segments = 34;
+          const start = new THREE.Vector2(-0.48, -0.12);
+          const control = new THREE.Vector2(-0.04, 0.27);
+          const end = new THREE.Vector2(0.48, 0.06);
 
-        const trailShape = new THREE.Shape();
-        trailShape.moveTo(0.02, 0.078);
-        trailShape.lineTo(-0.36, 0.026);
-        trailShape.lineTo(-0.36, -0.026);
-        trailShape.lineTo(0.02, -0.078);
-        trailShape.lineTo(0.02, 0.078);
+          const pointAt = (t: number) => {
+            const oneMinusT = 1 - t;
 
-        const arrowGeometry = track(
-          new THREE.ExtrudeGeometry(arrowShape, {
-            bevelEnabled: true,
-            bevelSegments: 4,
-            bevelSize: 0.018,
-            bevelThickness: 0.018,
-            depth: 0.09,
-          }),
-        );
-        arrowGeometry.center();
+            return new THREE.Vector2(
+              oneMinusT * oneMinusT * start.x + 2 * oneMinusT * t * control.x + t * t * end.x,
+              oneMinusT * oneMinusT * start.y + 2 * oneMinusT * t * control.y + t * t * end.y,
+            );
+          };
+          const tangentAt = (t: number) =>
+            new THREE.Vector2(
+              2 * (1 - t) * (control.x - start.x) + 2 * t * (end.x - control.x),
+              2 * (1 - t) * (control.y - start.y) + 2 * t * (end.y - control.y),
+            ).normalize();
 
-        const arrowFaceGeometry = track(new THREE.ShapeGeometry(arrowShape));
-        const arrowGlowGeometry = track(new THREE.ShapeGeometry(arrowShape));
-        const arrowTrailGeometry = track(new THREE.ShapeGeometry(trailShape));
+          for (let index = 0; index <= segments; index += 1) {
+            const progress = index / segments;
+            const point = pointAt(progress);
+            const tangent = tangentAt(progress);
+            const normal = new THREE.Vector2(-tangent.y, tangent.x);
+            const bodyWidth = 0.025 + progress * 0.075;
+            const headLift = progress > 0.72 ? (progress - 0.72) / 0.28 : 0;
+            const width = bodyWidth + headLift * 0.08;
 
-        const arrows: ArrowRender[] = flowPaths.flatMap((path) =>
+            [-1, 0, 1].forEach((side) => {
+              positions.push(point.x + normal.x * width * side, point.y + normal.y * width * side, 0);
+              progressValues.push(progress);
+              edgeValues.push(Math.abs(side));
+            });
+          }
+
+          const endPoint = pointAt(1);
+          const endTangent = tangentAt(1);
+          const tip = endPoint.clone().add(endTangent.multiplyScalar(0.08));
+          positions.push(tip.x, tip.y, 0);
+          progressValues.push(1);
+          edgeValues.push(0);
+          const tipIndex = positions.length / 3 - 1;
+
+          for (let index = 0; index < segments; index += 1) {
+            const left = index * 3;
+            const center = left + 1;
+            const right = left + 2;
+            const nextLeft = left + 3;
+            const nextCenter = left + 4;
+            const nextRight = left + 5;
+            indices.push(left, center, nextCenter, left, nextCenter, nextLeft);
+            indices.push(center, right, nextRight, center, nextRight, nextCenter);
+          }
+
+          indices.push(segments * 3, segments * 3 + 2, tipIndex);
+
+          geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+          geometry.setAttribute("arrowProgress", new THREE.Float32BufferAttribute(progressValues, 1));
+          geometry.setAttribute("arrowEdge", new THREE.Float32BufferAttribute(edgeValues, 1));
+          geometry.setIndex(indices);
+          geometry.computeBoundingSphere();
+
+          return geometry;
+        };
+
+        const arrowGeometry = createLightArrowGeometry();
+        const arrows = flowPaths.flatMap((path) =>
           path.offsets.map((offset) => {
-            const group = new THREE.Group();
-            const bodyMaterial = track(
-              new THREE.MeshPhysicalMaterial({
-                clearcoat: 1,
-                clearcoatRoughness: 0.08,
-                color: path.color,
-                emissive: path.color,
-                emissiveIntensity: 0.2,
-                metalness: 0.12,
-                opacity: 0,
-                roughness: 0.2,
-                transparent: true,
-              }),
-            );
-            const faceMaterial = track(
-              new THREE.MeshBasicMaterial({
+            const material = track(
+              new THREE.ShaderMaterial({
                 blending: THREE.AdditiveBlending,
-                color: 0xffffff,
                 depthWrite: false,
-                opacity: 0,
-                transparent: true,
-              }),
-            );
-            const glowMaterial = track(
-              new THREE.MeshBasicMaterial({
-                blending: THREE.AdditiveBlending,
-                color: path.color,
-                depthWrite: false,
-                opacity: 0,
+                fragmentShader: `
+                  varying float vArrowEdge;
+                  varying float vArrowProgress;
+                  uniform vec3 uColor;
+                  uniform float uOpacity;
+
+                  void main() {
+                    float core = 1.0 - smoothstep(0.0, 1.0, vArrowEdge);
+                    float startFade = smoothstep(0.0, 0.16, vArrowProgress);
+                    float endFade = 1.0 - smoothstep(0.9, 1.0, vArrowProgress);
+                    float alpha = uOpacity * startFade * endFade * (0.24 + core * 0.76);
+                    vec3 color = mix(uColor, vec3(0.9, 0.99, 1.0), core * 0.62);
+
+                    if (alpha < 0.01) {
+                      discard;
+                    }
+
+                    gl_FragColor = vec4(color, alpha);
+                  }
+                `,
                 side: THREE.DoubleSide,
                 transparent: true,
+                uniforms: {
+                  uColor: { value: new THREE.Color(path.color) },
+                  uOpacity: { value: 0 },
+                },
+                vertexShader: `
+                  attribute float arrowEdge;
+                  attribute float arrowProgress;
+                  varying float vArrowEdge;
+                  varying float vArrowProgress;
+
+                  void main() {
+                    vArrowEdge = arrowEdge;
+                    vArrowProgress = arrowProgress;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                  }
+                `,
               }),
             );
-            const trailMaterial = track(
-              new THREE.MeshBasicMaterial({
-                blending: THREE.AdditiveBlending,
-                color: path.color,
-                depthWrite: false,
-                opacity: 0,
-                side: THREE.DoubleSide,
-                transparent: true,
-              }),
-            );
+            const mesh = new THREE.Mesh(arrowGeometry, material);
+            root.add(mesh);
 
-            const glow = new THREE.Mesh(arrowGlowGeometry, glowMaterial);
-            glow.position.z = -0.06;
-            glow.scale.set(1.45, 1.45, 1);
-            group.add(glow);
-
-            const trail = new THREE.Mesh(arrowTrailGeometry, trailMaterial);
-            trail.position.set(-0.16, 0, -0.045);
-            group.add(trail);
-
-            const body = new THREE.Mesh(arrowGeometry, bodyMaterial);
-            group.add(body);
-
-            const face = new THREE.Mesh(arrowFaceGeometry, faceMaterial);
-            face.position.set(-0.025, 0.026, 0.06);
-            face.scale.set(0.48, 0.18, 1);
-            group.add(face);
-
-            group.scale.setScalar(1.16);
-            root.add(group);
-
-            return { body, face, glow, group, offset, path, trail };
+            return { mesh, offset, path };
           }),
         );
 
@@ -379,21 +380,17 @@ export function SolutionFlowAnimation() {
           updateEthereumDiamond(time);
           userNode.scale.setScalar(userBaseScale + pulse * 0.018);
 
-          arrows.forEach(({ body, face, glow, group, offset, path, trail }) => {
+          arrows.forEach(({ mesh, offset, path }) => {
             const progress = (time * path.speed + offset) % 1;
             const travelProgress = 0.3 + progress * 0.4;
             const opacity = fadeAtEnds(progress);
             const position = path.curve.getPoint(travelProgress);
             const tangent = path.curve.getTangent(travelProgress);
-            const arrowPulse = 1 + opacity * 0.16;
 
-            group.position.set(position.x, position.y, position.z + 0.18);
-            group.rotation.z = Math.atan2(tangent.y, tangent.x);
-            group.scale.setScalar(1.04 + arrowPulse * 0.16);
-            body.material.opacity = 0.94 * opacity;
-            face.material.opacity = 0.34 * opacity;
-            glow.material.opacity = 0.22 * opacity;
-            trail.material.opacity = 0.18 * opacity;
+            mesh.position.set(position.x, position.y, position.z + 0.18);
+            mesh.rotation.z = Math.atan2(tangent.y, tangent.x);
+            mesh.scale.setScalar(1 + opacity * 0.08);
+            mesh.material.uniforms.uOpacity.value = 0.94 * opacity;
           });
 
           renderer.render(scene, camera);
