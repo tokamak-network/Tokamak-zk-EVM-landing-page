@@ -179,88 +179,98 @@ export function SolutionFlowAnimation() {
 
         const trailSegments = 96;
         const trailArc = 3.55;
+        const trailWidthSamples = 7;
 
         const createOrbitRibbonGeometry = () => {
           const geometry = track(new THREE.BufferGeometry());
-          const positions = new Float32Array((trailSegments + 1) * 2 * 3);
-          const trailProgress = new Float32Array((trailSegments + 1) * 2);
+          const vertexCount = (trailSegments + 1) * trailWidthSamples;
+          const positions = new Float32Array(vertexCount * 3);
+          const trailProgress = new Float32Array(vertexCount);
+          const trailEdge = new Float32Array(vertexCount);
           const indices: number[] = [];
 
           for (let index = 0; index <= trailSegments; index += 1) {
             const progress = index / trailSegments;
-            const left = index * 2;
-            const right = left + 1;
+            const rowStart = index * trailWidthSamples;
 
-            trailProgress[left] = progress;
-            trailProgress[right] = progress;
+            for (let sample = 0; sample < trailWidthSamples; sample += 1) {
+              const vertexIndex = rowStart + sample;
+
+              trailProgress[vertexIndex] = progress;
+              trailEdge[vertexIndex] = sample / (trailWidthSamples - 1) * 2 - 1;
+            }
 
             if (index < trailSegments) {
-              const nextLeft = left + 2;
-              const nextRight = left + 3;
+              const nextRowStart = rowStart + trailWidthSamples;
 
-              indices.push(left, right, nextRight, left, nextRight, nextLeft);
+              for (let sample = 0; sample < trailWidthSamples - 1; sample += 1) {
+                const left = rowStart + sample;
+                const right = left + 1;
+                const nextLeft = nextRowStart + sample;
+                const nextRight = nextLeft + 1;
+
+                indices.push(left, right, nextRight, left, nextRight, nextLeft);
+              }
             }
           }
 
           geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
           geometry.setAttribute("trailProgress", new THREE.BufferAttribute(trailProgress, 1));
+          geometry.setAttribute("trailEdge", new THREE.BufferAttribute(trailEdge, 1));
           geometry.setIndex(indices);
 
           return geometry;
         };
 
-        const createOrbitRibbonMaterial = ({
-          color,
-          opacity,
-          power,
-        }: {
-          color: number;
-          opacity: number;
-          power: number;
-        }) =>
-          track(
-            new THREE.ShaderMaterial({
-              blending: THREE.AdditiveBlending,
-              depthWrite: false,
-              side: THREE.DoubleSide,
-              toneMapped: false,
-              transparent: true,
-              uniforms: {
-                uColor: { value: new THREE.Color(color) },
-                uOpacity: { value: opacity },
-                uPower: { value: power },
-              },
-              vertexShader: `
-                attribute float trailProgress;
-                varying float vTrailProgress;
+        const orbitRibbonMaterial = track(
+          new THREE.ShaderMaterial({
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+            toneMapped: false,
+            transparent: true,
+            uniforms: {
+              uColor: { value: new THREE.Color(0x55ddff) },
+              uOpacity: { value: 0.92 },
+            },
+            vertexShader: `
+              attribute float trailProgress;
+              attribute float trailEdge;
+              varying float vTrailProgress;
+              varying float vTrailEdge;
 
-                void main() {
-                  vTrailProgress = trailProgress;
-                  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+              void main() {
+                vTrailProgress = trailProgress;
+                vTrailEdge = trailEdge;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+              }
+            `,
+            fragmentShader: `
+              uniform vec3 uColor;
+              uniform float uOpacity;
+              varying float vTrailProgress;
+              varying float vTrailEdge;
+
+              void main() {
+                float center = 1.0 - abs(vTrailEdge);
+                float core = pow(max(center, 0.0), 2.8);
+                float halo = pow(max(center, 0.0), 0.74);
+                float tailFade = smoothstep(0.0, 0.18, vTrailProgress);
+                float bodyEnergy = pow(vTrailProgress, 1.34);
+                float headEnergy = smoothstep(0.78, 1.0, vTrailProgress);
+                float emission = tailFade * (bodyEnergy * (halo * 0.42 + core * 0.68) + headEnergy * (halo * 0.3 + core * 0.5));
+                float alpha = uOpacity * emission;
+                vec3 color = mix(uColor, vec3(1.0), core * 0.62 + headEnergy * 0.22);
+
+                if (alpha < 0.01) {
+                  discard;
                 }
-              `,
-              fragmentShader: `
-                uniform vec3 uColor;
-                uniform float uOpacity;
-                uniform float uPower;
-                varying float vTrailProgress;
 
-                void main() {
-                  float head = smoothstep(0.72, 1.0, vTrailProgress);
-                  float body = pow(vTrailProgress, uPower);
-                  float tailFade = smoothstep(0.0, 0.18, vTrailProgress);
-                  float alpha = uOpacity * tailFade * (body * 0.54 + head * 0.72);
-                  vec3 color = mix(uColor, vec3(1.0), head * 0.55);
-
-                  if (alpha < 0.01) {
-                    discard;
-                  }
-
-                  gl_FragColor = vec4(color, alpha);
-                }
-              `,
-            }),
-          );
+                gl_FragColor = vec4(color * (1.12 + core * 0.55), alpha);
+              }
+            `,
+          }),
+        );
 
         const updateOrbitRibbon = (
           geometry: InstanceType<typeof THREE.BufferGeometry>,
@@ -284,48 +294,41 @@ export function SolutionFlowAnimation() {
             const normalY = Math.sin(angle);
             const headWeight = Math.pow(progress, 1.7);
             const localWidth = width * (0.28 + headWeight * 0.72);
-            const leftIndex = index * 2;
-            const rightIndex = leftIndex + 1;
+            const rowStart = index * trailWidthSamples;
 
-            positionAttribute.setXYZ(
-              leftIndex,
-              x + normalX * localWidth * 0.5 + tangentX * localWidth * 0.08,
-              y + normalY * localWidth * 0.5 + tangentY * localWidth * 0.08,
-              z,
-            );
-            positionAttribute.setXYZ(
-              rightIndex,
-              x - normalX * localWidth * 0.5 - tangentX * localWidth * 0.08,
-              y - normalY * localWidth * 0.5 - tangentY * localWidth * 0.08,
-              z,
-            );
+            for (let sample = 0; sample < trailWidthSamples; sample += 1) {
+              const edge = sample / (trailWidthSamples - 1) * 2 - 1;
+              const vertexIndex = rowStart + sample;
+
+              positionAttribute.setXYZ(
+                vertexIndex,
+                x + normalX * localWidth * edge * 0.5 + tangentX * localWidth * 0.06,
+                y + normalY * localWidth * edge * 0.5 + tangentY * localWidth * 0.06,
+                z,
+              );
+            }
           }
 
           positionAttribute.needsUpdate = true;
           geometry.computeBoundingSphere();
         };
 
-        const glowRibbonGeometry = createOrbitRibbonGeometry();
-        const coreRibbonGeometry = createOrbitRibbonGeometry();
-        const glowRibbonMaterial = createOrbitRibbonMaterial({
-          color: 0x37d7ff,
-          opacity: 0.74,
-          power: 1.85,
-        });
-        const coreRibbonMaterial = createOrbitRibbonMaterial({
-          color: 0xeafcff,
-          opacity: 0.98,
-          power: 2.45,
-        });
-        const glowRibbon = new THREE.Mesh(glowRibbonGeometry, glowRibbonMaterial);
-        const coreRibbon = new THREE.Mesh(coreRibbonGeometry, coreRibbonMaterial);
-        glowRibbon.renderOrder = 8;
-        coreRibbon.renderOrder = 9;
-        root.add(glowRibbon, coreRibbon);
+        const orbitRibbonGeometry = createOrbitRibbonGeometry();
+        const orbitRibbon = new THREE.Mesh(orbitRibbonGeometry, orbitRibbonMaterial);
+        orbitRibbon.renderOrder = 8;
+        root.add(orbitRibbon);
 
         const lightEmitter = new THREE.PointLight(0xbff6ff, 3.4, 1.55, 2.1);
         lightEmitter.position.set(0, triangleRadius, 0.5);
         root.add(lightEmitter);
+
+        const bodyLights = Array.from({ length: 5 }, (_, index) => {
+          const light = new THREE.PointLight(0x7ce9ff, 0.34, 1.1, 2.1);
+          light.position.set(0, triangleRadius, 0.34);
+          root.add(light);
+
+          return { light, progress: (index + 1) / 6 };
+        });
 
         const emitterGlowGeometry = track(new THREE.SphereGeometry(1, 48, 24));
         const emitterGlowMaterial = track(
@@ -486,12 +489,21 @@ export function SolutionFlowAnimation() {
           const orbitY = Math.sin(orbitAngle) * triangleRadius;
           const trailIntensity = 0.88 + Math.sin(time * 3.4) * 0.08;
 
-          updateOrbitRibbon(glowRibbonGeometry, orbitAngle, 0.28, 0.24);
-          updateOrbitRibbon(coreRibbonGeometry, orbitAngle, 0.1, 0.28);
-          glowRibbonMaterial.uniforms.uOpacity.value = trailIntensity * 0.74;
-          coreRibbonMaterial.uniforms.uOpacity.value = trailIntensity;
+          updateOrbitRibbon(orbitRibbonGeometry, orbitAngle, 0.36, 0.26);
+          orbitRibbonMaterial.uniforms.uOpacity.value = trailIntensity * 0.96;
           lightEmitter.position.set(orbitX, orbitY, 0.48);
           lightEmitter.intensity = 3.1 + trailIntensity * 1.2;
+          bodyLights.forEach(({ light, progress }) => {
+            const bodyAngle = orbitAngle + trailArc * (1 - progress);
+            const bodyEnergy = Math.pow(progress, 1.44);
+
+            light.position.set(
+              Math.cos(bodyAngle) * triangleRadius,
+              Math.sin(bodyAngle) * triangleRadius,
+              0.36,
+            );
+            light.intensity = trailIntensity * bodyEnergy * 0.72;
+          });
           emitterGlow.position.copy(lightEmitter.position);
           emitterGlow.scale.setScalar(0.36 + trailIntensity * 0.08);
           emitterGlow.updateWorldMatrix(true, false);
