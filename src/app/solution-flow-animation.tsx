@@ -179,7 +179,7 @@ export function SolutionFlowAnimation() {
 
         const trailSegments = 96;
         const trailArc = 3.55;
-        const trailWidthSamples = 7;
+        const trailWidthSamples = 15;
 
         const createOrbitRibbonGeometry = () => {
           const geometry = track(new THREE.BufferGeometry());
@@ -252,19 +252,16 @@ export function SolutionFlowAnimation() {
               varying float vTrailEdge;
 
               void main() {
-                float center = 1.0 - abs(vTrailEdge);
-                float core = pow(max(center, 0.0), 2.8);
-                float halo = pow(max(center, 0.0), 0.74);
+                float edgeDistance = abs(vTrailEdge);
+                float core = exp(-edgeDistance * edgeDistance * 9.6);
+                float halo = exp(-edgeDistance * edgeDistance * 2.35);
+                float outerFade = 1.0 - smoothstep(0.82, 1.0, edgeDistance);
                 float tailFade = smoothstep(0.0, 0.18, vTrailProgress);
                 float bodyEnergy = pow(vTrailProgress, 1.34);
                 float headEnergy = smoothstep(0.78, 1.0, vTrailProgress);
-                float emission = tailFade * (bodyEnergy * (halo * 0.42 + core * 0.68) + headEnergy * (halo * 0.3 + core * 0.5));
+                float emission = tailFade * outerFade * (bodyEnergy * (halo * 0.52 + core * 0.62) + headEnergy * (halo * 0.34 + core * 0.48));
                 float alpha = uOpacity * emission;
                 vec3 color = mix(uColor, vec3(1.0), core * 0.62 + headEnergy * 0.22);
-
-                if (alpha < 0.01) {
-                  discard;
-                }
 
                 gl_FragColor = vec4(color * (1.12 + core * 0.55), alpha);
               }
@@ -318,7 +315,7 @@ export function SolutionFlowAnimation() {
         orbitRibbon.renderOrder = 8;
         root.add(orbitRibbon);
 
-        const lightEmitter = new THREE.PointLight(0xbff6ff, 3.4, 1.55, 2.1);
+        const lightEmitter = new THREE.PointLight(0xbff6ff, 2.0, 1.35, 2.1);
         lightEmitter.position.set(0, triangleRadius, 0.5);
         root.add(lightEmitter);
 
@@ -342,7 +339,7 @@ export function SolutionFlowAnimation() {
             uniforms: {
               uCameraLocalPosition: { value: new THREE.Vector3(0, 0, 4) },
               uColor: { value: new THREE.Color(0xf4fbff) },
-              uOpacity: { value: 0.62 },
+              uOpacity: { value: 0.4 },
               uTime: { value: 0 },
             },
             vertexShader: `
@@ -439,9 +436,9 @@ export function SolutionFlowAnimation() {
                   accumulatedCore += centerDensity * atmosphericFalloff * stepSize;
                 }
 
-                float alpha = 1.0 - exp(-accumulatedDensity * uOpacity * 1.92);
-                vec3 color = uColor * (1.25 + accumulatedCore * 3.1);
-                gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.95));
+                float alpha = 1.0 - exp(-accumulatedDensity * uOpacity * 1.34);
+                vec3 color = uColor * (1.08 + accumulatedCore * 2.15);
+                gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.72));
               }
             `,
           }),
@@ -492,7 +489,7 @@ export function SolutionFlowAnimation() {
           updateOrbitRibbon(orbitRibbonGeometry, orbitAngle, 0.36, 0.26);
           orbitRibbonMaterial.uniforms.uOpacity.value = trailIntensity * 0.96;
           lightEmitter.position.set(orbitX, orbitY, 0.48);
-          lightEmitter.intensity = 3.1 + trailIntensity * 1.2;
+          lightEmitter.intensity = 1.65 + trailIntensity * 0.68;
           bodyLights.forEach(({ light, progress }) => {
             const bodyAngle = orbitAngle + trailArc * (1 - progress);
             const bodyEnergy = Math.pow(progress, 1.44);
@@ -505,12 +502,12 @@ export function SolutionFlowAnimation() {
             light.intensity = trailIntensity * bodyEnergy * 0.72;
           });
           emitterGlow.position.copy(lightEmitter.position);
-          emitterGlow.scale.setScalar(0.36 + trailIntensity * 0.08);
+          emitterGlow.scale.setScalar(0.29 + trailIntensity * 0.045);
           emitterGlow.updateWorldMatrix(true, false);
           emitterGlowMaterial.uniforms.uCameraLocalPosition.value.copy(
             emitterGlow.worldToLocal(camera.position.clone()),
           );
-          emitterGlowMaterial.uniforms.uOpacity.value = 0.46 + trailIntensity * 0.22;
+          emitterGlowMaterial.uniforms.uOpacity.value = 0.28 + trailIntensity * 0.12;
           emitterGlowMaterial.uniforms.uTime.value = time;
 
           renderer.render(scene, camera);
