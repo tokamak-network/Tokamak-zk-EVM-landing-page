@@ -8,6 +8,10 @@ type Disposable = {
   dispose: () => void;
 };
 
+const triangleRadius = 1.16;
+const halfTriangleRadius = triangleRadius / 2;
+const triangleHorizontalRadius = triangleRadius * Math.sqrt(3) / 2;
+
 export function SolutionFlowAnimation() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [showFallback, setShowFallback] = useState(false);
@@ -66,9 +70,9 @@ export function SolutionFlowAnimation() {
         const root = new THREE.Group();
         scene.add(root);
 
-        const ethereumPosition = new THREE.Vector3(-0.6333333333, 1.2366666667, 0);
-        const userPosition = new THREE.Vector3(-0.6333333333, -1.2633333333, 0);
-        const tonigmaPosition = new THREE.Vector3(1.2666666667, 0.0266666667, 0);
+        const ethereumPosition = new THREE.Vector3(0, triangleRadius, 0);
+        const userPosition = new THREE.Vector3(-triangleHorizontalRadius, -halfTriangleRadius, 0);
+        const tonigmaPosition = new THREE.Vector3(triangleHorizontalRadius, -halfTriangleRadius, 0);
         const userBaseScale = 0.943;
 
         const createUserNode = () => {
@@ -173,6 +177,86 @@ export function SolutionFlowAnimation() {
         const userNode = createUserNode();
         root.add(ethereumViewGroup, userNode);
 
+        const lightTrailCanvas = document.createElement("canvas");
+        lightTrailCanvas.width = 256;
+        lightTrailCanvas.height = 80;
+        const lightTrailContext = lightTrailCanvas.getContext("2d");
+
+        if (lightTrailContext) {
+          const horizontalGlow = lightTrailContext.createLinearGradient(
+            0,
+            0,
+            lightTrailCanvas.width,
+            0,
+          );
+          horizontalGlow.addColorStop(0, "rgba(255,255,255,0)");
+          horizontalGlow.addColorStop(0.24, "rgba(150,232,255,0.18)");
+          horizontalGlow.addColorStop(0.5, "rgba(255,255,255,1)");
+          horizontalGlow.addColorStop(0.76, "rgba(150,232,255,0.18)");
+          horizontalGlow.addColorStop(1, "rgba(255,255,255,0)");
+
+          const verticalGlow = lightTrailContext.createRadialGradient(
+            lightTrailCanvas.width / 2,
+            lightTrailCanvas.height / 2,
+            0,
+            lightTrailCanvas.width / 2,
+            lightTrailCanvas.height / 2,
+            lightTrailCanvas.height / 2,
+          );
+          verticalGlow.addColorStop(0, "rgba(255,255,255,1)");
+          verticalGlow.addColorStop(0.54, "rgba(190,246,255,0.74)");
+          verticalGlow.addColorStop(1, "rgba(255,255,255,0)");
+
+          lightTrailContext.fillStyle = horizontalGlow;
+          lightTrailContext.fillRect(
+            0,
+            0,
+            lightTrailCanvas.width,
+            lightTrailCanvas.height,
+          );
+          lightTrailContext.globalCompositeOperation = "destination-in";
+          lightTrailContext.fillStyle = verticalGlow;
+          lightTrailContext.fillRect(
+            0,
+            0,
+            lightTrailCanvas.width,
+            lightTrailCanvas.height,
+          );
+        }
+
+        const lightTrailTexture = track(new THREE.CanvasTexture(lightTrailCanvas));
+        lightTrailTexture.colorSpace = THREE.SRGBColorSpace;
+        const lightTrailGeometry = track(new THREE.PlaneGeometry(1, 1));
+        const lightTrailGlowMaterial = track(
+          new THREE.MeshBasicMaterial({
+            blending: THREE.AdditiveBlending,
+            color: "#4acfff",
+            depthWrite: false,
+            map: lightTrailTexture,
+            opacity: 0.72,
+            side: THREE.DoubleSide,
+            toneMapped: false,
+            transparent: true,
+          }),
+        );
+        const lightTrailCoreMaterial = track(
+          new THREE.MeshBasicMaterial({
+            blending: THREE.AdditiveBlending,
+            color: "#f4fdff",
+            depthWrite: false,
+            map: lightTrailTexture,
+            opacity: 0.98,
+            side: THREE.DoubleSide,
+            toneMapped: false,
+            transparent: true,
+          }),
+        );
+        const lightTrailGlow = new THREE.Mesh(lightTrailGeometry, lightTrailGlowMaterial);
+        const lightTrailCore = new THREE.Mesh(lightTrailGeometry, lightTrailCoreMaterial);
+        lightTrailGlow.renderOrder = 8;
+        lightTrailCore.renderOrder = 9;
+        root.add(lightTrailGlow, lightTrailCore);
+
         const clock = new THREE.Clock();
         const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
         const ethereumSpinSpeed = 0.37;
@@ -206,6 +290,21 @@ export function SolutionFlowAnimation() {
           }
           updateEthereumDiamond(time);
           userNode.scale.setScalar(userBaseScale + pulse * 0.018);
+
+          const orbitAngle = Math.PI / 2 - time * 1.15;
+          const orbitX = Math.cos(orbitAngle) * triangleRadius;
+          const orbitY = Math.sin(orbitAngle) * triangleRadius;
+          const tangentAngle = orbitAngle - Math.PI / 2;
+          const trailIntensity = 0.86 + Math.sin(time * 3.4) * 0.08;
+
+          lightTrailGlow.position.set(orbitX, orbitY, 0.26);
+          lightTrailCore.position.copy(lightTrailGlow.position);
+          lightTrailGlow.rotation.z = tangentAngle;
+          lightTrailCore.rotation.z = tangentAngle;
+          lightTrailGlow.scale.set(1.04, 0.34, 1);
+          lightTrailCore.scale.set(0.74, 0.13, 1);
+          lightTrailGlowMaterial.opacity = trailIntensity * 0.86;
+          lightTrailCoreMaterial.opacity = trailIntensity;
 
           renderer.render(scene, camera);
           animationFrame = requestAnimationFrame(render);

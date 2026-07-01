@@ -393,8 +393,8 @@ main {
 
 .solution-flow .solution-flow__tonigma-logo {
   position: absolute;
-  left: 85.406%;
-  top: 49.255%;
+  left: 78.1%;
+  top: 66.2%;
   z-index: 3;
   width: 32.2%;
   min-width: 0;
@@ -409,18 +409,18 @@ main {
 }
 
 .solution-flow__capsule--ethereum {
-  left: 32.3%;
-  top: 15.4%;
+  left: 50%;
+  top: 17.6%;
 }
 
 .solution-flow__capsule--user {
-  left: 32.3%;
-  top: 85.4%;
+  left: 21.9%;
+  top: 66.2%;
 }
 
 .solution-flow__capsule--tonigma {
-  left: 85.406%;
-  top: 49.255%;
+  left: 78.1%;
+  top: 66.2%;
 }
 
 .solution-flow__capsule::before,
