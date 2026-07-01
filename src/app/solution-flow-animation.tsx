@@ -127,22 +127,21 @@ export function SolutionFlowAnimation() {
           const badgeRimMaterial = track(
             new THREE.MeshPhysicalMaterial({
               clearcoat: 1,
-              clearcoatRoughness: 0.02,
-              color: "#bcefff",
+              clearcoatRoughness: 0.04,
+              color: "#effdff",
               depthWrite: false,
               ior: 1.42,
               metalness: 0,
-              opacity: 0.36,
-              roughness: 0.03,
-              thickness: 0.08,
-              transmission: 0.3,
+              opacity: 0.46,
+              roughness: 0.04,
+              thickness: 0.2,
+              transmission: 0.55,
               transparent: true,
             }),
           );
-          const badgeRimLightMaterial = track(
+          const badgeRimShadowMaterial = track(
             new THREE.MeshBasicMaterial({
-              blending: THREE.AdditiveBlending,
-              color: 0xffffff,
+              color: 0x071923,
               depthWrite: false,
               opacity: 0.24,
               transparent: true,
@@ -166,20 +165,19 @@ export function SolutionFlowAnimation() {
           badge.position.z = -0.08;
           group.add(badge);
 
+          const badgeRimShadow = new THREE.Mesh(
+            track(new THREE.TorusGeometry(0.622, 0.05, 24, 128)),
+            badgeRimShadowMaterial,
+          );
+          badgeRimShadow.position.set(0.014, -0.014, -0.06);
+          group.add(badgeRimShadow);
+
           const badgeRim = new THREE.Mesh(
-            track(new THREE.TorusGeometry(0.62, 0.042, 24, 128)),
+            track(new THREE.TorusGeometry(0.62, 0.045, 32, 160)),
             badgeRimMaterial,
           );
-          badgeRim.position.z = -0.03;
+          badgeRim.position.z = -0.025;
           group.add(badgeRim);
-
-          const badgeRimLight = new THREE.Mesh(
-            track(new THREE.TorusGeometry(0.62, 0.012, 12, 128)),
-            badgeRimLightMaterial,
-          );
-          badgeRimLight.position.set(-0.015, 0.02, 0.02);
-          badgeRimLight.scale.set(0.98, 0.98, 1);
-          group.add(badgeRimLight);
 
           const head = new THREE.Mesh(
             track(new THREE.SphereGeometry(0.2, 64, 32)),
