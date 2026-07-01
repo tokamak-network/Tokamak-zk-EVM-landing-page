@@ -177,7 +177,7 @@ export function SolutionFlowAnimation() {
         } = createEthereumDiamondModel({
           THREE,
           camera,
-          scale: 0.47,
+          scale: 0.41,
           track,
         });
         const ethereumViewGroup = new THREE.Group();
@@ -336,6 +336,7 @@ export function SolutionFlowAnimation() {
       <canvas ref={canvasRef} className="solution-flow__canvas" />
       <span className="solution-flow__capsule solution-flow__capsule--ethereum" />
       <span className="solution-flow__capsule solution-flow__capsule--user" />
+      <span className="solution-flow__capsule solution-flow__capsule--tonigma" />
       <TonigmaNetworkLogo
         className="solution-flow__tonigma-logo"
         playback="final-flash"

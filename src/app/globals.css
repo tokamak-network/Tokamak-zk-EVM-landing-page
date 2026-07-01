@@ -355,6 +355,7 @@ main {
 }
 
 .solution-flow {
+  --solution-capsule-size: 28%;
   position: relative;
   width: min(48vw, 560px);
   min-width: 360px;
@@ -380,7 +381,6 @@ main {
     drop-shadow(0 0 34px rgba(255, 255, 255, 0.06));
 }
 
-.solution-flow .solution-flow__tonigma-logo,
 .solution-flow__capsule {
   position: absolute;
   z-index: 2;
@@ -392,30 +392,37 @@ main {
 }
 
 .solution-flow .solution-flow__tonigma-logo {
+  position: absolute;
   left: 85.406%;
   top: 49.255%;
-  width: 32%;
+  z-index: 3;
+  width: 28%;
+  min-width: 0;
+  margin: 0;
+  transform: translate(-50%, -50%);
 }
 
 .solution-flow__capsule {
   aspect-ratio: 1;
   pointer-events: none;
+  width: var(--solution-capsule-size);
 }
 
 .solution-flow__capsule--ethereum {
   left: 32.3%;
   top: 15.4%;
-  width: 25%;
 }
 
 .solution-flow__capsule--user {
   left: 32.3%;
   top: 85.4%;
-  width: 22%;
 }
 
-.solution-flow .solution-flow__tonigma-logo::before,
-.solution-flow .solution-flow__tonigma-logo::after,
+.solution-flow__capsule--tonigma {
+  left: 85.406%;
+  top: 49.255%;
+}
+
 .solution-flow__capsule::before,
 .solution-flow__capsule::after {
   position: absolute;
@@ -424,9 +431,8 @@ main {
   pointer-events: none;
 }
 
-.solution-flow .solution-flow__tonigma-logo::before,
 .solution-flow__capsule::before {
-  inset: -9%;
+  inset: 0;
   z-index: 0;
   background:
     radial-gradient(circle at 32% 22%, rgba(255, 255, 255, 0.18), transparent 15%),
@@ -441,9 +447,8 @@ main {
   backdrop-filter: blur(1.2px) saturate(1.12);
 }
 
-.solution-flow .solution-flow__tonigma-logo::after,
 .solution-flow__capsule::after {
-  inset: -9%;
+  inset: 0;
   z-index: 3;
   background:
     conic-gradient(
@@ -784,10 +789,6 @@ code {
     min-width: 300px;
   }
 
-  .solution-flow .solution-flow__tonigma-logo {
-    width: 34%;
-  }
-
   .ethereum-orbit-section {
     min-height: auto;
     grid-template-columns: minmax(0, 1fr);
@@ -859,10 +860,6 @@ code {
   .solution-flow {
     width: min(82vw, 360px);
     min-width: 260px;
-  }
-
-  .solution-flow .solution-flow__tonigma-logo {
-    width: 35%;
   }
 
   .tonigma-network-logo {
