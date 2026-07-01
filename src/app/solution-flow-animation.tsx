@@ -15,6 +15,28 @@ type FlowPath = {
   speed: number;
 };
 
+type ArrowRender = {
+  body: import("three").Mesh<
+    import("three").ExtrudeGeometry,
+    import("three").MeshPhysicalMaterial
+  >;
+  face: import("three").Mesh<
+    import("three").ShapeGeometry,
+    import("three").MeshBasicMaterial
+  >;
+  glow: import("three").Mesh<
+    import("three").ShapeGeometry,
+    import("three").MeshBasicMaterial
+  >;
+  group: import("three").Group;
+  offset: number;
+  path: FlowPath;
+  trail: import("three").Mesh<
+    import("three").ShapeGeometry,
+    import("three").MeshBasicMaterial
+  >;
+};
+
 function clamp(value: number, min = 0, max = 1) {
   return Math.min(Math.max(value, min), max);
 }
@@ -221,36 +243,105 @@ export function SolutionFlowAnimation() {
           },
         ];
 
-        const arrowMaterial = (color: number) =>
-          track(
-            new THREE.MeshBasicMaterial({
-              blending: THREE.AdditiveBlending,
-              color,
-              depthWrite: false,
-              opacity: 0,
-              side: THREE.DoubleSide,
-              transparent: true,
-            }),
-          );
-
         const arrowShape = new THREE.Shape();
-        arrowShape.moveTo(0.11, 0);
-        arrowShape.lineTo(-0.035, 0.075);
-        arrowShape.lineTo(-0.012, 0.028);
-        arrowShape.lineTo(-0.11, 0.028);
-        arrowShape.lineTo(-0.11, -0.028);
-        arrowShape.lineTo(-0.012, -0.028);
-        arrowShape.lineTo(-0.035, -0.075);
-        arrowShape.lineTo(0.11, 0);
+        arrowShape.moveTo(0.21, 0);
+        arrowShape.lineTo(0.02, 0.13);
+        arrowShape.lineTo(0.045, 0.052);
+        arrowShape.lineTo(-0.21, 0.052);
+        arrowShape.lineTo(-0.21, -0.052);
+        arrowShape.lineTo(0.045, -0.052);
+        arrowShape.lineTo(0.02, -0.13);
+        arrowShape.lineTo(0.21, 0);
 
-        const arrowGeometry = track(new THREE.ShapeGeometry(arrowShape));
-        const arrows = flowPaths.flatMap((path) =>
+        const trailShape = new THREE.Shape();
+        trailShape.moveTo(0.02, 0.078);
+        trailShape.lineTo(-0.36, 0.026);
+        trailShape.lineTo(-0.36, -0.026);
+        trailShape.lineTo(0.02, -0.078);
+        trailShape.lineTo(0.02, 0.078);
+
+        const arrowGeometry = track(
+          new THREE.ExtrudeGeometry(arrowShape, {
+            bevelEnabled: true,
+            bevelSegments: 4,
+            bevelSize: 0.018,
+            bevelThickness: 0.018,
+            depth: 0.09,
+          }),
+        );
+        arrowGeometry.center();
+
+        const arrowFaceGeometry = track(new THREE.ShapeGeometry(arrowShape));
+        const arrowGlowGeometry = track(new THREE.ShapeGeometry(arrowShape));
+        const arrowTrailGeometry = track(new THREE.ShapeGeometry(trailShape));
+
+        const arrows: ArrowRender[] = flowPaths.flatMap((path) =>
           path.offsets.map((offset) => {
-            const mesh = new THREE.Mesh(arrowGeometry, arrowMaterial(path.color));
-            mesh.scale.setScalar(0.88);
-            root.add(mesh);
+            const group = new THREE.Group();
+            const bodyMaterial = track(
+              new THREE.MeshPhysicalMaterial({
+                clearcoat: 1,
+                clearcoatRoughness: 0.08,
+                color: path.color,
+                emissive: path.color,
+                emissiveIntensity: 0.2,
+                metalness: 0.12,
+                opacity: 0,
+                roughness: 0.2,
+                transparent: true,
+              }),
+            );
+            const faceMaterial = track(
+              new THREE.MeshBasicMaterial({
+                blending: THREE.AdditiveBlending,
+                color: 0xffffff,
+                depthWrite: false,
+                opacity: 0,
+                transparent: true,
+              }),
+            );
+            const glowMaterial = track(
+              new THREE.MeshBasicMaterial({
+                blending: THREE.AdditiveBlending,
+                color: path.color,
+                depthWrite: false,
+                opacity: 0,
+                side: THREE.DoubleSide,
+                transparent: true,
+              }),
+            );
+            const trailMaterial = track(
+              new THREE.MeshBasicMaterial({
+                blending: THREE.AdditiveBlending,
+                color: path.color,
+                depthWrite: false,
+                opacity: 0,
+                side: THREE.DoubleSide,
+                transparent: true,
+              }),
+            );
 
-            return { mesh, offset, path };
+            const glow = new THREE.Mesh(arrowGlowGeometry, glowMaterial);
+            glow.position.z = -0.06;
+            glow.scale.set(1.45, 1.45, 1);
+            group.add(glow);
+
+            const trail = new THREE.Mesh(arrowTrailGeometry, trailMaterial);
+            trail.position.set(-0.16, 0, -0.045);
+            group.add(trail);
+
+            const body = new THREE.Mesh(arrowGeometry, bodyMaterial);
+            group.add(body);
+
+            const face = new THREE.Mesh(arrowFaceGeometry, faceMaterial);
+            face.position.set(-0.025, 0.026, 0.06);
+            face.scale.set(0.48, 0.18, 1);
+            group.add(face);
+
+            group.scale.setScalar(1.16);
+            root.add(group);
+
+            return { body, face, glow, group, offset, path, trail };
           }),
         );
 
@@ -288,15 +379,21 @@ export function SolutionFlowAnimation() {
           updateEthereumDiamond(time);
           userNode.scale.setScalar(userBaseScale + pulse * 0.018);
 
-          arrows.forEach(({ mesh, offset, path }) => {
+          arrows.forEach(({ body, face, glow, group, offset, path, trail }) => {
             const progress = (time * path.speed + offset) % 1;
+            const travelProgress = 0.3 + progress * 0.4;
             const opacity = fadeAtEnds(progress);
-            const position = path.curve.getPoint(progress);
-            const tangent = path.curve.getTangent(progress);
+            const position = path.curve.getPoint(travelProgress);
+            const tangent = path.curve.getTangent(travelProgress);
+            const arrowPulse = 1 + opacity * 0.16;
 
-            mesh.position.set(position.x, position.y, position.z + 0.16);
-            mesh.rotation.z = Math.atan2(tangent.y, tangent.x);
-            mesh.material.opacity = 0.78 * opacity;
+            group.position.set(position.x, position.y, position.z + 0.18);
+            group.rotation.z = Math.atan2(tangent.y, tangent.x);
+            group.scale.setScalar(1.04 + arrowPulse * 0.16);
+            body.material.opacity = 0.94 * opacity;
+            face.material.opacity = 0.34 * opacity;
+            glow.material.opacity = 0.22 * opacity;
+            trail.material.opacity = 0.18 * opacity;
           });
 
           renderer.render(scene, camera);
