@@ -257,9 +257,10 @@ export function SolutionFlowAnimation() {
                 float halo = exp(-edgeDistance * edgeDistance * 2.35);
                 float outerFade = 1.0 - smoothstep(0.82, 1.0, edgeDistance);
                 float tailFade = smoothstep(0.0, 0.18, vTrailProgress);
+                float headCapFade = 1.0 - smoothstep(0.93, 1.0, vTrailProgress);
                 float bodyEnergy = pow(vTrailProgress, 1.34);
                 float headEnergy = smoothstep(0.78, 1.0, vTrailProgress);
-                float emission = tailFade * outerFade * (bodyEnergy * (halo * 0.52 + core * 0.62) + headEnergy * (halo * 0.34 + core * 0.48));
+                float emission = tailFade * outerFade * headCapFade * (bodyEnergy * (halo * 0.52 + core * 0.62) + headEnergy * (halo * 0.34 + core * 0.48));
                 float alpha = uOpacity * emission;
                 vec3 color = mix(uColor, vec3(1.0), core * 0.62 + headEnergy * 0.22);
 
@@ -447,6 +448,46 @@ export function SolutionFlowAnimation() {
         emitterGlow.renderOrder = 10;
         root.add(emitterGlow);
 
+        const headCapMaterial = track(
+          new THREE.ShaderMaterial({
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+            toneMapped: false,
+            transparent: true,
+            uniforms: {
+              uColor: { value: new THREE.Color(0xcff8ff) },
+              uOpacity: { value: 0.46 },
+            },
+            vertexShader: `
+              varying vec2 vUv;
+
+              void main() {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+              }
+            `,
+            fragmentShader: `
+              uniform vec3 uColor;
+              uniform float uOpacity;
+              varying vec2 vUv;
+
+              void main() {
+                vec2 centeredUv = vUv * 2.0 - 1.0;
+                float radius = length(centeredUv);
+                float core = exp(-radius * radius * 5.4);
+                float halo = exp(-radius * radius * 1.75);
+                float alpha = uOpacity * (core * 0.58 + halo * 0.24) * (1.0 - smoothstep(0.78, 1.0, radius));
+
+                gl_FragColor = vec4(mix(uColor, vec3(1.0), core * 0.5), alpha);
+              }
+            `,
+          }),
+        );
+        const headCap = new THREE.Mesh(track(new THREE.PlaneGeometry(1, 1)), headCapMaterial);
+        headCap.renderOrder = 11;
+        root.add(headCap);
+
         const clock = new THREE.Clock();
         const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
         const ethereumSpinSpeed = 0.37;
@@ -509,6 +550,9 @@ export function SolutionFlowAnimation() {
           );
           emitterGlowMaterial.uniforms.uOpacity.value = 0.28 + trailIntensity * 0.12;
           emitterGlowMaterial.uniforms.uTime.value = time;
+          headCap.position.copy(lightEmitter.position);
+          headCap.scale.setScalar(0.34 + trailIntensity * 0.025);
+          headCapMaterial.uniforms.uOpacity.value = 0.36 + trailIntensity * 0.1;
 
           renderer.render(scene, camera);
           animationFrame = requestAnimationFrame(render);
