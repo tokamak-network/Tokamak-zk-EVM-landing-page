@@ -488,7 +488,8 @@ export function SolutionFlowAnimation() {
         headCap.renderOrder = 11;
         root.add(headCap);
 
-        const clock = new THREE.Clock();
+        const timer = track(new THREE.Timer());
+        timer.connect(document);
         const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
         const ethereumSpinSpeed = 0.37;
 
@@ -511,8 +512,9 @@ export function SolutionFlowAnimation() {
         resizeObserver.observe(canvas);
         resize();
 
-        const render = () => {
-          const elapsed = clock.getElapsedTime();
+        const render = (timestamp?: number) => {
+          timer.update(timestamp);
+          const elapsed = timer.getElapsed();
           const time = reducedMotion.matches ? 0.35 : elapsed;
           const pulse = Math.sin(time * 2.2) * 0.5 + 0.5;
 
