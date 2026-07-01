@@ -91,19 +91,6 @@ export function SolutionFlowAnimation() {
           group.position.copy(userPosition);
           group.scale.setScalar(userBaseScale);
 
-          const badgeMaterial = track(
-            new THREE.MeshPhysicalMaterial({
-              clearcoat: 0.42,
-              clearcoatRoughness: 0.26,
-              color: "#12324c",
-              emissive: "#06192a",
-              emissiveIntensity: 0.08,
-              metalness: 0.08,
-              roughness: 0.42,
-              transparent: true,
-              opacity: 0.78,
-            }),
-          );
           const avatarMaterial = track(
             new THREE.MeshPhysicalMaterial({
               clearcoat: 1,
@@ -124,29 +111,6 @@ export function SolutionFlowAnimation() {
               transparent: true,
             }),
           );
-          const badgeRimMaterial = track(
-            new THREE.MeshPhysicalMaterial({
-              clearcoat: 1,
-              clearcoatRoughness: 0.04,
-              color: "#effdff",
-              depthWrite: false,
-              ior: 1.42,
-              metalness: 0,
-              opacity: 0.46,
-              roughness: 0.04,
-              thickness: 0.2,
-              transmission: 0.55,
-              transparent: true,
-            }),
-          );
-          const badgeRimShadowMaterial = track(
-            new THREE.MeshBasicMaterial({
-              color: 0x071923,
-              depthWrite: false,
-              opacity: 0.24,
-              transparent: true,
-            }),
-          );
           const avatarShadeMaterial = track(
             new THREE.MeshBasicMaterial({
               blending: THREE.MultiplyBlending,
@@ -157,28 +121,6 @@ export function SolutionFlowAnimation() {
               transparent: true,
             }),
           );
-          const badge = new THREE.Mesh(
-            track(new THREE.CylinderGeometry(0.62, 0.62, 0.08, 96)),
-            badgeMaterial,
-          );
-          badge.rotation.x = Math.PI / 2;
-          badge.position.z = -0.08;
-          group.add(badge);
-
-          const badgeRimShadow = new THREE.Mesh(
-            track(new THREE.TorusGeometry(0.622, 0.05, 24, 128)),
-            badgeRimShadowMaterial,
-          );
-          badgeRimShadow.position.set(0.014, -0.014, -0.06);
-          group.add(badgeRimShadow);
-
-          const badgeRim = new THREE.Mesh(
-            track(new THREE.TorusGeometry(0.62, 0.045, 32, 160)),
-            badgeRimMaterial,
-          );
-          badgeRim.position.z = -0.025;
-          group.add(badgeRim);
-
           const head = new THREE.Mesh(
             track(new THREE.SphereGeometry(0.2, 64, 32)),
             avatarMaterial,
