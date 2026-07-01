@@ -380,12 +380,10 @@ main {
     drop-shadow(0 0 34px rgba(255, 255, 255, 0.06));
 }
 
-.solution-flow .solution-flow__tonigma-logo {
+.solution-flow .solution-flow__tonigma-logo,
+.solution-flow__capsule {
   position: absolute;
-  left: 85.406%;
-  top: 49.255%;
   z-index: 2;
-  width: 32%;
   min-width: 0;
   margin: 0;
   border-radius: 999px;
@@ -393,15 +391,41 @@ main {
   transform: translate(-50%, -50%);
 }
 
+.solution-flow .solution-flow__tonigma-logo {
+  left: 85.406%;
+  top: 49.255%;
+  width: 32%;
+}
+
+.solution-flow__capsule {
+  aspect-ratio: 1;
+  pointer-events: none;
+}
+
+.solution-flow__capsule--ethereum {
+  left: 32.3%;
+  top: 15.4%;
+  width: 25%;
+}
+
+.solution-flow__capsule--user {
+  left: 32.3%;
+  top: 85.4%;
+  width: 22%;
+}
+
 .solution-flow .solution-flow__tonigma-logo::before,
-.solution-flow .solution-flow__tonigma-logo::after {
+.solution-flow .solution-flow__tonigma-logo::after,
+.solution-flow__capsule::before,
+.solution-flow__capsule::after {
   position: absolute;
   border-radius: 999px;
   content: "";
   pointer-events: none;
 }
 
-.solution-flow .solution-flow__tonigma-logo::before {
+.solution-flow .solution-flow__tonigma-logo::before,
+.solution-flow__capsule::before {
   inset: -9%;
   z-index: 0;
   background:
@@ -417,7 +441,8 @@ main {
   backdrop-filter: blur(1.2px) saturate(1.12);
 }
 
-.solution-flow .solution-flow__tonigma-logo::after {
+.solution-flow .solution-flow__tonigma-logo::after,
+.solution-flow__capsule::after {
   inset: -9%;
   z-index: 3;
   background:

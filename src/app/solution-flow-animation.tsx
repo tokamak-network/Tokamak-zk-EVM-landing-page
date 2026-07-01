@@ -334,6 +334,8 @@ export function SolutionFlowAnimation() {
   return (
     <div className="solution-flow" aria-hidden="true">
       <canvas ref={canvasRef} className="solution-flow__canvas" />
+      <span className="solution-flow__capsule solution-flow__capsule--ethereum" />
+      <span className="solution-flow__capsule solution-flow__capsule--user" />
       <TonigmaNetworkLogo
         className="solution-flow__tonigma-logo"
         playback="final-flash"
