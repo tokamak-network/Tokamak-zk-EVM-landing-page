@@ -177,85 +177,275 @@ export function SolutionFlowAnimation() {
         const userNode = createUserNode();
         root.add(ethereumViewGroup, userNode);
 
-        const lightTrailCanvas = document.createElement("canvas");
-        lightTrailCanvas.width = 256;
-        lightTrailCanvas.height = 80;
-        const lightTrailContext = lightTrailCanvas.getContext("2d");
+        const trailSegments = 96;
+        const trailArc = 3.55;
 
-        if (lightTrailContext) {
-          const horizontalGlow = lightTrailContext.createLinearGradient(
-            0,
-            0,
-            lightTrailCanvas.width,
-            0,
-          );
-          horizontalGlow.addColorStop(0, "rgba(255,255,255,0)");
-          horizontalGlow.addColorStop(0.24, "rgba(150,232,255,0.18)");
-          horizontalGlow.addColorStop(0.5, "rgba(255,255,255,1)");
-          horizontalGlow.addColorStop(0.76, "rgba(150,232,255,0.18)");
-          horizontalGlow.addColorStop(1, "rgba(255,255,255,0)");
+        const createOrbitRibbonGeometry = () => {
+          const geometry = track(new THREE.BufferGeometry());
+          const positions = new Float32Array((trailSegments + 1) * 2 * 3);
+          const trailProgress = new Float32Array((trailSegments + 1) * 2);
+          const indices: number[] = [];
 
-          const verticalGlow = lightTrailContext.createRadialGradient(
-            lightTrailCanvas.width / 2,
-            lightTrailCanvas.height / 2,
-            0,
-            lightTrailCanvas.width / 2,
-            lightTrailCanvas.height / 2,
-            lightTrailCanvas.height / 2,
-          );
-          verticalGlow.addColorStop(0, "rgba(255,255,255,1)");
-          verticalGlow.addColorStop(0.54, "rgba(190,246,255,0.74)");
-          verticalGlow.addColorStop(1, "rgba(255,255,255,0)");
+          for (let index = 0; index <= trailSegments; index += 1) {
+            const progress = index / trailSegments;
+            const left = index * 2;
+            const right = left + 1;
 
-          lightTrailContext.fillStyle = horizontalGlow;
-          lightTrailContext.fillRect(
-            0,
-            0,
-            lightTrailCanvas.width,
-            lightTrailCanvas.height,
-          );
-          lightTrailContext.globalCompositeOperation = "destination-in";
-          lightTrailContext.fillStyle = verticalGlow;
-          lightTrailContext.fillRect(
-            0,
-            0,
-            lightTrailCanvas.width,
-            lightTrailCanvas.height,
-          );
-        }
+            trailProgress[left] = progress;
+            trailProgress[right] = progress;
 
-        const lightTrailTexture = track(new THREE.CanvasTexture(lightTrailCanvas));
-        lightTrailTexture.colorSpace = THREE.SRGBColorSpace;
-        const lightTrailGeometry = track(new THREE.PlaneGeometry(1, 1));
-        const lightTrailGlowMaterial = track(
-          new THREE.MeshBasicMaterial({
+            if (index < trailSegments) {
+              const nextLeft = left + 2;
+              const nextRight = left + 3;
+
+              indices.push(left, right, nextRight, left, nextRight, nextLeft);
+            }
+          }
+
+          geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+          geometry.setAttribute("trailProgress", new THREE.BufferAttribute(trailProgress, 1));
+          geometry.setIndex(indices);
+
+          return geometry;
+        };
+
+        const createOrbitRibbonMaterial = ({
+          color,
+          opacity,
+          power,
+        }: {
+          color: number;
+          opacity: number;
+          power: number;
+        }) =>
+          track(
+            new THREE.ShaderMaterial({
+              blending: THREE.AdditiveBlending,
+              depthWrite: false,
+              side: THREE.DoubleSide,
+              toneMapped: false,
+              transparent: true,
+              uniforms: {
+                uColor: { value: new THREE.Color(color) },
+                uOpacity: { value: opacity },
+                uPower: { value: power },
+              },
+              vertexShader: `
+                attribute float trailProgress;
+                varying float vTrailProgress;
+
+                void main() {
+                  vTrailProgress = trailProgress;
+                  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+              `,
+              fragmentShader: `
+                uniform vec3 uColor;
+                uniform float uOpacity;
+                uniform float uPower;
+                varying float vTrailProgress;
+
+                void main() {
+                  float head = smoothstep(0.72, 1.0, vTrailProgress);
+                  float body = pow(vTrailProgress, uPower);
+                  float tailFade = smoothstep(0.0, 0.18, vTrailProgress);
+                  float alpha = uOpacity * tailFade * (body * 0.54 + head * 0.72);
+                  vec3 color = mix(uColor, vec3(1.0), head * 0.55);
+
+                  if (alpha < 0.01) {
+                    discard;
+                  }
+
+                  gl_FragColor = vec4(color, alpha);
+                }
+              `,
+            }),
+          );
+
+        const updateOrbitRibbon = (
+          geometry: InstanceType<typeof THREE.BufferGeometry>,
+          headAngle: number,
+          width: number,
+          z: number,
+        ) => {
+          const positionAttribute = geometry.getAttribute(
+            "position",
+          ) as InstanceType<typeof THREE.BufferAttribute>;
+
+          for (let index = 0; index <= trailSegments; index += 1) {
+            const progress = index / trailSegments;
+            const angle = headAngle + trailArc * (1 - progress);
+            const radius = triangleRadius;
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+            const tangentX = Math.sin(angle);
+            const tangentY = -Math.cos(angle);
+            const normalX = Math.cos(angle);
+            const normalY = Math.sin(angle);
+            const headWeight = Math.pow(progress, 1.7);
+            const localWidth = width * (0.28 + headWeight * 0.72);
+            const leftIndex = index * 2;
+            const rightIndex = leftIndex + 1;
+
+            positionAttribute.setXYZ(
+              leftIndex,
+              x + normalX * localWidth * 0.5 + tangentX * localWidth * 0.08,
+              y + normalY * localWidth * 0.5 + tangentY * localWidth * 0.08,
+              z,
+            );
+            positionAttribute.setXYZ(
+              rightIndex,
+              x - normalX * localWidth * 0.5 - tangentX * localWidth * 0.08,
+              y - normalY * localWidth * 0.5 - tangentY * localWidth * 0.08,
+              z,
+            );
+          }
+
+          positionAttribute.needsUpdate = true;
+          geometry.computeBoundingSphere();
+        };
+
+        const glowRibbonGeometry = createOrbitRibbonGeometry();
+        const coreRibbonGeometry = createOrbitRibbonGeometry();
+        const glowRibbonMaterial = createOrbitRibbonMaterial({
+          color: 0x37d7ff,
+          opacity: 0.74,
+          power: 1.85,
+        });
+        const coreRibbonMaterial = createOrbitRibbonMaterial({
+          color: 0xeafcff,
+          opacity: 0.98,
+          power: 2.45,
+        });
+        const glowRibbon = new THREE.Mesh(glowRibbonGeometry, glowRibbonMaterial);
+        const coreRibbon = new THREE.Mesh(coreRibbonGeometry, coreRibbonMaterial);
+        glowRibbon.renderOrder = 8;
+        coreRibbon.renderOrder = 9;
+        root.add(glowRibbon, coreRibbon);
+
+        const lightEmitter = new THREE.PointLight(0xbff6ff, 3.4, 1.55, 2.1);
+        lightEmitter.position.set(0, triangleRadius, 0.5);
+        root.add(lightEmitter);
+
+        const emitterGlowGeometry = track(new THREE.SphereGeometry(1, 48, 24));
+        const emitterGlowMaterial = track(
+          new THREE.ShaderMaterial({
             blending: THREE.AdditiveBlending,
-            color: "#4acfff",
+            depthTest: true,
             depthWrite: false,
-            map: lightTrailTexture,
-            opacity: 0.72,
             side: THREE.DoubleSide,
             toneMapped: false,
             transparent: true,
+            uniforms: {
+              uCameraLocalPosition: { value: new THREE.Vector3(0, 0, 4) },
+              uColor: { value: new THREE.Color(0xf4fbff) },
+              uOpacity: { value: 0.62 },
+              uTime: { value: 0 },
+            },
+            vertexShader: `
+              varying vec3 vLocalPosition;
+
+              void main() {
+                vLocalPosition = position;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+              }
+            `,
+            fragmentShader: `
+              uniform vec3 uCameraLocalPosition;
+              uniform vec3 uColor;
+              uniform float uOpacity;
+              uniform float uTime;
+              varying vec3 vLocalPosition;
+
+              float hash(vec3 p) {
+                p = fract(p * 0.3183099 + vec3(0.11, 0.17, 0.23));
+                p *= 17.0;
+                return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+              }
+
+              float noise(vec3 p) {
+                vec3 i = floor(p);
+                vec3 f = fract(p);
+                f = f * f * (3.0 - 2.0 * f);
+
+                float n000 = hash(i + vec3(0.0, 0.0, 0.0));
+                float n100 = hash(i + vec3(1.0, 0.0, 0.0));
+                float n010 = hash(i + vec3(0.0, 1.0, 0.0));
+                float n110 = hash(i + vec3(1.0, 1.0, 0.0));
+                float n001 = hash(i + vec3(0.0, 0.0, 1.0));
+                float n101 = hash(i + vec3(1.0, 0.0, 1.0));
+                float n011 = hash(i + vec3(0.0, 1.0, 1.0));
+                float n111 = hash(i + vec3(1.0, 1.0, 1.0));
+
+                float nx00 = mix(n000, n100, f.x);
+                float nx10 = mix(n010, n110, f.x);
+                float nx01 = mix(n001, n101, f.x);
+                float nx11 = mix(n011, n111, f.x);
+                float nxy0 = mix(nx00, nx10, f.y);
+                float nxy1 = mix(nx01, nx11, f.y);
+
+                return mix(nxy0, nxy1, f.z);
+              }
+
+              vec2 intersectSphere(vec3 rayOrigin, vec3 rayDirection) {
+                float b = dot(rayOrigin, rayDirection);
+                float c = dot(rayOrigin, rayOrigin) - 1.0;
+                float h = b * b - c;
+
+                if (h < 0.0) {
+                  return vec2(1.0, -1.0);
+                }
+
+                h = sqrt(h);
+
+                return vec2(-b - h, -b + h);
+              }
+
+              void main() {
+                vec3 rayOrigin = uCameraLocalPosition;
+                vec3 rayDirection = normalize(vLocalPosition - rayOrigin);
+                vec2 hit = intersectSphere(rayOrigin, rayDirection);
+                float start = max(hit.x, 0.0);
+                float end = hit.y;
+
+                if (end <= start) {
+                  discard;
+                }
+
+                const int STEPS = 34;
+                float travel = end - start;
+                float stepSize = travel / float(STEPS);
+                float accumulatedDensity = 0.0;
+                float accumulatedCore = 0.0;
+
+                for (int i = 0; i < STEPS; i++) {
+                  float t = start + (float(i) + 0.5) * stepSize;
+                  vec3 p = rayOrigin + rayDirection * t;
+                  float radius = length(p);
+                  float centerDensity = exp(-radius * radius * 2.4);
+                  float atmosphericFalloff = 1.0 - smoothstep(0.54, 1.0, radius);
+                  float turbulence =
+                    noise(p * 4.8 + vec3(0.0, uTime * 0.28, uTime * 0.12)) * 0.38 +
+                    noise(p * 10.0 - vec3(uTime * 0.18, 0.0, uTime * 0.2)) * 0.16;
+                  float density =
+                    centerDensity *
+                    atmosphericFalloff *
+                    (0.9 + turbulence * 0.34);
+
+                  accumulatedDensity += density * stepSize;
+                  accumulatedCore += centerDensity * atmosphericFalloff * stepSize;
+                }
+
+                float alpha = 1.0 - exp(-accumulatedDensity * uOpacity * 1.92);
+                vec3 color = uColor * (1.25 + accumulatedCore * 3.1);
+                gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.95));
+              }
+            `,
           }),
         );
-        const lightTrailCoreMaterial = track(
-          new THREE.MeshBasicMaterial({
-            blending: THREE.AdditiveBlending,
-            color: "#f4fdff",
-            depthWrite: false,
-            map: lightTrailTexture,
-            opacity: 0.98,
-            side: THREE.DoubleSide,
-            toneMapped: false,
-            transparent: true,
-          }),
-        );
-        const lightTrailGlow = new THREE.Mesh(lightTrailGeometry, lightTrailGlowMaterial);
-        const lightTrailCore = new THREE.Mesh(lightTrailGeometry, lightTrailCoreMaterial);
-        lightTrailGlow.renderOrder = 8;
-        lightTrailCore.renderOrder = 9;
-        root.add(lightTrailGlow, lightTrailCore);
+        const emitterGlow = new THREE.Mesh(emitterGlowGeometry, emitterGlowMaterial);
+        emitterGlow.renderOrder = 10;
+        root.add(emitterGlow);
 
         const clock = new THREE.Clock();
         const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -294,17 +484,22 @@ export function SolutionFlowAnimation() {
           const orbitAngle = Math.PI / 2 - time * 1.15;
           const orbitX = Math.cos(orbitAngle) * triangleRadius;
           const orbitY = Math.sin(orbitAngle) * triangleRadius;
-          const tangentAngle = orbitAngle - Math.PI / 2;
-          const trailIntensity = 0.86 + Math.sin(time * 3.4) * 0.08;
+          const trailIntensity = 0.88 + Math.sin(time * 3.4) * 0.08;
 
-          lightTrailGlow.position.set(orbitX, orbitY, 0.26);
-          lightTrailCore.position.copy(lightTrailGlow.position);
-          lightTrailGlow.rotation.z = tangentAngle;
-          lightTrailCore.rotation.z = tangentAngle;
-          lightTrailGlow.scale.set(1.04, 0.34, 1);
-          lightTrailCore.scale.set(0.74, 0.13, 1);
-          lightTrailGlowMaterial.opacity = trailIntensity * 0.86;
-          lightTrailCoreMaterial.opacity = trailIntensity;
+          updateOrbitRibbon(glowRibbonGeometry, orbitAngle, 0.28, 0.24);
+          updateOrbitRibbon(coreRibbonGeometry, orbitAngle, 0.1, 0.28);
+          glowRibbonMaterial.uniforms.uOpacity.value = trailIntensity * 0.74;
+          coreRibbonMaterial.uniforms.uOpacity.value = trailIntensity;
+          lightEmitter.position.set(orbitX, orbitY, 0.48);
+          lightEmitter.intensity = 3.1 + trailIntensity * 1.2;
+          emitterGlow.position.copy(lightEmitter.position);
+          emitterGlow.scale.setScalar(0.36 + trailIntensity * 0.08);
+          emitterGlow.updateWorldMatrix(true, false);
+          emitterGlowMaterial.uniforms.uCameraLocalPosition.value.copy(
+            emitterGlow.worldToLocal(camera.position.clone()),
+          );
+          emitterGlowMaterial.uniforms.uOpacity.value = 0.46 + trailIntensity * 0.22;
+          emitterGlowMaterial.uniforms.uTime.value = time;
 
           renderer.render(scene, camera);
           animationFrame = requestAnimationFrame(render);
