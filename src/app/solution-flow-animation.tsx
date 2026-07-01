@@ -8,21 +8,6 @@ type Disposable = {
   dispose: () => void;
 };
 
-type FlowPath = {
-  curve: import("three").QuadraticBezierCurve3;
-  color: number;
-  offsets: number[];
-  speed: number;
-};
-
-function clamp(value: number, min = 0, max = 1) {
-  return Math.min(Math.max(value, min), max);
-}
-
-function fadeAtEnds(progress: number) {
-  return clamp(Math.min(progress / 0.12, (1 - progress) / 0.12));
-}
-
 export function SolutionFlowAnimation() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [showFallback, setShowFallback] = useState(false);
@@ -188,164 +173,6 @@ export function SolutionFlowAnimation() {
         const userNode = createUserNode();
         root.add(ethereumViewGroup, userNode);
 
-        const flowPaths: FlowPath[] = [
-          {
-            color: 0x60d7ff,
-            curve: new THREE.QuadraticBezierCurve3(
-              ethereumPosition,
-              new THREE.Vector3(0.68, 1.28, 0.12),
-              tonigmaPosition,
-            ),
-            offsets: [0.08],
-            speed: 0.16,
-          },
-          {
-            color: 0x8adfff,
-            curve: new THREE.QuadraticBezierCurve3(
-              tonigmaPosition,
-              new THREE.Vector3(1.08, -0.94, 0.08),
-              userPosition,
-            ),
-            offsets: [0.42],
-            speed: 0.16,
-          },
-          {
-            color: 0xd9f2ff,
-            curve: new THREE.QuadraticBezierCurve3(
-              userPosition,
-              new THREE.Vector3(-0.78, -0.1, 0.04),
-              ethereumPosition,
-            ),
-            offsets: [0.76],
-            speed: 0.16,
-          },
-        ];
-
-        const createLightArrowGeometry = () => {
-          const geometry = track(new THREE.BufferGeometry());
-          const positions: number[] = [];
-          const progressValues: number[] = [];
-          const edgeValues: number[] = [];
-          const indices: number[] = [];
-          const segments = 34;
-          const start = new THREE.Vector2(-0.48, -0.12);
-          const control = new THREE.Vector2(-0.04, 0.27);
-          const end = new THREE.Vector2(0.48, 0.06);
-
-          const pointAt = (t: number) => {
-            const oneMinusT = 1 - t;
-
-            return new THREE.Vector2(
-              oneMinusT * oneMinusT * start.x + 2 * oneMinusT * t * control.x + t * t * end.x,
-              oneMinusT * oneMinusT * start.y + 2 * oneMinusT * t * control.y + t * t * end.y,
-            );
-          };
-          const tangentAt = (t: number) =>
-            new THREE.Vector2(
-              2 * (1 - t) * (control.x - start.x) + 2 * t * (end.x - control.x),
-              2 * (1 - t) * (control.y - start.y) + 2 * t * (end.y - control.y),
-            ).normalize();
-
-          for (let index = 0; index <= segments; index += 1) {
-            const progress = index / segments;
-            const point = pointAt(progress);
-            const tangent = tangentAt(progress);
-            const normal = new THREE.Vector2(-tangent.y, tangent.x);
-            const bodyWidth = 0.025 + progress * 0.075;
-            const headLift = progress > 0.72 ? (progress - 0.72) / 0.28 : 0;
-            const width = bodyWidth + headLift * 0.08;
-
-            [-1, 0, 1].forEach((side) => {
-              positions.push(point.x + normal.x * width * side, point.y + normal.y * width * side, 0);
-              progressValues.push(progress);
-              edgeValues.push(Math.abs(side));
-            });
-          }
-
-          const endPoint = pointAt(1);
-          const endTangent = tangentAt(1);
-          const tip = endPoint.clone().add(endTangent.multiplyScalar(0.08));
-          positions.push(tip.x, tip.y, 0);
-          progressValues.push(1);
-          edgeValues.push(0);
-          const tipIndex = positions.length / 3 - 1;
-
-          for (let index = 0; index < segments; index += 1) {
-            const left = index * 3;
-            const center = left + 1;
-            const right = left + 2;
-            const nextLeft = left + 3;
-            const nextCenter = left + 4;
-            const nextRight = left + 5;
-            indices.push(left, center, nextCenter, left, nextCenter, nextLeft);
-            indices.push(center, right, nextRight, center, nextRight, nextCenter);
-          }
-
-          indices.push(segments * 3, segments * 3 + 2, tipIndex);
-
-          geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-          geometry.setAttribute("arrowProgress", new THREE.Float32BufferAttribute(progressValues, 1));
-          geometry.setAttribute("arrowEdge", new THREE.Float32BufferAttribute(edgeValues, 1));
-          geometry.setIndex(indices);
-          geometry.computeBoundingSphere();
-
-          return geometry;
-        };
-
-        const arrowGeometry = createLightArrowGeometry();
-        const arrows = flowPaths.flatMap((path) =>
-          path.offsets.map((offset) => {
-            const material = track(
-              new THREE.ShaderMaterial({
-                blending: THREE.AdditiveBlending,
-                depthWrite: false,
-                fragmentShader: `
-                  varying float vArrowEdge;
-                  varying float vArrowProgress;
-                  uniform vec3 uColor;
-                  uniform float uOpacity;
-
-                  void main() {
-                    float core = 1.0 - smoothstep(0.0, 1.0, vArrowEdge);
-                    float startFade = smoothstep(0.0, 0.16, vArrowProgress);
-                    float endFade = 1.0 - smoothstep(0.9, 1.0, vArrowProgress);
-                    float alpha = uOpacity * startFade * endFade * (0.24 + core * 0.76);
-                    vec3 color = mix(uColor, vec3(0.9, 0.99, 1.0), core * 0.62);
-
-                    if (alpha < 0.01) {
-                      discard;
-                    }
-
-                    gl_FragColor = vec4(color, alpha);
-                  }
-                `,
-                side: THREE.DoubleSide,
-                transparent: true,
-                uniforms: {
-                  uColor: { value: new THREE.Color(path.color) },
-                  uOpacity: { value: 0 },
-                },
-                vertexShader: `
-                  attribute float arrowEdge;
-                  attribute float arrowProgress;
-                  varying float vArrowEdge;
-                  varying float vArrowProgress;
-
-                  void main() {
-                    vArrowEdge = arrowEdge;
-                    vArrowProgress = arrowProgress;
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                  }
-                `,
-              }),
-            );
-            const mesh = new THREE.Mesh(arrowGeometry, material);
-            root.add(mesh);
-
-            return { mesh, offset, path };
-          }),
-        );
-
         const clock = new THREE.Clock();
         const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
         const ethereumSpinSpeed = 0.37;
@@ -379,19 +206,6 @@ export function SolutionFlowAnimation() {
           }
           updateEthereumDiamond(time);
           userNode.scale.setScalar(userBaseScale + pulse * 0.018);
-
-          arrows.forEach(({ mesh, offset, path }) => {
-            const progress = (time * path.speed + offset) % 1;
-            const travelProgress = 0.3 + progress * 0.4;
-            const opacity = fadeAtEnds(progress);
-            const position = path.curve.getPoint(travelProgress);
-            const tangent = path.curve.getTangent(travelProgress);
-
-            mesh.position.set(position.x, position.y, position.z + 0.18);
-            mesh.rotation.z = Math.atan2(tangent.y, tangent.x);
-            mesh.scale.setScalar(1 + opacity * 0.08);
-            mesh.material.uniforms.uOpacity.value = 0.94 * opacity;
-          });
 
           renderer.render(scene, camera);
           animationFrame = requestAnimationFrame(render);
