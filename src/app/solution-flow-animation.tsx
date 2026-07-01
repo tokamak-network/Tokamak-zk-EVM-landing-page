@@ -115,21 +115,36 @@ export function SolutionFlowAnimation() {
               roughness: 0.24,
             }),
           );
-          const rimMaterial = track(
-            new THREE.MeshBasicMaterial({
-              blending: THREE.AdditiveBlending,
-              color: 0xc9f3ff,
-              depthWrite: false,
-              opacity: 0.28,
-              transparent: true,
-            }),
-          );
           const reflectionMaterial = track(
             new THREE.MeshBasicMaterial({
               blending: THREE.AdditiveBlending,
               color: 0xffffff,
               depthWrite: false,
               opacity: 0.2,
+              transparent: true,
+            }),
+          );
+          const badgeRimMaterial = track(
+            new THREE.MeshPhysicalMaterial({
+              clearcoat: 1,
+              clearcoatRoughness: 0.02,
+              color: "#bcefff",
+              depthWrite: false,
+              ior: 1.42,
+              metalness: 0,
+              opacity: 0.36,
+              roughness: 0.03,
+              thickness: 0.08,
+              transmission: 0.3,
+              transparent: true,
+            }),
+          );
+          const badgeRimLightMaterial = track(
+            new THREE.MeshBasicMaterial({
+              blending: THREE.AdditiveBlending,
+              color: 0xffffff,
+              depthWrite: false,
+              opacity: 0.24,
               transparent: true,
             }),
           );
@@ -152,11 +167,19 @@ export function SolutionFlowAnimation() {
           group.add(badge);
 
           const badgeRim = new THREE.Mesh(
-            track(new THREE.TorusGeometry(0.62, 0.024, 12, 128)),
-            rimMaterial,
+            track(new THREE.TorusGeometry(0.62, 0.042, 24, 128)),
+            badgeRimMaterial,
           );
           badgeRim.position.z = -0.03;
           group.add(badgeRim);
+
+          const badgeRimLight = new THREE.Mesh(
+            track(new THREE.TorusGeometry(0.62, 0.012, 12, 128)),
+            badgeRimLightMaterial,
+          );
+          badgeRimLight.position.set(-0.015, 0.02, 0.02);
+          badgeRimLight.scale.set(0.98, 0.98, 1);
+          group.add(badgeRimLight);
 
           const head = new THREE.Mesh(
             track(new THREE.SphereGeometry(0.2, 64, 32)),
@@ -165,14 +188,6 @@ export function SolutionFlowAnimation() {
           head.position.set(0, 0.18, 0.04);
           head.scale.set(0.98, 1.02, 0.82);
           group.add(head);
-
-          const headRim = new THREE.Mesh(
-            track(new THREE.SphereGeometry(0.21, 64, 32)),
-            rimMaterial,
-          );
-          headRim.position.copy(head.position);
-          headRim.scale.copy(head.scale);
-          group.add(headRim);
 
           const headReflection = new THREE.Mesh(
             track(new THREE.SphereGeometry(0.07, 32, 16)),
@@ -195,11 +210,6 @@ export function SolutionFlowAnimation() {
           torso.position.set(0, -0.27, 0.04);
           torso.scale.set(1.16, 0.56, 0.46);
           group.add(torso);
-
-          const torsoGlow = new THREE.Mesh(shoulderGeometry, rimMaterial);
-          torsoGlow.position.copy(torso.position);
-          torsoGlow.scale.set(1.22, 0.62, 0.5);
-          group.add(torsoGlow);
 
           const torsoShade = new THREE.Mesh(
             track(new THREE.SphereGeometry(0.42, 64, 32)),
